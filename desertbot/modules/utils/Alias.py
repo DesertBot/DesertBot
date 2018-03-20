@@ -9,14 +9,18 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand, admin
 from zope.interface import implementer
 
+import os
 import re
 from collections import OrderedDict
 from six import iteritems
 
 from bs4 import UnicodeDammit
+from ruamel.yaml import YAML
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
+
+yaml = YAML()
 
 
 @implementer(IPlugin, IModule)
@@ -27,8 +31,19 @@ class Alias(BotCommand):
     def onLoad(self):
         self.ownTriggers = ['alias']
 
-        self.data = self.bot.config.getWithDefault('module-alias', { 'aliases': {},
-                                                                     'help': {} })
+        # load aliases from data file
+        try:
+            path = os.path.join(self.bot.dataPath, 'alias.yaml')
+            with open(path, 'r') as file:
+                self.data = yaml.load(file)
+
+            if not self.data:
+                self.data = {'aliases': {},
+                             'help': {}}
+        except FileNotFoundError:
+            self.data = {'aliases': {},
+                             'help': {}}
+
         self.aliases = self.data['aliases']
         self.aliasHelp = self.data['help']
 
@@ -328,8 +343,9 @@ class Alias(BotCommand):
         self.aliasHelp[alias] = aliasHelp
 
     def _syncAliases(self):
-        self.bot.config['module-alias'] = self.data
-        self.bot.config.writeConfig()
+        path = os.path.join(self.bot.dataPath, 'alias.yaml')
+        with open(path, 'w') as file:
+            yaml.dump(self.data, file)
 
     def _aliasedMessage(self, message):
         if message.Command.lower() not in self.aliases:

@@ -5,7 +5,7 @@ A modular IRC bot with extensive aliasing capabilities, written in Python.
 
 Features
 --------
-* [Alias](desertbot/modules/admin/Alias.py) any of the following to create new commands on-the-fly, and then alias *those* aliases to create even more
+* [Alias](desertbot/modules/utils/Alias.py) any of the following to create new commands on-the-fly, and then alias *those* aliases to create even more
 * Use [Slurp](desertbot/modules/utils/Slurp.py) to extract data from HTML/XML
 * Use [Sub](desertbot/modules/utils/Sub.py) or [Chain](desertbot/modules/utils/Chain.py) to link multiple modules together
   * and use [Var](desertbot/modules/utils/Var.py) to store data for use within the same command (eg, a URL you want to slurp multiple times)
