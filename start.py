@@ -2,8 +2,8 @@
 import argparse
 import os
 
-from pymoronbot.config import Config, ConfigError
-from pymoronbot.factory import MoronBotFactory
+from desertbot.config import Config, ConfigError
+from desertbot.factory import DesertBotFactory
 
 
 if __name__ == '__main__':
@@ -19,4 +19,4 @@ if __name__ == '__main__':
     except ConfigError as e:
         print(e)
     else:
-        factory = MoronBotFactory(config)
+        factory = DesertBotFactory(config)

@@ -1,13 +1,13 @@
 # the bot's name
-nickname: PyMoronBot
-username: PyMoronBot
-realname: PyMoronBot
+nickname: DesertBot
+username: DesertBot
+realname: DesertBot
 
 # prefix for commands
 commandChar: .
 
 # where to find the bot's source
-source: https://github.com/TyranicMoron/PyMoronBot/
+source: https://github.com/DesertBot/DesertBot/
 
 # CTCP FINGER response
 finger: GET YOUR FINGER OUT OF THERE
@@ -16,12 +16,9 @@ finger: GET YOUR FINGER OUT OF THERE
 owners:
 - "*!~TM@tyranicmoron.uk"
 - "*!TM@tyranicmoron.uk"
+- "*!Heufy@netadmin.dbcommunity.org"
+- "*!hubbe@dbchat-d1d5c6a1.bb.dnainternet.fi"
 
 # modules to load
 modules:
 - all
-# postprocesses to load
-postprocesses:
-- all
-
-# aliases created with the Alias module
