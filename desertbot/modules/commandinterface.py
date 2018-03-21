@@ -7,6 +7,7 @@ Created on Feb 28, 2018
 
 from fnmatch import fnmatch
 from functools import wraps, partial
+import logging
 
 from desertbot.moduleinterface import BotModule
 from desertbot.response import IRCResponse, ResponseType
@@ -31,6 +32,9 @@ def admin(func=None, msg=''):
 
 
 class BotCommand(BotModule):
+    def __init__(self):
+        self.logger = logging.getLogger('desertbot.{}'.format(self.__class__.__name__))
+
     def triggers(self):
         return []
 
@@ -68,13 +72,8 @@ class BotCommand(BotModule):
 
         try:
             return self.execute(message)
-        except Exception as e:
-            error = u"Python execution error while running command {!r}: {}: {}".format(message.Command,
-                                                                                        type(e).__name__,
-                                                                                        e)#e.message)
-            self.bot.moduleHandler.sendPRIVMSG(error, message.ReplyTo)
-            #self.bot.log.failure(error)
-            print(error)
+        except Exception:
+            self.logger.exception("Python execution error while running command {!r}".format(message.Command))
 
     def shouldExecute(self, message):
         """

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 from twisted.internet import reactor, protocol
 
 from desertbot.desertbot import DesertBot
@@ -9,6 +10,8 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
         """
         @type config: Config
         """
+        self.logger = logging.getLogger('desertbot.factory')
+
         self.bot = DesertBot(self, config)
         self.protocol = self.bot
 
@@ -19,19 +22,19 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
         reactor.run()
 
     def startedConnecting(self, connector):
-        print('-#- Started to connect.')
+        self.logger.info('Started to connect')
 
     def buildProtocol(self, addr):
-        print('-#- Connected.')
-        print('-#- Resetting reconnection delay')
+        self.logger.info('Connected.')
+        self.logger.info('Resetting reconnection delay.')
         self.resetDelay()
         return self.bot
 
     def clientConnectionLost(self, connector, reason):
         if not self.bot.quitting:
-            print('-!- Lost connection.  Reason:', reason)
+            self.logger.error('Connection lost! - {}'.format(reason))
             protocol.ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
-        print('-!- Connection failed. Reason:', reason)
+        self.logger.error('Connection failed! - {}'.format(reason))
         protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)

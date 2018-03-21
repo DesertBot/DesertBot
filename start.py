@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import argparse
+import logging
 import os
+import sys
 
 from desertbot.config import Config, ConfigError
 from desertbot.factory import DesertBotFactory
@@ -13,10 +15,21 @@ if __name__ == '__main__':
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+    # Set up logging for stdout on the root 'desertbot' logger
+    # Modules can then just add more handlers to the root logger to capture all logs to files in various ways
+    rootLogger = logging.getLogger('desertbot')
+    logFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', '%H:%M:%S')
+
+    streamHandler = logging.StreamHandler(stream=sys.stdout)
+    streamHandler.setFormatter(logFormatter)
+    streamHandler.setLevel(logging.INFO)
+
+    rootLogger.addHandler(streamHandler)
+
     config = Config(cmdArgs.config)
     try:
         config.loadConfig()
-    except ConfigError as e:
-        print(e)
+    except ConfigError:
+        rootLogger.exception("Failed to load configuration file {}".format(cmdArgs.config))
     else:
         factory = DesertBotFactory(config)

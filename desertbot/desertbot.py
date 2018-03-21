@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 import os
 import platform
 import datetime
@@ -16,6 +17,7 @@ class DesertBot(irc.IRCClient, object):
         @type factory: DesertBotFactory
         @type config: Config
         """
+        self.logger = logging.getLogger('desertbot.core')
         self.factory = factory
         self.config = config
 
@@ -62,7 +64,7 @@ class DesertBot(irc.IRCClient, object):
 
     def cleanup(self):
         self.config.writeConfig()
-        print('-#- Saved config and data')
+        self.logger.info('Saved config and data')
 
     def quit(self, message=''):
         self.cleanup()
