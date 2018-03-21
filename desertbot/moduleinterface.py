@@ -57,7 +57,7 @@ def ignore(func):
 
 class BotModule(object):
     def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = logging.getLogger('desertbot.{}'.format(self.__class__.__name__))
 
     def actions(self):
         return [('help', 1, self.displayHelp)]
