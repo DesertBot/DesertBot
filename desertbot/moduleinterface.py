@@ -3,6 +3,7 @@
 from zope.interface import Interface
 from functools import wraps
 from fnmatch import fnmatch
+import logging
 
 
 class IModule(Interface):
@@ -55,6 +56,9 @@ def ignore(func):
 
 
 class BotModule(object):
+    def __init__(self):
+        self.logger = logging.getLogger(self.__class__.__name__)
+
     def actions(self):
         return [('help', 1, self.displayHelp)]
 

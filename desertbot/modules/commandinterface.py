@@ -7,7 +7,6 @@ Created on Feb 28, 2018
 
 from fnmatch import fnmatch
 from functools import wraps, partial
-import logging
 
 from desertbot.moduleinterface import BotModule
 from desertbot.response import IRCResponse, ResponseType
@@ -32,9 +31,6 @@ def admin(func=None, msg=''):
 
 
 class BotCommand(BotModule):
-    def __init__(self):
-        self.logger = logging.getLogger('desertbot.{}'.format(self.__class__.__name__))
-
     def triggers(self):
         return []
 
