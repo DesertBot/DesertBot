@@ -16,7 +16,6 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
         self.port = config.getWithDefault('port', 6667)
 
         reactor.connectTCP(self.server, self.port, self)
-        reactor.run()
 
     def startedConnecting(self, connector):
         print('-#- Started to connect.')
