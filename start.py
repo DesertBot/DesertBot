@@ -18,11 +18,12 @@ if __name__ == '__main__':
     # Set up logging for stdout on the root 'desertbot' logger
     # Modules can then just add more handlers to the root logger to capture all logs to files in various ways
     rootLogger = logging.getLogger('desertbot')
+    rootLogger.setLevel(logging.INFO)  # TODO change this from config value once it's loaded
+
     logFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', '%H:%M:%S')
 
     streamHandler = logging.StreamHandler(stream=sys.stdout)
     streamHandler.setFormatter(logFormatter)
-    streamHandler.setLevel(logging.INFO)
 
     rootLogger.addHandler(streamHandler)
 
