@@ -67,7 +67,6 @@ class DesertBot(irc.IRCClient, object):
         self.logger.info('Saved config and data')
 
     def quit(self, message=''):
-        self.cleanup()
         super(DesertBot, self).quit(message)
 
     def signedOn(self):
