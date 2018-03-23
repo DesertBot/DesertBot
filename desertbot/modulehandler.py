@@ -27,10 +27,11 @@ class ModuleHandler(object):
         self.actions = {}
         self.mappedTriggers = {}
 
-    def loadModule(self, name):
+    def loadModule(self, name, rebuild_=True):
         for module in getPlugins(IModule, desertbot.modules):
             if module.__class__.__name__ and module.__class__.__name__.lower() == name.lower():
-                rebuild(importlib.import_module(module.__module__))
+                if rebuild_:
+                    rebuild(importlib.import_module(module.__module__))
                 self._loadModuleData(module)
 
                 self.logger.info('Module {} loaded'.format(module.__class__.__name__))
@@ -180,7 +181,7 @@ class ModuleHandler(object):
 
         for module in modulesToLoad:
             try:
-                self.loadModule(module)
+                self.loadModule(module, rebuild_=False)
             except Exception:
                 self.logger.exception("Exception when loading module {!r}".format(module))
 
