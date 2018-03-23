@@ -44,7 +44,8 @@ class GPSLookup(BotCommand):
             result = json.loads(page.body)
 
             if result['resourceSets'][0]['estimatedTotal'] == 0:
-                print(result)
+                self.logger.warning("Could not find GPS record for {}".format(message.Parameters))
+                self.logger.debug(result)
                 return IRCResponse(ResponseType.Say,
                                    "Couldn't find GPS coords for '{0}', sorry!".format(message.Parameters),
                                    message.ReplyTo)

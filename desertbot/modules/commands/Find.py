@@ -49,7 +49,7 @@ class Find(BotCommand):
 
             return IRCResponse(ResponseType.Say, replyText, message.ReplyTo)
         except Exception as x:
-            print(str(x))
+            self.logger.exception("Exception when finding a thing {}".format(message.Parameters))
             return IRCResponse(ResponseType.Say, x.args, message.ReplyTo)
 
 

@@ -53,8 +53,7 @@ class ModuleLoader(BotCommand):
 
         return responses
 
-    @staticmethod
-    def load(moduleNames, moduleHandler):
+    def load(self, moduleNames, moduleHandler):
         """
         @type moduleNames: list[str]
         @type moduleHandler: ModuleHandler
@@ -77,13 +76,11 @@ class ModuleLoader(BotCommand):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(moduleNameCaseMap[moduleName], xName))
-                print(xName, x.args)
-                traceback.print_tb(sys.exc_info()[2])
+                self.logger.exception("Exception when loading module {!r}".format(moduleNameCaseMap[moduleName]))
 
         return successes, failures, exceptions
 
-    @staticmethod
-    def reload(moduleNames, moduleHandler):
+    def reload(self, moduleNames, moduleHandler):
         """
         @type moduleNames: list[str]
         @type moduleHandler: ModuleHandler
@@ -118,13 +115,11 @@ class ModuleLoader(BotCommand):
                 except Exception as x:
                     xName = x.__class__.__name__
                     exceptions.append(u"{} ({})".format(moduleNameCaseMap[moduleName], xName))
-                    print(xName, x.args)
-                    traceback.print_tb(sys.exc_info()[2])
+                    self.logger.exception("Exception when loading module {!r}".format(moduleNameCaseMap[moduleName]))
 
         return successes, failures, exceptions
 
-    @staticmethod
-    def unload(moduleNames, moduleHandler):
+    def unload(self, moduleNames, moduleHandler):
         """
         @type moduleNames: list[str]
         @type moduleHandler: ModuleHandler
@@ -147,8 +142,7 @@ class ModuleLoader(BotCommand):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(moduleNameCaseMap[moduleName], xName))
-                print(xName, x.args)
-                traceback.print_tb(sys.exc_info()[2])
+                self.logger.exception("Exception when loading module {!r}".format(moduleNameCaseMap[moduleName]))
 
         return successes, failures, exceptions
 

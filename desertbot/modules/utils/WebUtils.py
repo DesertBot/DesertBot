@@ -85,11 +85,8 @@ class WebUtils(BotModule):
             else:
                 response.close()
 
-        except requests.exceptions.RequestException as e:
-            today = time.strftime("[%H:%M:%S]")
-            reason = str(e)
-            print("{} *** ERROR: Fetch from \"{}\" failed: {}".format(today, url, reason))
-
+        except requests.exceptions.RequestException:
+            self.logger.exception("GET from {!r} failed!".format(url))
 
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L43
@@ -120,10 +117,8 @@ class WebUtils(BotModule):
             else:
                 response.close()
 
-        except requests.exceptions.RequestException as e:
-            today = time.strftime("[%H:%M:%S]")
-            reason = str(e)
-            print("{} *** ERROR: Post to \"{}\" failed: {}".format(today, url, reason))
+        except requests.exceptions.RequestException:
+            self.logger.exception("POST to {!r} failed!".format(url))
 
     def shortenGoogl(self, url):
         """
@@ -148,8 +143,8 @@ class WebUtils(BotModule):
                 return '[Googl Error: {} {}]'.format(responseJson['error']['message'], post['longUrl'])
             return responseJson['id']
 
-        except requests.exceptions.RequestException as e:
-            print("Goo.gl error: {}".format(e))
+        except requests.exceptions.RequestException:
+            self.logger.exception("Goo.gl error")
 
     def googleSearch(self, query):
         """

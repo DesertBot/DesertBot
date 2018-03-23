@@ -404,8 +404,8 @@ class Responses(BotCommand):
             #   OK I'VE GOT THIS NOW, BRO    #
             #                                #
             ##################################
-        except Exception as e:
-            print(e)
+        except Exception:
+            self.logger.exception("Exception in boop response.")
 
     @ignore
     def respond(self, message):

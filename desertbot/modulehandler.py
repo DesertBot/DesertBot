@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import importlib
-import sys
-import traceback
+import logging
 
 from twisted.plugin import getPlugins
 from twisted.python.rebuild import rebuild
@@ -21,6 +20,7 @@ class ModuleHandler(object):
         @type bot: DesertBot
         """
         self.bot = bot
+        self.logger = logging.getLogger('desertbot.modulehandler')
 
         self.modules = {}
         self.caseMap = {}
@@ -33,7 +33,7 @@ class ModuleHandler(object):
                 rebuild(importlib.import_module(module.__module__))
                 self._loadModuleData(module)
 
-                print('-- {} loaded'.format(module.__class__.__name__))
+                self.logger.info('Module {} loaded'.format(module.__class__.__name__))
 
                 return module.__class__.__name__
 
@@ -100,7 +100,7 @@ class ModuleHandler(object):
         del self.modules[name]
         del self.caseMap[name.lower()]
 
-        print('-- {} unloaded'.format(name))
+        self.logger.info('Module {} unloaded'.format(name))
 
         return name
 
@@ -159,8 +159,7 @@ class ModuleHandler(object):
                     self.bot.sendLine(response.Response)
             except Exception:
                 # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
-                print("Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info())))
-                traceback.print_tb(sys.exc_info()[2])
+                self.logger.exception("Python Execution Error sending responses {!r}".format(responses))
 
     def _deferredError(self, error):
         pass
@@ -182,8 +181,8 @@ class ModuleHandler(object):
         for module in modulesToLoad:
             try:
                 self.loadModule(module)
-            except Exception as e:
-                print(u'[{}]'.format(module), e)
+            except Exception:
+                self.logger.exception("Exception when loading module {!r}".format(module))
 
     def runGenericAction(self, actionName, *params, **kw):
         actionList = []
