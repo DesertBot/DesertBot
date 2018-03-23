@@ -4,13 +4,17 @@ import logging
 import os
 import sys
 
+from twisted.internet import reactor
+
 from desertbot.config import Config, ConfigError
 from desertbot.factory import DesertBotFactory
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
-    parser.add_argument('-c', '--config', help='the config file to read from', type=str, required=True)
+    parser.add_argument('-c', '--config',
+                        help='the config file to read from',
+                        type=str, required=True)
     cmdArgs = parser.parse_args()
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -34,3 +38,4 @@ if __name__ == '__main__':
         rootLogger.exception("Failed to load configuration file {}".format(cmdArgs.config))
     else:
         factory = DesertBotFactory(config)
+        reactor.run()
