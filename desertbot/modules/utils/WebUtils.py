@@ -90,32 +90,27 @@ class WebUtils(BotModule):
 
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L43
-    def postURL(self, url, data, extraHeaders=None):
+    def postURL(self, url, data=None, json=None, extraHeaders=None):
         """
         @type url: unicode
         @type values: dict[unicode, T]
         @type extraHeaders: dict[unicode, unicode]
         @rtype: URLResponse
         """
-        headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"}
+        headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
+                   "Accept": "text/*, "
+                             "application/xml, application/xhtml+xml, "
+                             "application/rss+xml, application/atom+xml, application/rdf+xml, "
+                             "application/json"
+        }
         if extraHeaders:
             headers.update(extraHeaders)
 
-        for k, v in iteritems(data):
-            data[k] = str(v)
-
         try:
-            response = requests.post(url, data=data, headers=headers, timeout=10)
-            responseHeaders = response.headers
-            pageType = responseHeaders["content-type"]
+            response = requests.post(url, data=data, json=json, headers=headers, timeout=10)
 
-            # Make sure we don't download any unwanted things
-            #              |   text|                       rss feeds and xml|                      json|
-            if re.match(r"^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/(.*)json(;.*)?)$", pageType):
-                urlResponse = URLResponse(response)
-                return urlResponse
-            else:
-                response.close()
+            urlResponse = URLResponse(response)
+            return urlResponse
 
         except requests.exceptions.RequestException:
             self.logger.exception("POST to {!r} failed!".format(url))
