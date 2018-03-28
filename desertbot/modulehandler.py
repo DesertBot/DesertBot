@@ -102,7 +102,7 @@ class ModuleHandler(object):
         self.modules[name].onUnload()
 
         del self.modules[name]
-        for k, v in iteritems(self.fileMap):
+        for k, v in list(self.fileMap.items()):
             if v.lower() == name.lower():
                 del self.fileMap[k]
         del self.caseMap[name.lower()]
