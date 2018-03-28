@@ -35,7 +35,7 @@ class Slurp(BotCommand):
         @type message: IRCMessage
         """
         if len(message.ParameterList) < 3:
-            return IRCResponse(ResponseType.Say, u"Not enough parameters, usage: {}".format(self.help), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, u"Not enough parameters, usage: {}".format(self.help(None)), message.ReplyTo)
 
         prop, url, selector = (message.ParameterList[0], message.ParameterList[1], u" ".join(message.ParameterList[2:]))
 
