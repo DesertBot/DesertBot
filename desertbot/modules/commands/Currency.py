@@ -60,7 +60,7 @@ class Currency(BotCommand):
 
         data = []
         for curr,rate in iteritems(rates):
-            data.append("{:.2f} {:.2f}".format(rate*amount, curr))
+            data.append("{:.2f} {}".format(rate*amount, curr))
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
         return IRCResponse(ResponseType.Say, graySplitter.join(data), message.ReplyTo)
