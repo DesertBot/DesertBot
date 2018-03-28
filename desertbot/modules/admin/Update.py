@@ -59,9 +59,9 @@ class Update(BotCommand):
                                message.ReplyTo)
 
         output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '..origin/master'])
-        changed_files = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
+        changedFiles = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
-        if 'requirements.txt' in changed_files:
+        if 'requirements.txt' in changedFiles:
             try:
                 subprocess.check_call([os.path.join(os.path.dirname(sys.executable), 'pip'),
                                        'install', '-r', 'requirements.txt'])
@@ -71,26 +71,26 @@ class Update(BotCommand):
             finally:
                 response += " | No auto-reload due to requirements change, please restart bot."
         else:
-            modules_to_reload = []
-            for filename in changed_files:
+            modulesToReload = []
+            for filename in changedFiles:
                 if filename in self.bot.moduleHandler.fileMap:
-                    modules_to_reload.append(self.bot.moduleHandler.fileMap[filename])
+                    modulesToReload.append(self.bot.moduleHandler.fileMap[filename])
                 else:
-                    modules_to_reload = []
+                    modulesToReload = []
                     response += " | No auto-reload due to change(s) in bot core, please restart bot."
 
-            reloaded_modules = []
+            reloadedModules = []
             failures = []
-            for module_name in modules_to_reload:
+            for moduleName in modulesToReload:
                 try:
-                    self.bot.moduleHandler.reloadModule(module_name)
+                    self.bot.moduleHandler.reloadModule(moduleName)
                 except Exception:
-                    failures.append(module_name)
-                    self.logger.exception("Exception when auto-reloading module {!r}".format(module_name))
+                    failures.append(moduleName)
+                    self.logger.exception("Exception when auto-reloading module {!r}".format(moduleName))
                 else:
-                    reloaded_modules.append(module_name)
-            if len(reloaded_modules) > 0:
-                response += " | Reloaded modules: {}".format(", ".join(reloaded_modules))
+                    reloadedModules.append(moduleName)
+            if len(reloadedModules) > 0:
+                response += " | Reloaded modules: {}".format(", ".join(reloadedModules))
             if len(failures) > 0:
                 response += " | Failed to reload modules: {}".format(", ".join(failures))
 
