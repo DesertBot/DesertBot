@@ -68,8 +68,10 @@ class BotCommand(BotModule):
 
         try:
             return self.execute(message)
-        except Exception:
+        except Exception as e:
             self.logger.exception("Python execution error while running command {!r}".format(message.Command))
+            error_text = "Python execution error while running command {!r}: {}: {}".format(message.Command, type(e).__name__, e)
+            self.bot.moduleHandler.sendPRIVMSG(error_text, message.ReplyTo)
 
     def shouldExecute(self, message):
         """
