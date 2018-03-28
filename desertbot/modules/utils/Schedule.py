@@ -88,7 +88,9 @@ class Task(object):
         return self.command(message)
 
     def cycle(self, response):
-        self.bot.sendResponse(response)
+        if not isinstance(response, list):
+            response = [response]
+        self.bot.moduleHandler.sendResponses(response)
         if self.type in ['cron']:
             self.nextTime = self.cron.get_next(datetime.datetime)
             self.start()
