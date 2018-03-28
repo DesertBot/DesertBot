@@ -20,7 +20,7 @@ import sys
 @implementer(IPlugin, IModule)
 class Update(BotCommand):
     def triggers(self):
-        return ['update', 'fullupdate']
+        return ['update']
     
     def help(self, query):
         """
@@ -58,13 +58,42 @@ class Update(BotCommand):
                                'Merge after update failed, please merge manually',
                                message.ReplyTo)
 
-        if message.Command.lower() == 'fullupdate':
+        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '..origin/master'])
+        changed_files = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
+
+        if 'requirements.txt' in changed_files:
             try:
                 subprocess.check_call([os.path.join(os.path.dirname(sys.executable), 'pip'),
                                        'install', '-r', 'requirements.txt'])
-            except OSError:
-                response += ' | pip not found, requirements not updated'
-        
+            except Exception:
+                self.logger.exception("Exception when updating requirements!")
+                response += "Requirements update failed, check log."
+            finally:
+                response += " | No auto-reload due to requirements change, please restart bot."
+        else:
+            modules_to_reload = []
+            for filename in changed_files:
+                if filename in self.bot.moduleHandler.fileMap:
+                    modules_to_reload.append(self.bot.moduleHandler.fileMap[filename])
+                else:
+                    modules_to_reload = []
+                    response += " | No auto-reload due to change(s) in bot core, please restart bot."
+
+            reloaded_modules = []
+            failures = []
+            for module_name in modules_to_reload:
+                try:
+                    self.bot.moduleHandler.reloadModule(module_name)
+                except Exception:
+                    failures.append(module_name)
+                    self.logger.exception("Exception when auto-reloading module {!r}".format(module_name))
+                else:
+                    reloaded_modules.append(module_name)
+            if len(reloaded_modules) > 0:
+                response += " | Reloaded modules: {}".format(", ".join(reloaded_modules))
+            if len(failures) > 0:
+                response += " | Failed to reload modules: {}".format(", ".join(failures))
+
         return IRCResponse(ResponseType.Say,
                            response,
                            message.ReplyTo)

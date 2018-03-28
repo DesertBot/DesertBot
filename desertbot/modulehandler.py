@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import importlib
+import inspect
 import logging
 
 from twisted.plugin import getPlugins
@@ -24,6 +25,7 @@ class ModuleHandler(object):
 
         self.modules = {}
         self.caseMap = {}
+        self.fileMap = {}
         self.actions = {}
         self.mappedTriggers = {}
 
@@ -78,6 +80,7 @@ class ModuleHandler(object):
                 self.mappedTriggers[trigger] = module
 
         self.modules.update({module.__class__.__name__: module})
+        self.fileMap.update({inspect.getsourcefile(module): module.__class__.__name__})
         self.caseMap.update({module.__class__.__name__.lower(): module.__class__.__name__})
 
     def unloadModule(self, name):
@@ -99,6 +102,9 @@ class ModuleHandler(object):
         self.modules[name].onUnload()
 
         del self.modules[name]
+        for k, v in iteritems(self.fileMap):
+            if v.lower() == name.lower():
+                del self.fileMap[k]
         del self.caseMap[name.lower()]
 
         self.logger.info('Module {} unloaded'.format(name))
