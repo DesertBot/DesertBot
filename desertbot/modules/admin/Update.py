@@ -26,13 +26,7 @@ class Update(BotCommand):
         """
         @type query: list[str]
         """
-        helpDict = {
-            u"update": u"update - pulls the latest code from GitHub",
-            u"fullupdate": u"updatelibs - updates the libraries used by the bot (not implemented yet, does the same as update)"}
-            
-        command = query[0].lower()
-        if command in helpDict:
-            return helpDict[command]
+        return "update - pulls the latest code from GitHub and reloads affected modules"
 
     @admin
     def execute(self, message):
@@ -67,7 +61,7 @@ class Update(BotCommand):
                                        'install', '-r', 'requirements.txt'])
             except Exception:
                 self.logger.exception("Exception when updating requirements!")
-                response += "Requirements update failed, check log."
+                response += " | Requirements update failed, check log."
             finally:
                 response += " | No auto-reload due to requirements change, please restart bot."
         else:
