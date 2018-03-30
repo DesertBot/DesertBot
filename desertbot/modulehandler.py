@@ -80,7 +80,7 @@ class ModuleHandler(object):
                 self.mappedTriggers[trigger] = module
 
         self.modules.update({module.__class__.__name__: module})
-        self.fileMap.update({inspect.getsourcefile(module): module.__class__.__name__})
+        self.fileMap.update({inspect.getsourcefile(module.__class__): module.__class__.__name__})
         self.caseMap.update({module.__class__.__name__.lower(): module.__class__.__name__})
 
     def unloadModule(self, name):
