@@ -44,6 +44,9 @@ class Update(BotCommand):
 
         changes = list(reversed(changes))
         response = u'New commits: {}'.format(u' | '.join(changes))
+        
+        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '..origin/master'])
+        changedFiles = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         returnCode = subprocess.check_call(['git', 'merge', 'origin/master'])
 
@@ -51,9 +54,6 @@ class Update(BotCommand):
             return IRCResponse(ResponseType.Say,
                                'Merge after update failed, please merge manually',
                                message.ReplyTo)
-
-        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '..origin/master'])
-        changedFiles = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         if 'requirements.txt' in changedFiles:
             try:
