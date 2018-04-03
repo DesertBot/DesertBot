@@ -117,7 +117,7 @@ int main() {{
         else:
             return IRCResponse(ResponseType.Say, self._helpText(), message.ReplyTo)
 
-        return IRCResponse(ResponseType.Say, result, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, result.replace("\n", " "), message.ReplyTo)
 
 
 langPlayground = LangPlayground()
