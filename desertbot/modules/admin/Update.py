@@ -72,6 +72,8 @@ class Update(BotCommand):
                 else:
                     modulesToReload = []
                     response += " | No auto-reload due to change(s) in bot core, please restart bot."
+                    self.logger.info("No auto-reload due to change in file {!r}".format(filename))
+                    break
 
             reloadedModules = []
             failures = []
