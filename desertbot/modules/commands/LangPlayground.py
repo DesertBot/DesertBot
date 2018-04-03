@@ -9,8 +9,9 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import json
-from collections import OrderedDict
+import zlib
+
+import requests
 
 from desertbot.response import IRCResponse, ResponseType
 
@@ -27,79 +28,84 @@ class LangPlayground(BotCommand):
         """
         return self._helpText()
 
-    def _helpText(self):
-        langs = u'/'.join(self._subCommands.keys())
-        return u"{1}lang <{0}> <code> - evaluates the given code " \
-               u"using a playground service for the given language".format(langs,
-                                                                           self.bot.commandChar)
-
-    def _rust(self, code):
-        """
-        @type code: str
-        @rtype str
-        """
-        template = (
+    def onLoad(self):
+        self.languages = None
+        self.templates = {
+            'rust':
 """fn main() {{
     println!("{{:?}}", {{
         {code}
     }});
-}}""")
-        code = template.format(code=code)
+}}""",
+            'cpp-clang':
+"""#include <iostream>
+int main() {{
+    std::cout << ({code}) << std::endl;
+}}""",
+            'cpp-gcc':
+"""#include <iostream>
+int main() {{
+    std::cout << ({code}) << std::endl;
+}}"""
+        }
 
-        url = "https://play.rust-lang.org/execute"
-        response = self.bot.moduleHandler.runActionUntilValue('post-url', url, None, {
-            "code": code,
-            "channel": "stable",
-            "mode": "debug",
-            "crateType": "bin",
-            "tests": False,
-            })
-        j = json.loads(response.body)
+    def _helpText(self):
+        return u"{}lang <lang> <code> - evaluates the given code using TryItOnline.net".format(self.bot.commandChar)
 
-        if j["success"]:
-            result = j["stdout"]
-        else:
-            result = j["stderr"].splitlines()
-            result = result[1]
-
-            paste = "{code}\n\n/* --- stderr ---\n{stderr}\n*/\n\n/* --- stdout ---\n{stdout}\n*/"
-            paste = paste.format(code=code, stderr=j["stderr"], stdout=j["stdout"])
-
-            url = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
-                                                             paste, result, 10)
-
-            result = "{}\nFull error output: {}".format(result, url)
-        return result
-
-    def _haskell(self, code):
+    def _tio(self, lang, code):
         """
+        @type lang: str
         @type code: str
         @rtype str
         """
-        url = "https://tryhaskell.org/eval"
-        response = self.bot.moduleHandler.runActionUntilValue('post-url', url, {
-            "exp": code,
-            })
-        print(response.body)
-        j = json.loads(response.body)
+        if self.languages == None:
+            langUrl = "https://raw.githubusercontent.com/TryItOnline/tryitonline/master/usr/share/tio.run/languages.json"
+            response = requests.get(langUrl)
+            self.languages = response.json().keys()
 
-        if "success" in j:
-            if j["success"]["stdout"]:
-                result = j["success"]["stdout"]
-            else:
-                result = j["success"]["value"]
-        else:
-            result = u" | ".join(l.strip() for l in j["error"].splitlines())
-        return result
+        if lang not in self.languages:
+            return "[Language {!r} unknown on TryItOnline.net]"
 
-    _subCommands = OrderedDict([
-        (u'rust', _rust),
-        (u'haskell', _haskell),
-        ])
+        if lang in self.templates:
+            code = self.templates[lang].format(code=code)
 
-    def _unrecognizedLanguage(self, lang):
-        return u"unrecognized language {!r}, " \
-               u"available languages are: {}".format(lang, u', '.join(self._subCommands.keys()))
+        request = [{'command': 'V', 'payload': {'lang': [lang]}},
+                   {'command': 'F', 'payload': {'.code.tio': code}},
+                   {'command': 'RC'}]
+        req = b''
+        for instr in request:
+            req += instr['command'].encode()
+            if 'payload' in instr:
+                [(name, value)] = instr['payload'].items()
+                req += b'%s\0' % name.encode()
+                if type(value) == str:
+                    value = value.encode()
+                req += b'%u\0' % len(value)
+                if type(value) != bytes:
+                    value = '\0'.join(value).encode() + b'\0'
+                req += value
+        req_raw = zlib.compress(req, 9)[2:-4]
+
+        url = "https://tio.run/cgi-bin/static/b666d85ff48692ae95f24a66f7612256-run/93d25ed21c8d2bb5917e6217ac439d61"
+        res = requests.post(url, data=req_raw)
+        res = zlib.decompress(res.content, 31)
+        delim = res[:16]
+        ret = res[16:].split(delim)
+        count = len(ret) >> 1
+        returned, errors = ret[:count], ret[count:]
+        errors = errors[0].decode('utf-8', 'ignore')
+        # this heuristic is guesstimated from python3, cpp-gcc, rust, and haskell output
+        # potential improvement: expected amount of lines for various languages
+        if len(errors.splitlines()[0:-5]) > 2:
+            paste = "{code}\n\n/* --- stderr ---\n{stderr}\n*/".format(code=code, stderr=errors)
+            url = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
+                                                             paste, "TIO stderr", 10)
+            error = "Errors occurred! Output: {url}".format(url=url)
+            if lang in self.templates:
+                error += " (language uses a template, see link for framing code)"
+            return error
+
+        return u' | '.join(r.decode('utf-8', 'ignore') for r in returned)
 
     def execute(self, message):
         """
@@ -107,11 +113,7 @@ class LangPlayground(BotCommand):
         """
         if len(message.ParameterList) > 0:
             lang = message.ParameterList[0].lower()
-            if lang not in self._subCommands:
-                return IRCResponse(ResponseType.Say,
-                                   self._unrecognizedLanguage(lang),
-                                   message.ReplyTo)
-            result = self._subCommands[lang](self, u' '.join(message.ParameterList[1:]))
+            result = self._tio(lang, u' '.join(message.ParameterList[1:]))
         else:
             return IRCResponse(ResponseType.Say, self._helpText(), message.ReplyTo)
 
