@@ -94,9 +94,8 @@ int main() {{
         count = len(ret) >> 1
         returned, errors = ret[:count], ret[count:]
         errors = errors[0].decode('utf-8', 'ignore')
-        # this heuristic is guesstimated from python3, cpp-gcc, rust, and haskell output
-        # potential improvement: expected amount of lines for various languages
-        if len(errors.splitlines()[0:-5]) > 2:
+        # Grab and check the exit code
+        if int(errors.splitlines()[-1][len("Exit code: ")-1:]) != 0:
             paste = "{code}\n\n/* --- stderr ---\n{stderr}\n*/".format(code=code, stderr=errors)
             url = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
                                                              paste, "TIO stderr", 10)
