@@ -78,6 +78,8 @@ class Update(BotCommand):
             reloadedModules = []
             failures = []
             for moduleName in modulesToReload:
+                if moduleName == "Update":
+                    failures.append(moduleName)
                 try:
                     self.bot.moduleHandler.reloadModule(moduleName)
                 except Exception:
