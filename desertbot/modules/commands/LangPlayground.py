@@ -64,7 +64,7 @@ int main() {{
             self.languages = response.json().keys()
 
         if lang not in self.languages:
-            return "[Language {!r} unknown on TryItOnline.net]"
+            return "[Language {!r} unknown on TryItOnline.net]".format(lang)
 
         if lang in self.templates:
             code = self.templates[lang].format(code=code)
