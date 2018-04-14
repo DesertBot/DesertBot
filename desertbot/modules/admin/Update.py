@@ -66,7 +66,8 @@ class Update(BotCommand):
                 response += " | No auto-reload due to requirements change, please restart bot."
         else:
             modulesToReload = []
-            for filename in changedFiles:
+            for filepath in changedFiles:
+                filename = filepath.split(os.path.sep)[-1]  # changedFiles contains full filepaths, split on os.path.sep and get last for filename
                 if filename in self.bot.moduleHandler.fileMap:
                     modulesToReload.append(self.bot.moduleHandler.fileMap[filename])
                 else:
