@@ -160,7 +160,7 @@ class Responses(BotCommand):
             def animalMatch(message):
                 matchDict = {
                     r'(woo+f|r+u+ff+|arf|ba+r+k)': 'puppeh',
-                    r'nya+n?~?': 'neko ₍˄·͈༝·͈˄₎◞'
+                    r'nya+n?~?': 'neko ₍˄·͈༝·͈˄₎◞',
                     r'squeak': 'mouse',
                     r'moo+': 'cow',
                     r'(twee+t|ca+w+)': 'bird',
