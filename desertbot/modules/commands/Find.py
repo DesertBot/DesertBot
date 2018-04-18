@@ -37,6 +37,11 @@ class Find(BotCommand):
                                    u'[google developer key missing]',
                                    message.ReplyTo)
 
+            if u'items' not in results:
+                return IRCResponse(ResponseType.Say,
+                                   u'No results found for query!',
+                                   message.ReplyTo)
+
             firstResult = results[u'items'][0]
 
             title = firstResult[u'title']
@@ -50,7 +55,7 @@ class Find(BotCommand):
             return IRCResponse(ResponseType.Say, replyText, message.ReplyTo)
         except Exception as x:
             self.logger.exception("Exception when finding a thing {}".format(message.Parameters))
-            return IRCResponse(ResponseType.Say, x.args, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, str(x.args), message.ReplyTo)
 
 
 find = Find()
