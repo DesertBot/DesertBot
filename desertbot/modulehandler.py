@@ -2,6 +2,7 @@
 import importlib
 import inspect
 import logging
+import os
 
 from twisted.plugin import getPlugins
 from twisted.python.rebuild import rebuild
@@ -80,7 +81,7 @@ class ModuleHandler(object):
                 self.mappedTriggers[trigger] = module
 
         self.modules.update({module.__class__.__name__: module})
-        self.fileMap.update({inspect.getsourcefile(module.__class__): module.__class__.__name__})
+        self.fileMap.update({inspect.getsourcefile(module.__class__).split(os.path.sep)[-1]: module.__class__.__name__})
         self.caseMap.update({module.__class__.__name__.lower(): module.__class__.__name__})
 
     def unloadModule(self, name):
