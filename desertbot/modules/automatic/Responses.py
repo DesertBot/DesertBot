@@ -390,6 +390,7 @@ class Responses(BotCommand):
                     "http://i.imgur.com/WmRnfbX.png",   # can you smash my sadness? / *boop* / :)
                     "https://i.imgur.com/1R2dOmJ.gifv", # labrador aggressively boops other dog to steal their treat
                     "https://giant.gfycat.com/ElasticAdventurousCottontail.webm", # parrot gets booped from off-screen
+                    "https://i.imgur.com/8mMGnA1.gifv", # cat boops dog, then escapes under a couch
                     ]
                 return [IRCResponse(ResponseType.Say,
                                     'Boop! {}'.format(random.choice(boops)),
