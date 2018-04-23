@@ -103,7 +103,7 @@ int main() {{
         errors = errors[0].decode('utf-8', 'ignore')
         # Grab and check the exit code
         if int(errors.splitlines()[-1][len("Exit code: ")-1:]) != 0:
-            paste = "{code}\n\n/* --- stderr ---\n{stderr}\n*/".format(code=code, stderr=errors)
+            paste = "{code}\n\n/* --- stdout ---\n{stdout}\n*/\n\n/* --- stderr ---\n{stderr}\n*/".format(code=code, stdout=returned[0].decode('utf-8', 'ignore'), stderr=errors)
             url = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
                                                              paste, "TIO stderr", 10)
             error = "Errors occurred! Output: {url}".format(url=url)
