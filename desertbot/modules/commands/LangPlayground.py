@@ -50,7 +50,7 @@ int main() {{
         }
 
     def _helpText(self):
-        return u"{}lang <lang> <code> - evaluates the given code using TryItOnline.net".format(self.bot.commandChar)
+        return u"{}lang <lang> <code> - evaluates the given code using https://tio.run".format(self.bot.commandChar)
 
     def _tio(self, lang, code):
         """
@@ -64,7 +64,14 @@ int main() {{
             self.languages = response.json().keys()
 
         if lang not in self.languages:
-            return "[Language {!r} unknown on TryItOnline.net]".format(lang)
+            langList = self.bot.moduleHandler.runActionUntilValue('closest-matches',
+                                                                  lang,
+                                                                  self.languages,
+                                                                  10,
+                                                                  0.8)
+            langString = ", ".join(langList)
+            return "[Language {!r} unknown on tio.run. Perhaps you want: {}]".format(lang,
+                                                                                     langString)
 
         if lang in self.templates:
             code = self.templates[lang].format(code=code)
