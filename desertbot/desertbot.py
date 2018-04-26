@@ -7,16 +7,15 @@ import subprocess
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor
+from desertbot.config import Config
 from desertbot.message import IRCMessage, IRCChannel, IRCUser
+from desertbot.response import IRCResponse
 from desertbot import modulehandler, serverinfo
+from typing import Any
 
 
 class DesertBot(irc.IRCClient, object):
-    def __init__(self, factory, config):
-        """
-        @type factory: DesertBotFactory
-        @type config: Config
-        """
+    def __init__(self, factory: 'DesertBotFactory', config: Config):
         self.logger = logging.getLogger('desertbot.core')
         self.factory = factory
         self.config = config
@@ -269,7 +268,7 @@ class DesertBot(irc.IRCClient, object):
 
         self.handleMessage(message)
 
-    def getChannel(self, name):
+    def getChannel(self, name: str) -> Any:
         if name in self.channels:
             return self.channels[name]
         else:
@@ -291,14 +290,8 @@ class DesertBot(irc.IRCClient, object):
 
         super(DesertBot, self).lineReceived(line)
 
-    def handleMessage(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def handleMessage(self, message: IRCMessage):
         self.moduleHandler.handleMessage(message)
 
-    def sendResponse(self, response):
-        """
-        @type response: IRCResponse
-        """
+    def sendResponse(self, response: IRCResponse):
         self.moduleHandler.sendResponse(response)

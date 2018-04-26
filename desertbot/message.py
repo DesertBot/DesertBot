@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
+from typing import Dict
 import re
 
 from desertbot.user import IRCUser
@@ -12,15 +13,7 @@ class TargetTypes(Enum):
             
 
 class IRCMessage(object):
-    def __init__(self, msgType, user, channel, message, bot, metadata=None):
-        """
-        @type msgType: str
-        @type user: str
-        @type channel: IRCChannel
-        @type message: unicode
-        @type bot: DesertBot
-        @type metadata: dict
-        """
+    def __init__(self, msgType: str, user: str, channel: IRCChannel, message: str, bot: 'DesertBot', metadata: Dict=None):
         if metadata is None:
             metadata = {}
         self.Metadata = metadata

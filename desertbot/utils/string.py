@@ -3,6 +3,7 @@ from collections import OrderedDict
 from html.entities import name2codepoint
 from builtins import chr
 from six import iteritems
+from datetime import timedelta
 import re
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
@@ -11,7 +12,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
 
-def isNumber(s):
+def isNumber(s: str) -> bool:
     """returns True if string s can be cast to a number, False otherwise"""
     try:
         float(s)
@@ -21,7 +22,7 @@ def isNumber(s):
 
 
 # From this SO answer: http://stackoverflow.com/a/6043797/331047
-def splitUTF8(s, n):
+def splitUTF8(s: str, n: int) -> str:
     """Split UTF-8 s into chunks of maximum byte length n"""
     while len(s) > n:
         k = n
@@ -43,7 +44,7 @@ def splitUTF8(s, n):
 # \x03FF: set foreground
 # \x03FF,BB: set fore/background
 format_chars = re.compile(r'[\x02\x1f\x16\x1d\x0f]|\x03([0-9]{1,2}(,[0-9]{1,2})?)?')
-def stripFormatting(message):
+def stripFormatting(message: str) -> str:
     """
     Removes IRC formatting from the provided message.
     """
@@ -51,11 +52,9 @@ def stripFormatting(message):
 
 
 # mostly taken from dave_random's UnsafeBot (whose source is not generally accessible)
-def deltaTimeToString(timeDelta, resolution='m'):
+def deltaTimeToString(timeDelta: timedelta, resolution: str='m') -> str:
     """
     returns a string version of the given timedelta, with a resolution of minutes ('m') or seconds ('s')
-    @type timeDelta: timedelta
-    @type resolution: str
     """
     d = OrderedDict()
     d['days'] = timeDelta.days
@@ -79,7 +78,7 @@ def deltaTimeToString(timeDelta, resolution='m'):
 #
 # @param text The HTML (or XML) source text.
 # @return The plain text, as a Unicode string, if necessary.
-def unescapeXHTML(text):
+def unescapeXHTML(text: str) -> str:
     def fixup(m):
         escapeText = m.group(0)
         if escapeText[:2] == '&#':

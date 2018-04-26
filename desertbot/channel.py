@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from desertbot import serverinfo
+from typing import Any
 
 
 class IRCChannel(object):
-    def __init__(self, name):
-        """
-        @type name: str
-        """
+    def __init__(self, name: str):
         self.Name = name
         self.Topic = ''
         self.TopicSetBy = ''
@@ -17,7 +15,7 @@ class IRCChannel(object):
     def __str__(self):
         return self.Name
 
-    def getHighestStatusOfUser(self, nickname):
+    def getHighestStatusOfUser(self, nickname: str) -> Any:
         if not self.Ranks[nickname]:
             return None
 

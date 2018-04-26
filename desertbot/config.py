@@ -3,24 +3,25 @@
 import copy
 from ruamel.yaml import YAML
 from six import iteritems
+from typing import Any, Dict
 
 
 _required = ['server']
 
 
 class Config(object):
-    def __init__(self, configFile):
+    def __init__(self, configFile: str):
         self.configFile = configFile
         self._configData = {}
         self.yaml = YAML()
         self._inBaseConfig = []
 
-    def loadConfig(self):
+    def loadConfig(self) -> None:
         configData = self._readConfig(self.configFile)
         self._validate(configData)
         self._configData = configData
 
-    def _readConfig(self, fileName):
+    def _readConfig(self, fileName: str) -> Dict:
         try:
             with open(fileName, mode='r') as config:
                 configData = self.yaml.load(config)
@@ -73,7 +74,7 @@ class Config(object):
 
         return configData
 
-    def writeConfig(self):
+    def writeConfig(self) -> None:
         # filter the configData to only those keys
         # that were present in the base server config,
         # or have been modified at runtime
@@ -89,12 +90,12 @@ class Config(object):
         except Exception as e:
             raise ConfigError(self.configFile, e)
 
-    def getWithDefault(self, key, default=None):
+    def getWithDefault(self, key: str, default=None) -> Any:
         if key in self._configData:
             return self._configData[key]
         return default
 
-    def _validate(self, configData):
+    def _validate(self, configData) -> None:
         for key in _required:
             if key not in configData:
                 raise ConfigError(self.configFile, 'Required item {!r} was not found in the config.'.format(key))

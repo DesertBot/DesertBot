@@ -2,14 +2,12 @@
 import logging
 from twisted.internet import reactor, protocol
 
+from desertbot.config import Config
 from desertbot.desertbot import DesertBot
 
 
 class DesertBotFactory(protocol.ReconnectingClientFactory):
-    def __init__(self, config):
-        """
-        @type config: Config
-        """
+    def __init__(self, config: Config):
         self.logger = logging.getLogger('desertbot.factory')
 
         self.bot = DesertBot(self, config)
