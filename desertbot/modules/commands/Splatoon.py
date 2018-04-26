@@ -64,11 +64,7 @@ class Splatoon(BotCommand):
         elif not short:
             return 'No SplatFest is currently scheduled'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
-
+    def execute(self, message: IRCMessage):
         url = "https://splatoon2.ink/data/schedules.json"
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         jsonResponse = json.loads(response.body)

@@ -303,10 +303,7 @@ class Alias(BotCommand):
         return u"unrecognized subcommand '{0}', " \
                u"available subcommands for alias are: {1}".format(subCommand, u', '.join(self.subCommands.keys()))
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if message.Command.lower() in self.ownTriggers:
             if len(message.ParameterList) > 0:
                 subCommand = message.ParameterList[0].lower()

@@ -23,10 +23,7 @@ class Choose(BotCommand):
     def help(self, query):
         return 'choose <option1>, <option2>[, <optionN>] - randomly chooses one of the given options for you'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give me any options to choose from! {}".format(self.help(None)),

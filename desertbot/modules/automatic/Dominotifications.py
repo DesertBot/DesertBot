@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from twisted.plugin import IPlugin
+from desertbot.channel import IRCChannel
 from desertbot.moduleinterface import IModule, BotModule
 from zope.interface import implementer
+from typing import Dict
 
 import re
 import json
@@ -22,17 +24,12 @@ class Dominotifications(BotModule):
            "informing you of the progress of your pizza until delivery"
 
     def onLoad(self):
-        self.trackers = {}
-        """@type : dict[str, TrackingDetails]"""
+        self.trackers = Dict[str, TrackingDetails]
 
     def onUnload(self):
         self._stopAllPizzaTrackers()
 
-    def trackPizza(self, message, url):
-        """
-        @type message: IRCMessage
-        @type url: str
-        """
+    def trackPizza(self, message: IRCMessage, url: str):
         regex = r'www\.dominos\.(co\.uk|ie)/pizzatracker/?\?id=(?P<orderID>[a-zA-Z0-9=]+)'
         match = re.search(regex, url, re.IGNORECASE)
 
@@ -49,22 +46,13 @@ class Dominotifications(BotModule):
         else:
             return u"I'm already tracking that pizza for {}".format(self.trackers[orderID].orderer), ''
 
-    def _startPizzaTracker(self, orderID):
-        """
-        @type orderID: str
-        """
+    def _startPizzaTracker(self, orderID: str):
         self.trackers[orderID].tracker.start(30)
 
-    def _pizzaLoop(self, orderID):
-        """
-        @type orderID: str
-        """
+    def _pizzaLoop(self, orderID: str):
         return threads.deferToThread(self._pizzaTracker, orderID)
 
-    def _pizzaTracker(self, orderID):
-        """
-        @type orderID: str
-        """
+    def _pizzaTracker(self, orderID: str):
         steps = {6: u"{}'s pizza order has been placed",
                  7: u"{}'s pizza is being prepared",
                  5: u"{}'s pizza is in the oven",
@@ -110,10 +98,7 @@ class Dominotifications(BotModule):
         if response is not None:
             self.bot.sendResponse(response)
 
-    def _stopPizzaTracker(self, orderID):
-        """
-        @type orderID: str
-        """
+    def _stopPizzaTracker(self, orderID: str):
         if orderID in self.trackers:
             if self.trackers[orderID].tracker.running:
                 self.trackers[orderID].tracker.stop()
@@ -127,12 +112,7 @@ class Dominotifications(BotModule):
 
 
 class TrackingDetails(object):
-    def __init__(self, orderer, channel, tracker):
-        """
-        @type orderer: str
-        @type channel: IRCChannel
-        @type tracker: task.LoopingCall
-        """
+    def __init__(self, orderer: str, channel: IRCChannel, tracker: task.LoopingCall):
         self.orderer = orderer
         self.channel = channel
         self.tracker = tracker

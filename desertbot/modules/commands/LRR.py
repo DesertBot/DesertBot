@@ -31,10 +31,7 @@ class LRR(BotCommand):
                 "series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
         return "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
 
-    def checkLRR(self, _):
-        """
-        @type _: IRCMessage
-        """
+    def checkLRR(self, _: IRCMessage):
         responses = []
         for feedName, feedDeets in iteritems(DataStore.LRRChecker):
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
@@ -72,10 +69,7 @@ class LRR(BotCommand):
             
         return responses
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)
             lowerMap = {key.lower(): key for key in DataStore.LRRChecker}

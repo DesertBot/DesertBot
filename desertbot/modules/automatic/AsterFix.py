@@ -31,10 +31,7 @@ class AsterFix(BotModule):
         self.messages = {}
 
     @ignore
-    def asterFix(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def asterFix(self, message: IRCMessage):
         changeMatch = re.match(r"^(?P<change>(\*\*[^\s*]+)|([^\s*]+)\*\*)$", message.MessageString)
         if changeMatch:
             change = changeMatch.group('change').strip('*')

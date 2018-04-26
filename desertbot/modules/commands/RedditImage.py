@@ -36,10 +36,7 @@ class RedditImage(BotCommand):
         self.imgurClientID = load_key(u'imgur Client ID')
         self.headers = [('Authorization', 'Client-ID {}'.format(self.imgurClientID))]
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) == 0 or len(message.ParameterList) > 2:
             return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
 

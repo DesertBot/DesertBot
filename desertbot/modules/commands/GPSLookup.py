@@ -30,10 +30,7 @@ class GPSLookup(BotCommand):
     def onLoad(self):
         self.api_key = load_key(u'Bing Maps')
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             if self.api_key is None:
                 return IRCResponse(ResponseType.Say, "[Bing Maps API key not found]", message.ReplyTo)

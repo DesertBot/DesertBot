@@ -21,10 +21,7 @@ class Source(BotCommand):
     def help(self, query):
         return "source - returns a link to {0}'s source".format(self.bot.nickname)
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         return IRCResponse(ResponseType.Say, self.bot.sourceURL, message.ReplyTo)
 
 

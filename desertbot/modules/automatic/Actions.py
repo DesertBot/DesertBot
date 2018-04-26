@@ -19,10 +19,7 @@ class Actions(BotModule):
         return 'Responds to various actions'
 
     @ignore
-    def handleAction(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def handleAction(self, message: IRCMessage):
         regex = r"^(?P<action>(\w+s)),?[ ]{}([^a-zA-Z0-9_\|`\[\]\^-]|$)"
         match = re.search(
             regex.format(self.bot.nickname),

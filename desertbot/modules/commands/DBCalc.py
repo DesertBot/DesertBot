@@ -19,10 +19,7 @@ class DBCalc(BotCommand):
         return 'dbcalc (hours <hours> / money <money>) - tells you how much money is required for a given number of hours, ' \
            'or how many hours will be bussed for a given amount of money'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
 

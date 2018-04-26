@@ -25,10 +25,7 @@ class Find(BotCommand):
     def help(self, query):
         return 'find/google/g <searchterm> - returns the first google result for the given search term'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         try:
             results = self.bot.moduleHandler.runActionUntilValue('search-web', message.Parameters)
 

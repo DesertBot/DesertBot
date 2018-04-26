@@ -21,10 +21,7 @@ class Notice(BotCommand):
     def help(self, query):
         return 'notice <target> <text> - makes the bot send the specified text as a notice to the specified target'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 1:
             return IRCResponse(ResponseType.Notice, " ".join(message.ParameterList[1:]), message.ParameterList[0])
         else:

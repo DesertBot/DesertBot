@@ -22,10 +22,7 @@ class Leave(BotCommand):
         return "leave/gtfo - makes the bot leave the current channel"
 
     @admin('Only my admins can tell me to leave')
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Raw, 'PART {} :{}'.format(message.ReplyTo, message.Parameters), '')
         else:

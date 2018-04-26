@@ -21,10 +21,7 @@ class Do(BotCommand):
     def help(self, query):
         return 'do <text> - makes the bot perform the specified text'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Do, message.Parameters, message.ReplyTo)
         else:

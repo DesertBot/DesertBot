@@ -35,10 +35,7 @@ class Apples(BotCommand):
             elif cmd == "wins the game!" or name == "Sorry,":
                 self.playApples = 0
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if message.Command.lower() == "playapples":
             self.playApples = 1
             return IRCResponse(ResponseType.Say, "!join", message.ReplyTo)

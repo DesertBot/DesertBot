@@ -21,10 +21,7 @@ class Reverse(BotCommand):
     def help(self, query):
         return 'reverse <text> - reverses the text given to it'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Say, message.Parameters[::-1], message.ReplyTo)
         else:

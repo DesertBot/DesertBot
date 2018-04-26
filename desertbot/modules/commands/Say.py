@@ -21,10 +21,7 @@ class Say(BotCommand):
     def help(self, query):
         return 'say [channel] <text> - makes the bot repeat the specified text'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if not message.ParameterList:
             return IRCResponse(ResponseType.Say, 'Say what?', message.ReplyTo)
         

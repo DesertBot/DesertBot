@@ -23,11 +23,7 @@ class Gif(BotCommand):
     def help(self, query):
         return 'gif [<year>] - fetches a random gif posted during Desert Bus'
     
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
-
+    def execute(self, message: IRCMessage):
         baseURL = "http://greywool.com/desertbus/{}/gifs/random.php"
         years = range(7, 11)
 

@@ -83,10 +83,7 @@ class Flip(BotCommand):
         table.update({v: k for k,v in iteritems(table)})
         self.translation = {ord(k): v for k,v in iteritems(table)}
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             translated = message.Parameters.translate(self.translation)
             reversed = translated[::-1]

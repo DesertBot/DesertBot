@@ -41,10 +41,7 @@ class Rainbow(BotCommand):
                  assembleFormattedText(A.bg.magenta['']),
                  ]
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, "You didn't give me any text to rainbow!", message.ReplyTo)
 

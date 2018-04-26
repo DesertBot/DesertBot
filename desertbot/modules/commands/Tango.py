@@ -54,10 +54,7 @@ class Tango(BotCommand):
     def help(self, query):
         return 'tango <words> - reproduces <words> with the NATO phonetic alphabet, because reasons.'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) == 0:
             return
 

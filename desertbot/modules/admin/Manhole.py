@@ -48,10 +48,7 @@ class Manhole(BotCommand):
         self.manhole.stopService()
 
     @admin
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         return IRCResponse(ResponseType.Notice, "Manhole port: {}".format(self.port), message.User.Name)
 
 

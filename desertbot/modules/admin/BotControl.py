@@ -56,21 +56,14 @@ class BotControl(BotCommand):
         (u'shutdown', _shutdown),
     ])
 
-    def help(self, query):
-        """
-        @type query: str
-        @rtype str
-        """
+    def help(self, query: str) -> str:
         command = query[0].lower()
         if command in self._commands:
             return self._commands[command].__doc__
         else:
             return u'{} - pretty obvious'.format(u', '.join(self._commands.keys()))
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         return self._commands[message.Command.lower()](self, message)
 
 

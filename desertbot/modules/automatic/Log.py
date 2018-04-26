@@ -15,7 +15,7 @@ import codecs
 import os
 
 from desertbot.message import IRCMessage
-from desertbot.response import ResponseType
+from desertbot.response import IRCResponse, ResponseType
 
 logFuncs = {
     'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.User.Name, m.MessageString),
@@ -84,18 +84,12 @@ class Log(BotCommand):
             #"-n links to the log n days ago. " \
             #"yyyy-mm-dd links to the log for the specified date"
 
-    def input(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def input(self, message: IRCMessage):
         if message.Type in logFuncs:
             logString = logFuncs[message.Type](message)
             log(os.path.join(self.bot.logPath, self.bot.server), message.ReplyTo, logString)
 
-    def output(self, response):
-        """
-        @type response: IRCResponse
-        """
+    def output(self, response: IRCResponse):
         if response.Type in logSelfFuncs:
             logString = logSelfFuncs[response.Type](self.bot.nickname, response)
             log(os.path.join(self.bot.logPath, self.bot.server),

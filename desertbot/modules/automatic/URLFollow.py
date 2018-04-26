@@ -53,10 +53,7 @@ class URLFollow(BotCommand):
         
         self.autoFollow = True
     
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if message.ParameterList[0].lower() == 'on':
             self.autoFollow = True
             return IRCResponse(ResponseType.Say, 'Auto-follow on', message.ReplyTo)
@@ -95,11 +92,7 @@ class URLFollow(BotCommand):
 
         return IRCResponse(ResponseType.Say, text, message.ReplyTo, {'urlfollowURL': url})
 
-    def dispatchToFollows(self, _, url):
-        """
-        @type _: IRCMessage
-        @type url: unicode
-        """
+    def dispatchToFollows(self, _: IRCMessage, url: str):
         youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
         twitterMatch = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)

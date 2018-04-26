@@ -22,10 +22,7 @@ class Nick(BotCommand):
         return "nick <nick> - changes the bot's nick to the one specified"
 
     @admin
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Raw, 'NICK %s' % (message.ParameterList[0]), '')
         else:

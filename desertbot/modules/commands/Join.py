@@ -21,10 +21,7 @@ class Join(BotCommand):
     def help(self, query):
         return 'join <channel> - makes the bot join the specified channel(s)'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             responses = []
             for param in message.ParameterList:
