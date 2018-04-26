@@ -8,6 +8,7 @@ from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
+from typing import List
 
 from collections import OrderedDict
 
@@ -40,16 +41,10 @@ class Time(BotCommand):
         (u'date', _date),
         ])
 
-    def help(self, query):
-        """
-        @type query: [str]
-        """
+    def help(self, query: List[str]):
         return self._commands[query[0].lower()].__doc__
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         response = self._commands[message.Command](self, message.Parameters)
         return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 

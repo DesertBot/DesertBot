@@ -30,10 +30,7 @@ class Slurp(BotCommand):
 
     htmlParser = HTMLParser()
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) < 3:
             return IRCResponse(ResponseType.Say, u"Not enough parameters, usage: {}".format(self.help(None)), message.ReplyTo)
 

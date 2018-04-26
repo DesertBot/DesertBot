@@ -28,10 +28,7 @@ class Delay(BotCommand):
     def help(self, query):
         return 'delay <duration> <command> (<parameters>) - executes the given command after the specified delay'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
 

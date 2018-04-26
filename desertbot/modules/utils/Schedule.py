@@ -8,6 +8,7 @@ from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
+from typing import List
 
 import datetime
 import re
@@ -211,11 +212,7 @@ class Schedule(BotCommand):
         (u'stop', _stop),
     ])
 
-    def help(self, query):
-        """
-        @type query: list[str]
-        @rtype str
-        """
+    def help(self, query: List[str]) -> str:
         if len(query) > 1:
             subCommand = query[1].lower()
             if subCommand in self.subCommands:
@@ -265,10 +262,7 @@ class Schedule(BotCommand):
         for _, t in iteritems(self.schedule):
             t.stop()
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             subCommand = message.ParameterList[0].lower()
             if subCommand not in self.subCommands:

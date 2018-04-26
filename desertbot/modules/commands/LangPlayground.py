@@ -5,9 +5,11 @@ Created on Mar 27, 2018
 @author: Tyranic-Moron
 """
 from twisted.plugin import IPlugin
+from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
+from typing import List
 
 import zlib
 
@@ -21,11 +23,7 @@ class LangPlayground(BotCommand):
     def triggers(self):
         return ['lang']
 
-    def help(self, query):
-        """
-        @type query: list[str]
-        @rtype str
-        """
+    def help(self, query: List[str]) -> str:
         return self._helpText()
 
     def onLoad(self):
@@ -52,12 +50,7 @@ int main() {{
     def _helpText(self):
         return u"{}lang <lang> <code> - evaluates the given code using https://tio.run".format(self.bot.commandChar)
 
-    def _tio(self, lang, code):
-        """
-        @type lang: str
-        @type code: str
-        @rtype str
-        """
+    def _tio(self, lang: str, code: str) -> str:
         if self.languages == None:
             langUrl = "https://raw.githubusercontent.com/TryItOnline/tryitonline/master/usr/share/tio.run/languages.json"
             response = requests.get(langUrl)
@@ -113,10 +106,7 @@ int main() {{
 
         return u' | '.join(r.decode('utf-8', 'ignore') for r in returned)
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             lang = message.ParameterList[0].lower()
             result = self._tio(lang, u' '.join(message.ParameterList[1:]))

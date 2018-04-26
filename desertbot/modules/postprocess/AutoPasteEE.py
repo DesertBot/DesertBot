@@ -9,6 +9,7 @@ from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule, BotModule
 from zope.interface import implementer
 
+from desertbot.response import IRCResponse
 from desertbot.utils import string
 
 
@@ -23,10 +24,7 @@ class AutoPasteEE(BotModule):
         return "Automatic module that uploads overly " \
                "long reponses to paste.ee and gives you a link instead"
 
-    def execute(self, response):
-        """
-        @type response: IRCResponse
-        """
+    def execute(self, response: IRCResponse):
         limit = 700  # chars
         expire = 10  # minutes
         if len(response.Response) > limit:

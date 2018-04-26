@@ -13,6 +13,7 @@ from future.standard_library import install_aliases
 install_aliases()
 from urllib.parse import urlparse
 from six import iteritems
+from typing import Any, Dict, Optional
 
 from apiclient.discovery import build
 
@@ -57,12 +58,7 @@ class WebUtils(BotModule):
                                                   ('search-web', 1, self.googleSearch),
                                                   ('upload-pasteee', 1, self.pasteEE)]
 
-    def fetchURL(self, url, params=None, extraHeaders=None):
-        """
-        @type url: unicode
-        @type extraHeaders: dict
-        @rtype: URLResponse
-        """
+    def fetchURL(self, url: str, params: Any=None, extraHeaders: Optional[Dict[str, str]]=None) -> URLResponse:
         headers = {
             "User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
             "Accept": "text/*, "
@@ -90,13 +86,7 @@ class WebUtils(BotModule):
 
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L43
-    def postURL(self, url, data=None, json=None, extraHeaders=None):
-        """
-        @type url: unicode
-        @type values: dict[unicode, T]
-        @type extraHeaders: dict[unicode, unicode]
-        @rtype: URLResponse
-        """
+    def postURL(self, url: str, data: Any=None, json: Any=None, extraHeaders: Optional[Dict[str, str]]=None) -> URLResponse:
         headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
                    "Accept": "text/*, "
                              "application/xml, application/xhtml+xml, "
@@ -115,11 +105,7 @@ class WebUtils(BotModule):
         except requests.exceptions.RequestException:
             self.logger.exception("POST to {!r} failed!".format(url))
 
-    def shortenGoogl(self, url):
-        """
-        @type url: unicode
-        @rtype: unicode
-        """
+    def shortenGoogl(self, url: str) -> str:
         post = {"longUrl": url}
 
         googlKey = load_key(u'goo.gl')
@@ -141,11 +127,7 @@ class WebUtils(BotModule):
         except requests.exceptions.RequestException:
             self.logger.exception("Goo.gl error")
 
-    def googleSearch(self, query):
-        """
-        @type query: unicode
-        @rtype: dict[unicode, T]
-        """
+    def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
         googleKey = load_key(u'Google')
         if not googleKey:
             return None
@@ -159,14 +141,7 @@ class WebUtils(BotModule):
 
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L74
-    def pasteEE(self, data, description, expire, raw=True):
-        """
-        @type data: unicode
-        @type description: unicode
-        @type expire: int
-        @type raw: bool
-        @rtype: unicode
-        """
+    def pasteEE(self, data: str, description: str, expire: int, raw: bool=True) -> str:
         pasteEEKey = load_key(u'Paste.ee')
 
         values = {u"key": "public",

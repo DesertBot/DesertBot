@@ -8,6 +8,7 @@ from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand, admin
 from zope.interface import implementer
+from typing import List
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -22,17 +23,11 @@ class Update(BotCommand):
     def triggers(self):
         return ['update']
     
-    def help(self, query):
-        """
-        @type query: list[str]
-        """
+    def help(self, query: List[str]) -> str:
         return "update - pulls the latest code from GitHub and reloads affected modules"
 
     @admin
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         subprocess.check_call(['git', 'fetch'])
 
         output = subprocess.check_output(['git', 'log', '--no-merges',

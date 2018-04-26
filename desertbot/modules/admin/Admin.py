@@ -8,6 +8,7 @@ from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand, admin
 from zope.interface import implementer
+from typing import List
 
 import re
 from collections import OrderedDict
@@ -93,11 +94,7 @@ class Admin(BotCommand):
         (u'del', _del),
         (u'list', _list)])
 
-    def help(self, query):
-        """
-        @type query: list[str]
-        @rtype str
-        """
+    def help(self, query: List[str]) -> str:
         if len(query) > 1:
             subCommand = query[1].lower()
             if subCommand in self.subCommands:

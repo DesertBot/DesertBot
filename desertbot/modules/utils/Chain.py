@@ -30,10 +30,7 @@ class Chain(BotCommand):
            '$output is the output text of the previous command in the chain\n' \
            '$var is any extra var that may have been added to the message by commands earlier in the chain'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         # split on unescaped |
         chain = re.split(r'(?<!\\)\|', message.Parameters)
 

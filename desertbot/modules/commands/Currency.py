@@ -28,10 +28,7 @@ class Currency(BotCommand):
 
     runInThread = True
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) < 3:
             return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
 

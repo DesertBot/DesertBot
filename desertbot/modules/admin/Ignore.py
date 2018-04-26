@@ -91,11 +91,7 @@ class Ignore(BotCommand):
         (u'del', _del),
         (u'list', _list)])
 
-    def help(self, message):
-        """
-        @type message: IRCMessage
-        @rtype str
-        """
+    def help(self, message: IRCMessage) -> str:
         if len(message.ParameterList) > 1:
             subCommand = message.ParameterList[1].lower()
             if subCommand in self.subCommands:

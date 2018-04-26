@@ -19,10 +19,7 @@ class Help(BotCommand):
         return 'help/module(s) (<module>) - returns a list of loaded modules, ' \
                'or the help text of a particular module if one is specified'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         moduleHandler = self.bot.moduleHandler
 
         if message.ParameterList:

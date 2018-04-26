@@ -3,7 +3,9 @@ from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand, admin
 from zope.interface import implementer
+from typing import List, Tuple
 
+from desertbot.message import IRCMessage
 from desertbot.modulehandler import ModuleHandler
 from desertbot.response import IRCResponse, ResponseType
 
@@ -22,10 +24,7 @@ class ModuleLoader(BotCommand):
         return "load/reload/unload <module> - handles loading/reloading/unloading of modules."
 
     @admin
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't specify a module name! Usage: {0}".format(self.help),
@@ -53,13 +52,7 @@ class ModuleLoader(BotCommand):
 
         return responses
 
-    def load(self, moduleNames, moduleHandler):
-        """
-        @type moduleNames: list[str]
-        @type moduleHandler: ModuleHandler
-        @return: (list[str], list[str], list[str])
-        """
-
+    def load(self, moduleNames: List[str], moduleHandler: ModuleHandler) -> Tuple[List[str], List[str], List[str]]:
         moduleNameCaseMap = {m.lower(): m for m in moduleNames}
 
         successes = []
@@ -80,12 +73,7 @@ class ModuleLoader(BotCommand):
 
         return successes, failures, exceptions
 
-    def reload(self, moduleNames, moduleHandler):
-        """
-        @type moduleNames: list[str]
-        @type moduleHandler: ModuleHandler
-        @return: (list[str], list[str], list[str])
-        """
+    def reload(self, moduleNames: List[str], moduleHandler: ModuleHandler) -> Tuple[List[str], List[str], List[str]]:
         moduleNameCaseMap = {m.lower(): m for m in moduleNames}
 
         successes = []
@@ -119,13 +107,7 @@ class ModuleLoader(BotCommand):
 
         return successes, failures, exceptions
 
-    def unload(self, moduleNames, moduleHandler):
-        """
-        @type moduleNames: list[str]
-        @type moduleHandler: ModuleHandler
-        @return: (list[str], list[str], list[str])
-        """
-
+    def unload(self, moduleNames: List[str], moduleHandler: ModuleHandler) -> Tuple[List[str], List[str], List[str]]:
         moduleNameCaseMap = {m.lower(): m for m in moduleNames}
 
         successes = []

@@ -7,6 +7,7 @@ Created on May 11, 2014
 
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule, BotModule
+from desertbot.response import IRCResponse
 from zope.interface import implementer
 
 from desertbot.utils import string
@@ -23,10 +24,7 @@ class StripColour(BotModule):
         return "Automatic module that strips colours from responses " \
                "if colours are blocked by channel mode"
 
-    def execute(self, response):
-        """
-        @type response: IRCResponse
-        """
+    def execute(self, response: IRCResponse):
         channel = self.bot.getChannel(response.Target)
         if channel is not None and 'c' in channel.Modes:
             # strip formatting if colours are blocked on the channel

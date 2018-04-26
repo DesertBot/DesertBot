@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from twisted.plugin import IPlugin
+from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule, ignore
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
@@ -411,10 +412,7 @@ class Responses(BotCommand):
             self.logger.exception("Exception in boop response.")
 
     @ignore
-    def respond(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def respond(self, message: IRCMessage):
         if message.Command:
             return
 
@@ -430,10 +428,7 @@ class Responses(BotCommand):
         return triggers
 
     @ignore
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) > 0:
             enableds = []
             for param in message.ParameterList:
@@ -489,26 +484,15 @@ class MobroResponse(object):
                 (datetime.datetime.utcnow() - self.lastTriggered).seconds >= self.seconds and
                 self.match(message))
 
-    def chat(self, saywords, chatMessage):
-        """
-        @type saywords: str
-        @type chatMessage: IRCMessage
-        @return: IRCResponse
-        """
+    def chat(self, saywords: str, chatMessage: IRCMessage) -> IRCResponse:
         return IRCResponse(self.responseType, saywords, chatMessage.ReplyTo)
 
-    def toggle(self, chatMessage):
-        """
-        @type chatMessage: IRCMessage
-        """
+    def toggle(self, chatMessage: IRCMessage):
         self.enabled = not self.enabled
         return self.chat("Response {!r} {}".format(self.name, 'enabled' if self.enabled else 'disabled'), chatMessage)
 
     # overwrite this with your own talkwords(IRCMessage) function if a response calls for it
-    def talkwords(self, chatMessage):
-        """
-        @type chatMessage: IRCMessage
-        """
+    def talkwords(self, chatMessage: IRCMessage):
         if isinstance(self.response, str):
             self.response = [self.response]
         responses = []
@@ -516,10 +500,7 @@ class MobroResponse(object):
             responses.append(self.chat(response, chatMessage))
         return responses
 
-    def trigger(self, chatMessage):
-        """
-        @type chatMessage: IRCMessage
-        """
+    def trigger(self, chatMessage: IRCMessage):
         if self.eligible(chatMessage.MessageString):
             self.lastTriggered = datetime.datetime.utcnow()
             return self.talkwords(chatMessage)
@@ -531,11 +512,7 @@ class MobroResponseDict(object):
     def add(self, mbr):
         self.dict[mbr.name] = mbr
 
-    def toggle(self, name, chatMessage):
-        """
-        @type name: str
-        @type chatMessage: IRCMessage
-        """
+    def toggle(self, name: str, chatMessage: IRCMessage):
         if name.lower() in self.dict:
             return self.dict[name.lower()].toggle(chatMessage)
         return

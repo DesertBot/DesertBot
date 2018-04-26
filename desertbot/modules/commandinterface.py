@@ -7,7 +7,9 @@ Created on Feb 28, 2018
 
 from fnmatch import fnmatch
 from functools import wraps, partial
+from typing import Callable, List, Optional, Tuple, Union
 
+from desertbot.message import IRCMessage
 from desertbot.moduleinterface import BotModule
 from desertbot.response import IRCResponse, ResponseType
 
@@ -34,26 +36,22 @@ class BotCommand(BotModule):
     def triggers(self):
         return []
 
-    def actions(self):
+    def actions(self) -> List[Tuple[str, int, Callable]]:
         return super(BotCommand, self).actions() + [('botmessage', 1, self.handleCommand)]
 
-    def onLoad(self):
+    def onLoad(self) -> None:
         self.triggerHelp = {}
 
-    def displayHelp(self, query):
+    def displayHelp(self, query: str) -> str:
         if query[0].lower() in self.triggers() or query[0].lower() == self.__class__.__name__.lower():
             return self.help(query)
 
-    def help(self, query):
+    def help(self, query: str) -> str:
         if query[0].lower() in self.triggerHelp:
             return self.triggerHelp[query[0].lower()]
         return super(BotCommand, self).help(query)
 
-    def checkPermissions(self, message):
-        """
-        @type message: IRCMessage
-        @rtype Boolean
-        """
+    def checkPermissions(self, message: IRCMessage) -> bool:
         for owner in self.bot.config.getWithDefault('owners', []):
             if fnmatch(message.User.String, owner):
                 return True
@@ -62,7 +60,7 @@ class BotCommand(BotModule):
                 return True
         return False
 
-    def handleCommand(self, message):
+    def handleCommand(self, message: IRCMessage) -> Optional[IRCResponse]:
         if not self.shouldExecute(message):
             return
 
@@ -73,19 +71,11 @@ class BotCommand(BotModule):
             error_text = "Python execution error while running command {!r}: {}: {}".format(message.Command, type(e).__name__, e)
             self.bot.moduleHandler.sendPRIVMSG(error_text, message.ReplyTo)
 
-    def shouldExecute(self, message):
-        """
-        @type message: IRCMessage
-        @rtype Boolean
-        """
+    def shouldExecute(self, message: IRCMessage) -> bool:
         if message.Command.lower() not in [t.lower() for t in self.triggers()]:
             return False
 
         return True
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        @rtype IRCResponse | list[IRCResponse]
-        """
+    def execute(self, message: IRCMessage) -> Union[IRCResponse, List[IRCResponse]]:
         return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

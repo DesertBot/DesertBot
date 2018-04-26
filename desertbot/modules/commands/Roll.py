@@ -26,11 +26,7 @@ class Roll(BotCommand):
     def onLoad(self):
         self.roller = dice.DiceParser()
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
-
+    def execute(self, message: IRCMessage):
         verbose = False
         if message.Command.lower().endswith('v'):
             verbose = True

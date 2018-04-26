@@ -24,10 +24,7 @@ class Dinner(BotCommand):
         return 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com' \
            ' what you should make for dinner'
     
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         wtfsimfd = "http://whatthefuckshouldimakefordinner.com/{}"
 
         options = {'meat': 'index.php', 'veg': 'veg.php', 'drink': 'drinks.php'}

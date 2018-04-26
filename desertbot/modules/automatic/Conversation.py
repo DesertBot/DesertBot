@@ -19,10 +19,7 @@ class Conversation(BotModule):
         return 'Responds to greetings and such'
 
     @ignore
-    def handleConversation(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def handleConversation(self, message: IRCMessage):
         greetings = ["(wa+s+|')?so?u+p",
                      "hi(ya)?",
                      "hello",

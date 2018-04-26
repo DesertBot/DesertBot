@@ -23,10 +23,7 @@ class EightBall(BotCommand):
     def help(self):
         return '8ball (question) - swirls a magic 8-ball to give you the answer to your questions'
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         answers = ['It is certain',  # positive
                    'It is decidedly so',
                    'Without a doubt',

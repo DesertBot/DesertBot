@@ -52,10 +52,7 @@ class Sed(BotCommand):
 
         return self.sed(message, match)
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         match = self.match(message.Parameters)
 
         return self.sed(message, match)

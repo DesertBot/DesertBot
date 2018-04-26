@@ -27,10 +27,7 @@ class Urban(BotCommand):
     def help(self, query):
         return "urban <search term> - returns the definition of the given search term from UrbanDictionary.com"
     
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give a word! Usage: {0}".format(self.help),

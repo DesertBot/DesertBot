@@ -272,11 +272,7 @@ class Hangman(BotCommand):
                                u'[Hangman] maximum bad guesses should be an integer between 1 and 20',
                                message.ReplyTo)
 
-    def _guess(self, message):
-        """
-        @type message: IRCMessage
-        @rtype: IRCResponse
-        """
+    def _guess(self, message: IRCMessage) -> IRCResponse:
         channel = message.ReplyTo.lower()
         if channel not in self.gameStates:
             return IRCResponse(ResponseType.Say,
@@ -342,10 +338,7 @@ class Hangman(BotCommand):
         (u'max', _setMaxBadGuesses),
     ])
 
-    def help(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def help(self, message: IRCMessage):
         if len(message.ParameterList) == 1:
             return self._helpText
 
@@ -361,10 +354,7 @@ class Hangman(BotCommand):
         else:
             return self._helpText
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
+    def execute(self, message: IRCMessage):
         if len(message.ParameterList) == 0:
             return self._start(message)
 

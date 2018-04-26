@@ -41,11 +41,7 @@ class Sub(BotCommand):
            "syntax: text {command params} more text {command {command params} {command params}}\n" \
            "example: .sub Some {rainbow magical} {flip topsy-turvy} text"
 
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        """
-
+    def execute(self, message: IRCMessage):
         subString = self._mangleEscapes(message.Parameters)
 
         try:
