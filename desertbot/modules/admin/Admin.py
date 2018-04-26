@@ -32,14 +32,14 @@ class Admin(BotCommand):
                                u"You didn't give me a user to add!",
                                message.ReplyTo)
 
-        for admin in message.ParameterList[1:]:
+        for adminName in message.ParameterList[1:]:
             if message.ReplyTo in self.bot.channels:
-                if admin in self.bot.channels[message.ReplyTo].Users:
-                    user = self.bot.channels[message.ReplyTo].Users[admin]
-                    admin = u'*!{}@{}'.format(user.User, user.Hostmask)
+                if adminName in self.bot.channels[message.ReplyTo].Users:
+                    user = self.bot.channels[message.ReplyTo].Users[adminName]
+                    adminName = u'*!{}@{}'.format(user.User, user.Hostmask)
 
             admins = self.bot.config.getWithDefault('admins', [])
-            admins.append(admin)
+            admins.append(adminName)
             self.bot.config['admins'] = admins
 
         self.bot.config.writeConfig()
@@ -59,18 +59,18 @@ class Admin(BotCommand):
         deleted = []
         skipped = []
         admins = self.bot.config.getWithDefault('admins', [])
-        for admin in message.ParameterList[1:]:
+        for adminName in message.ParameterList[1:]:
             if message.ReplyTo in self.bot.channels:
-                if admin in self.bot.channels[message.ReplyTo].Users:
+                if adminName in self.bot.channels[message.ReplyTo].Users:
                     user = self.bot.channels[message.ReplyTo].Users[admin]
-                    admin = u'*!{}@{}'.format(user.User, user.Hostmask)
+                    adminName = u'*!{}@{}'.format(user.User, user.Hostmask)
 
-            if admin not in admins:
-                skipped.append(admin)
+            if adminName not in admins:
+                skipped.append(adminName)
                 continue
 
-            admins.remove(admin)
-            deleted.append(admin)
+            admins.remove(adminName)
+            deleted.append(adminName)
 
         self.bot.config['admins'] = admins
         self.bot.config.writeConfig()

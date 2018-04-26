@@ -7,8 +7,6 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-from six import string_types
-
 
 @implementer(IPlugin, IModule)
 class Help(BotCommand):
