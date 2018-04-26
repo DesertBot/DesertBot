@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from twisted.plugin import IPlugin
-from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule, ignore
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer

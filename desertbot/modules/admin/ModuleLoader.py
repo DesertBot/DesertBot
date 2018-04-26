@@ -9,9 +9,6 @@ from desertbot.message import IRCMessage
 from desertbot.modulehandler import ModuleHandler
 from desertbot.response import IRCResponse, ResponseType
 
-import sys
-import traceback
-
 from six import iteritems
 
 

@@ -6,13 +6,11 @@ from zope.interface import implementer
 import requests
 import json
 import re
-import time
 
 from builtins import str
 from future.standard_library import install_aliases
 install_aliases()
 from urllib.parse import urlparse
-from six import iteritems
 from typing import Any, Dict, Optional
 
 from apiclient.discovery import build
@@ -142,7 +140,7 @@ class WebUtils(BotModule):
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L74
     def pasteEE(self, data: str, description: str, expire: int, raw: bool=True) -> str:
-        pasteEEKey = load_key(u'Paste.ee')
+        # pasteEEKey = load_key(u'Paste.ee') (Heufneutje, 2018-4-27): Unused?
 
         values = {u"key": "public",
                   u"description": description,
