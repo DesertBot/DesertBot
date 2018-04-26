@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from builtins import str
+from typing import Dict
 
 
 class ResponseType(Enum):
@@ -15,14 +16,7 @@ class IRCResponse(object):
     Response = ''
     Target = ''
 
-    def __init__(self, messageType, response, target, extraVars=None, metadata=None):
-        """
-        @type messageType: ResponseType
-        @type response: unicode
-        @type target: unicode
-        @type extraVars: dict
-        @type metadata: dict
-        """
+    def __init__(self, messageType: ResponseType, response: str, target: str, extraVars: Dict=None, metadata: Dict=None):
         if extraVars is None:
             extraVars = {}
         if metadata is None:

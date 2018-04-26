@@ -9,18 +9,16 @@ from twisted.python.rebuild import rebuild
 from twisted.internet import threads
 from enum import Enum
 from six import iteritems
+from typing import Any, List
 
 from desertbot.moduleinterface import IModule
 import desertbot.modules
-from desertbot.message import TargetTypes
+from desertbot.message import IRCMessage, TargetTypes
 from desertbot.response import ResponseType
 
 
 class ModuleHandler(object):
-    def __init__(self, bot):
-        """
-        @type bot: DesertBot
-        """
+    def __init__(self, bot: 'DesertBot'):
         self.bot = bot
         self.logger = logging.getLogger('desertbot.modulehandler')
 
@@ -30,7 +28,7 @@ class ModuleHandler(object):
         self.actions = {}
         self.mappedTriggers = {}
 
-    def loadModule(self, name, rebuild_=True):
+    def loadModule(self, name: str, rebuild_: bool=True) -> str:
         for module in getPlugins(IModule, desertbot.modules):
             if module.__class__.__name__ and module.__class__.__name__.lower() == name.lower():
                 if rebuild_:
@@ -41,7 +39,7 @@ class ModuleHandler(object):
 
                 return module.__class__.__name__
 
-    def _loadModuleData(self, module):
+    def _loadModuleData(self, module: Any) -> None:
         if not IModule.providedBy(module):
             raise ModuleLoaderError(module.__class__.__name__,
                                     "Module doesn't implement the module interface.",
@@ -84,7 +82,7 @@ class ModuleHandler(object):
         self.fileMap.update({inspect.getsourcefile(module.__class__).split(os.path.sep)[-1]: module.__class__.__name__})
         self.caseMap.update({module.__class__.__name__.lower(): module.__class__.__name__})
 
-    def unloadModule(self, name):
+    def unloadModule(self, name: str) -> str:
         if name.lower() not in self.caseMap:
             raise ModuleLoaderError(name, "The module is not loaded.", ModuleLoadType.UNLOAD)
 
@@ -112,14 +110,14 @@ class ModuleHandler(object):
 
         return name
 
-    def reloadModule(self, name):
+    def reloadModule(self, name: str) -> str:
         self.unloadModule(name)
         return self.loadModule(name)
 
-    def sendPRIVMSG(self, message, destination):
+    def sendPRIVMSG(self, message: str, destination: str) -> None:
         self.bot.msg(destination, message)
 
-    def handleMessage(self, message):
+    def handleMessage(self, message: IRCMessage) -> None:
         isChannel = message.TargetType == TargetTypes.CHANNEL
         typeActionMap = {
             "PRIVMSG": lambda: "message-channel" if isChannel else "message-user",
@@ -140,7 +138,7 @@ class ModuleHandler(object):
         d.addCallback(self.sendResponses)
         d.addErrback(self._deferredError)
 
-    def sendResponses(self, responses):
+    def sendResponses(self, responses: List) -> None:
         typeActionMap = {
             ResponseType.Say: "response-message",
             ResponseType.Do: "response-action",
@@ -172,7 +170,7 @@ class ModuleHandler(object):
     def _deferredError(self, error):
         pass
 
-    def loadAll(self):
+    def loadAll(self) -> None:
         configModulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
         modulesToLoad = set()
         if 'all' in configModulesToLoad:
@@ -192,14 +190,14 @@ class ModuleHandler(object):
             except Exception:
                 self.logger.exception("Exception when loading module {!r}".format(module))
 
-    def runGenericAction(self, actionName, *params, **kw):
+    def runGenericAction(self, actionName: str, *params: Any, **kw: Any) -> None:
         actionList = []
         if actionName in self.actions:
             actionList = self.actions[actionName]
         for action in actionList:
             action[0](*params, **kw)
 
-    def runProcessingAction(self, actionName, data, *params, **kw):
+    def runProcessingAction(self, actionName: str, data: Any, *params: Any, **kw: Any) -> None:
         actionList = []
         if actionName in self.actions:
             actionList = self.actions[actionName]
@@ -208,7 +206,7 @@ class ModuleHandler(object):
             if not data:
                 return
 
-    def runGatheringAction(self, actionName, *params, **kw):
+    def runGatheringAction(self, actionName: str, *params: Any, **kw: Any) -> List:
         actionList = []
         if actionName in self.actions:
             actionList = self.actions[actionName]
@@ -224,7 +222,7 @@ class ModuleHandler(object):
 
         return responses
 
-    def runActionUntilTrue(self, actionName, *params, **kw):
+    def runActionUntilTrue(self, actionName: str, *params: Any, **kw: Any) -> bool:
         actionList = []
         if actionName in self.actions:
             actionList = self.actions[actionName]
@@ -233,7 +231,7 @@ class ModuleHandler(object):
                 return True
         return False
 
-    def runActionUntilFalse(self, actionName, *params, **kw):
+    def runActionUntilFalse(self, actionName: str, *params: Any, **kw: Any) -> bool:
         actionList = []
         if actionName in self.actions:
             actionList = self.actions[actionName]
@@ -242,7 +240,7 @@ class ModuleHandler(object):
                 return True
         return False
 
-    def runActionUntilValue(self, actionName, *params, **kw):
+    def runActionUntilValue(self, actionName: str, *params: Any, **kw: Any) -> Any:
         actionList = []
         if actionName in self.actions:
             actionList = self.actions[actionName]

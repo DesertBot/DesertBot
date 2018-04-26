@@ -2,10 +2,7 @@
 
 
 class IRCUser(object):
-    def __init__(self, user):
-        """
-        @type user: str
-        """
+    def __init__(self, user: str):
         self.User = None
         self.Hostmask = None
 
