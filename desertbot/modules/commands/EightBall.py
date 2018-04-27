@@ -49,7 +49,7 @@ class EightBall(BotCommand):
 
         return IRCResponse(ResponseType.Say,
                            'The Magic 8-ball says... {}'.format(random.choice(answers)),
-                           message.ReplyTo)
+                           message.replyTo)
 
 
 eightball = EightBall()

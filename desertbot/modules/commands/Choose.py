@@ -24,19 +24,19 @@ class Choose(BotCommand):
         return 'choose <option1>, <option2>[, <optionN>] - randomly chooses one of the given options for you'
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) == 0:
+        if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give me any options to choose from! {}".format(self.help(None)),
-                               message.ReplyTo)
+                               message.replyTo)
 
-        if ',' in message.Parameters:
-            options = message.Parameters.split(',')
+        if ',' in message.parameters:
+            options = message.parameters.split(',')
         else:
-            options = message.Parameters.split()
+            options = message.parameters.split()
 
         choice = random.choice(options).strip()
 
-        return IRCResponse(ResponseType.Say, choice, message.ReplyTo, {'chooseChoice': choice})
+        return IRCResponse(ResponseType.Say, choice, message.replyTo, {'chooseChoice': choice})
 
 
 choose = Choose()

@@ -107,13 +107,13 @@ int main() {{
         return u' | '.join(r.decode('utf-8', 'ignore') for r in returned)
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
-            lang = message.ParameterList[0].lower()
-            result = self._tio(lang, u' '.join(message.ParameterList[1:]))
+        if len(message.parameterList) > 0:
+            lang = message.parameterList[0].lower()
+            result = self._tio(lang, u' '.join(message.parameterList[1:]))
         else:
-            return IRCResponse(ResponseType.Say, self._helpText(), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self._helpText(), message.replyTo)
 
-        return IRCResponse(ResponseType.Say, result.replace("\n", " "), message.ReplyTo)
+        return IRCResponse(ResponseType.Say, result.replace("\n", " "), message.replyTo)
 
 
 langPlayground = LangPlayground()

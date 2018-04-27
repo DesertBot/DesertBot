@@ -23,10 +23,10 @@ class Nick(BotCommand):
 
     @admin
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
-            return IRCResponse(ResponseType.Raw, 'NICK %s' % (message.ParameterList[0]), '')
+        if len(message.parameterList) > 0:
+            return IRCResponse(ResponseType.Raw, 'NICK %s' % (message.parameterList[0]), '')
         else:
-            return IRCResponse(ResponseType.Say, 'Change my %s to what?' % message.Command, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, 'Change my %s to what?' % message.command, message.replyTo)
 
 
 nick = Nick()

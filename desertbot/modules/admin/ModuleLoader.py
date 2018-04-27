@@ -22,30 +22,30 @@ class ModuleLoader(BotCommand):
 
     @admin
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) == 0:
+        if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't specify a module name! Usage: {0}".format(self.help),
-                               message.ReplyTo)
+                               message.replyTo)
 
-        command = {'load': self.load, 'reload': self.reload, 'unload': self.unload}[message.Command.lower()]
+        command = {'load': self.load, 'reload': self.reload, 'unload': self.unload}[message.command.lower()]
 
-        successes, failures, exceptions = command(message.ParameterList, self.bot.moduleHandler)
+        successes, failures, exceptions = command(message.parameterList, self.bot.moduleHandler)
 
         responses = []
         if len(successes) > 0:
             responses.append(IRCResponse(ResponseType.Say,
                                          "'{0}' {1}ed successfully".format(', '.join(successes),
-                                                                           message.Command.lower()),
-                                         message.ReplyTo))
+                                                                           message.command.lower()),
+                                         message.replyTo))
         if len(failures) > 0:
             responses.append(IRCResponse(ResponseType.Say,
                                          "'{0}' failed to {1}, or (they) do not exist".format(', '.join(failures),
-                                                                                              message.Command.lower()),
-                                         message.ReplyTo))
+                                                                                              message.command.lower()),
+                                         message.replyTo))
         if len(exceptions) > 0:
             responses.append(IRCResponse(ResponseType.Say,
                                          "'{0}' threw an exception (printed to console)".format(', '.join(exceptions)),
-                                         message.ReplyTo))
+                                         message.replyTo))
 
         return responses
 

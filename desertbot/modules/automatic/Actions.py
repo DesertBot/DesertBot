@@ -23,12 +23,12 @@ class Actions(BotModule):
         regex = r"^(?P<action>(\w+s)),?[ ]{}([^a-zA-Z0-9_\|`\[\]\^-]|$)"
         match = re.search(
             regex.format(self.bot.nickname),
-            message.MessageString,
+            message.messageString,
             re.IGNORECASE)
         if match:
             return IRCResponse(ResponseType.Do,
-                               re.sub(self.bot.nickname, message.User.Name, message.MessageString, flags=re.IGNORECASE),
-                               message.ReplyTo)
+                               re.sub(self.bot.nickname, message.user.name, message.messageString, flags=re.IGNORECASE),
+                               message.replyTo)
 
 
 actions = Actions()

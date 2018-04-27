@@ -31,20 +31,20 @@ class Slurp(BotCommand):
     htmlParser = HTMLParser()
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) < 3:
-            return IRCResponse(ResponseType.Say, u"Not enough parameters, usage: {}".format(self.help(None)), message.ReplyTo)
+        if len(message.parameterList) < 3:
+            return IRCResponse(ResponseType.Say, u"Not enough parameters, usage: {}".format(self.help(None)), message.replyTo)
 
-        prop, url, selector = (message.ParameterList[0], message.ParameterList[1], u" ".join(message.ParameterList[2:]))
+        prop, url, selector = (message.parameterList[0], message.parameterList[1], u" ".join(message.parameterList[2:]))
 
         if not re.match(r'^\w+://', url):
             url = u"http://{}".format(url)
 
-        if 'slurp' in message.Metadata and url in message.Metadata['slurp']:
-            soup = message.Metadata['slurp'][url]
+        if 'slurp' in message.metadata and url in message.metadata['slurp']:
+            soup = message.metadata['slurp'][url]
         else:
             page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             if page is None:
-                return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.ReplyTo)
+                return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.replyTo)
             soup = BeautifulSoup(page.body, 'lxml')
 
         tag = soup.select_one(selector)
@@ -52,7 +52,7 @@ class Slurp(BotCommand):
         if tag is None:
             return IRCResponse(ResponseType.Say,
                                u"'{}' does not select a tag at {}".format(selector, url),
-                               message.ReplyTo)
+                               message.replyTo)
 
         specials = {
             'tagname': tag.name,
@@ -68,7 +68,7 @@ class Slurp(BotCommand):
                                u"The tag selected by '{}' ({}) does not have attribute '{}'".format(selector,
                                                                                                     tag.name,
                                                                                                     prop),
-                               message.ReplyTo)
+                               message.replyTo)
 
         if not isinstance(value, string_types):
             value = u" ".join(value)
@@ -79,7 +79,7 @@ class Slurp(BotCommand):
         value = re.sub(r'\s+', u' ', value)
         value = self.htmlParser.unescape(value)
 
-        return IRCResponse(ResponseType.Say, value, message.ReplyTo,
+        return IRCResponse(ResponseType.Say, value, message.replyTo,
                            extraVars={'slurpURL': url},
                            metadata={'slurp': {url: soup}})
 

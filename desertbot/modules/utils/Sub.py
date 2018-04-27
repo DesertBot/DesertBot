@@ -42,7 +42,7 @@ class Sub(BotCommand):
            "example: .sub Some {rainbow magical} {flip topsy-turvy} text"
 
     def execute(self, message: IRCMessage):
-        subString = self._mangleEscapes(message.Parameters)
+        subString = self._mangleEscapes(message.parameters)
 
         try:
             segments = list(self._parseSubcommandTree(subString))
@@ -51,8 +51,8 @@ class Sub(BotCommand):
             normal = assembleFormattedText(A.normal[''])
             error = subString[:e.column] + red + subString[e.column] + normal + subString[e.column+1:]
             error = self._unmangleEscapes(error, False)
-            return [IRCResponse(ResponseType.Say, u"Sub Error: {}".format(e.message), message.ReplyTo),
-                    IRCResponse(ResponseType.Say, error, message.ReplyTo)]
+            return [IRCResponse(ResponseType.Say, u"Sub Error: {}".format(e.message), message.replyTo),
+                    IRCResponse(ResponseType.Say, error, message.replyTo)]
 
         prevLevel = -1
         responseStack = []
@@ -72,22 +72,22 @@ class Sub(BotCommand):
                 command = re.sub(r'\$\b{}\b'.format(re.escape(var)), u'{}'.format(value), command)
 
             # Build a new message out of this segment
-            inputMessage = IRCMessage(message.Type, message.User.String, message.Channel,
+            inputMessage = IRCMessage(message.type, message.user.string, message.channel,
                                       self.bot.commandChar + command.lstrip(),
                                       self.bot,
                                       metadata=metadata)
 
             # Execute the constructed message
-            if inputMessage.Command.lower() in self.bot.moduleHandler.mappedTriggers:
-                response = self.bot.moduleHandler.mappedTriggers[inputMessage.Command.lower()].execute(inputMessage)
+            if inputMessage.command.lower() in self.bot.moduleHandler.mappedTriggers:
+                response = self.bot.moduleHandler.mappedTriggers[inputMessage.command.lower()].execute(inputMessage)
                 """@type : IRCResponse"""
             else:
                 return IRCResponse(ResponseType.Say,
-                                   u"'{}' is not a recognized command trigger".format(inputMessage.Command),
-                                   message.ReplyTo)
+                                   u"'{}' is not a recognized command trigger".format(inputMessage.command),
+                                   message.replyTo)
 
             # Push the response onto the stack
-            responseStack.append((level, response.Response, start, end))
+            responseStack.append((level, response.response, start, end))
             # Update the extraVars dict
             extraVars.update(response.ExtraVars)
             metadata = self._recursiveMerge(metadata, response.Metadata)
@@ -96,7 +96,7 @@ class Sub(BotCommand):
 
         responseString = self._substituteResponses(subString, responseStack, -1, extraVars, -1)
         responseString = self._unmangleEscapes(responseString)
-        return IRCResponse(ResponseType.Say, responseString, message.ReplyTo, extraVars=extraVars, metadata=metadata)
+        return IRCResponse(ResponseType.Say, responseString, message.replyTo, extraVars=extraVars, metadata=metadata)
 
     @staticmethod
     def _parseSubcommandTree(string):

@@ -29,18 +29,18 @@ class Currency(BotCommand):
     runInThread = True
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) < 3:
-            return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
+        if len(message.parameterList) < 3:
+            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
         try:
-            amount = float(message.ParameterList[0])
+            amount = float(message.parameterList[0])
             offset = 1
         except ValueError:
             amount = 1.0
             offset = 0
 
-        ccFrom = message.ParameterList[offset].upper()
-        ccTo   = message.ParameterList[offset+2:]
+        ccFrom = message.parameterList[offset].upper()
+        ccTo   = message.parameterList[offset + 2:]
         ccTo   = ",".join(ccTo)
         ccTo   = ccTo.upper()
 
@@ -53,14 +53,14 @@ class Currency(BotCommand):
         if not rates:
             return IRCResponse(ResponseType.Say,
                                "Some or all of those currencies weren't recognized!",
-                               message.ReplyTo)
+                               message.replyTo)
 
         data = []
         for curr,rate in iteritems(rates):
             data.append("{:.2f} {}".format(rate*amount, curr))
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
-        return IRCResponse(ResponseType.Say, graySplitter.join(data), message.ReplyTo)
+        return IRCResponse(ResponseType.Say, graySplitter.join(data), message.replyTo)
 
 
 currency = Currency()

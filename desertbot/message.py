@@ -16,47 +16,47 @@ class IRCMessage(object):
     def __init__(self, msgType: str, user: str, channel: IRCChannel, message: str, bot: 'DesertBot', metadata: Dict=None):
         if metadata is None:
             metadata = {}
-        self.Metadata = metadata
+        self.metadata = metadata
 
         if isinstance(message, bytes):
             unicodeMessage = message.decode('utf-8', 'ignore')
         else:  # Already utf-8?
             unicodeMessage = message
-        self.Type = msgType
-        self.MessageList = unicodeMessage.strip().split(' ')
-        self.MessageString = unicodeMessage
-        self.User = IRCUser(user)
+        self.type = msgType
+        self.messageList = unicodeMessage.strip().split(' ')
+        self.messageString = unicodeMessage
+        self.user = IRCUser(user)
 
-        self.Channel = None
+        self.channel = None
         if channel is None:
-            self.ReplyTo = self.User.Name
-            self.TargetType = TargetTypes.USER
+            self.replyTo = self.user.name
+            self.targetType = TargetTypes.USER
         else:
-            self.Channel = channel
+            self.channel = channel
             # I would like to set this to the channel object but I would probably break functionality if I did :I
-            self.ReplyTo = channel.Name
-            self.TargetType = TargetTypes.CHANNEL
+            self.replyTo = channel.name
+            self.targetType = TargetTypes.CHANNEL
 
-        self.Command = ''
-        self.Parameters = ''
-        self.ParameterList = []
+        self.command = ''
+        self.parameters = ''
+        self.parameterList = []
 
-        if self.MessageList[0].startswith(bot.commandChar):
-            self.Command = self.MessageList[0][len(bot.commandChar):]
-            if self.Command == '':
-                self.Command = self.MessageList[1]
-                self.Parameters = u' '.join(self.MessageList[2:])
+        if self.messageList[0].startswith(bot.commandChar):
+            self.command = self.messageList[0][len(bot.commandChar):]
+            if self.command == '':
+                self.command = self.messageList[1]
+                self.parameters = u' '.join(self.messageList[2:])
             else:
-                self.Parameters = u' '.join(self.MessageList[1:])
-        elif re.match('{}[:,]?'.format(re.escape(bot.nickname)), self.MessageList[0], re.IGNORECASE):
-            if len(self.MessageList) > 1:
-                self.Command = self.MessageList[1]
-                self.Parameters = u' '.join(self.MessageList[2:])
+                self.parameters = u' '.join(self.messageList[1:])
+        elif re.match('{}[:,]?'.format(re.escape(bot.nickname)), self.messageList[0], re.IGNORECASE):
+            if len(self.messageList) > 1:
+                self.command = self.messageList[1]
+                self.parameters = u' '.join(self.messageList[2:])
 
-        if self.Parameters.strip():
-            self.ParameterList = self.Parameters.split(' ')
+        if self.parameters.strip():
+            self.parameterList = self.parameters.split(' ')
 
-            self.ParameterList = [param for param in self.ParameterList if param != '']
+            self.parameterList = [param for param in self.parameterList if param != '']
 
-            if len(self.ParameterList) == 1 and not self.ParameterList[0]:
-                self.ParameterList = []
+            if len(self.parameterList) == 1 and not self.parameterList[0]:
+                self.parameterList = []

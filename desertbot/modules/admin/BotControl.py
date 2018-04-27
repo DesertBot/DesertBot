@@ -64,7 +64,7 @@ class BotControl(BotCommand):
             return u'{} - pretty obvious'.format(u', '.join(self._commands.keys()))
 
     def execute(self, message: IRCMessage):
-        return self._commands[message.Command.lower()](self, message)
+        return self._commands[message.command.lower()](self, message)
 
 
 botcontrol = BotControl()

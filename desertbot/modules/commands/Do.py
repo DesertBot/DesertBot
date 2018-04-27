@@ -22,10 +22,10 @@ class Do(BotCommand):
         return 'do <text> - makes the bot perform the specified text'
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
-            return IRCResponse(ResponseType.Do, message.Parameters, message.ReplyTo)
+        if len(message.parameterList) > 0:
+            return IRCResponse(ResponseType.Do, message.parameters, message.replyTo)
         else:
-            return IRCResponse(ResponseType.Do, 'Do what?', message.ReplyTo)
+            return IRCResponse(ResponseType.Do, 'Do what?', message.replyTo)
 
 
 do = Do()

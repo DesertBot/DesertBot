@@ -118,7 +118,7 @@ class ModuleHandler(object):
         self.bot.msg(destination, message)
 
     def handleMessage(self, message: IRCMessage) -> None:
-        isChannel = message.TargetType == TargetTypes.CHANNEL
+        isChannel = message.targetType == TargetTypes.CHANNEL
         typeActionMap = {
             "PRIVMSG": lambda: "message-channel" if isChannel else "message-user",
             "ACTION": lambda: "action-channel" if isChannel else "action-user",
@@ -132,7 +132,7 @@ class ModuleHandler(object):
             "MODE": lambda: "modeschanged-channel" if isChannel else "modeschanged-user",
             "TOPIC": lambda: "channeltopic",
         }
-        action = typeActionMap[message.Type]()
+        action = typeActionMap[message.type]()
         # fire off a thread for every incoming message
         d = threads.deferToThread(self.runGatheringAction, action, message)
         d.addCallback(self.sendResponses)
@@ -146,23 +146,23 @@ class ModuleHandler(object):
             ResponseType.Raw: "response-",
         }
         for response in responses:
-            if not response or not response.Response:
+            if not response or not response.response:
                 continue
 
-            action = typeActionMap[response.Type]
-            if response.Type == ResponseType.Raw:
-                action += response.Response.split()[0].lower()
+            action = typeActionMap[response.type]
+            if response.type == ResponseType.Raw:
+                action += response.response.split()[0].lower()
             self.runProcessingAction(action, response)
 
             try:
-                if response.Type == ResponseType.Say:
-                    self.bot.msg(response.Target, response.Response)
-                elif response.Type == ResponseType.Do:
-                    self.bot.describe(response.Target, response.Response)
-                elif response.Type == ResponseType.Notice:
-                    self.bot.notice(response.Target, response.Response)
-                elif response.Type == ResponseType.Raw:
-                    self.bot.sendLine(response.Response)
+                if response.type == ResponseType.Say:
+                    self.bot.msg(response.target, response.response)
+                elif response.type == ResponseType.Do:
+                    self.bot.describe(response.target, response.response)
+                elif response.type == ResponseType.Notice:
+                    self.bot.notice(response.target, response.response)
+                elif response.type == ResponseType.Raw:
+                    self.bot.sendLine(response.response)
             except Exception:
                 # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
                 self.logger.exception("Python Execution Error sending responses {!r}".format(responses))

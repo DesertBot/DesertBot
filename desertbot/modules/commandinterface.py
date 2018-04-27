@@ -20,11 +20,11 @@ def admin(func=None, msg=''):
         def wrapped_func(inst, message):
             if not inst.checkPermissions(message):
                 if msg:
-                    return IRCResponse(ResponseType.Say, msg, message.ReplyTo)
+                    return IRCResponse(ResponseType.Say, msg, message.replyTo)
                 else:
                     return IRCResponse(ResponseType.Say,
-                                       "Only my admins may use {!r}".format(message.Command),
-                                       message.ReplyTo)
+                                       "Only my admins may use {!r}".format(message.command),
+                                       message.replyTo)
             return func(inst, message)
 
         return wrapped_func
@@ -53,10 +53,10 @@ class BotCommand(BotModule):
 
     def checkPermissions(self, message: IRCMessage) -> bool:
         for owner in self.bot.config.getWithDefault('owners', []):
-            if fnmatch(message.User.String, owner):
+            if fnmatch(message.user.string, owner):
                 return True
         for admin in self.bot.config.getWithDefault('admins', []):
-            if fnmatch(message.User.String, admin):
+            if fnmatch(message.user.string, admin):
                 return True
         return False
 
@@ -67,15 +67,15 @@ class BotCommand(BotModule):
         try:
             return self.execute(message)
         except Exception as e:
-            self.logger.exception("Python execution error while running command {!r}".format(message.Command))
-            error_text = "Python execution error while running command {!r}: {}: {}".format(message.Command, type(e).__name__, e)
-            self.bot.moduleHandler.sendPRIVMSG(error_text, message.ReplyTo)
+            self.logger.exception("Python execution error while running command {!r}".format(message.command))
+            error_text = "Python execution error while running command {!r}: {}: {}".format(message.command, type(e).__name__, e)
+            self.bot.moduleHandler.sendPRIVMSG(error_text, message.replyTo)
 
     def shouldExecute(self, message: IRCMessage) -> bool:
-        if message.Command.lower() not in [t.lower() for t in self.triggers()]:
+        if message.command.lower() not in [t.lower() for t in self.triggers()]:
             return False
 
         return True
 
     def execute(self, message: IRCMessage) -> Union[IRCResponse, List[IRCResponse]]:
-        return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)
+        return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.replyTo)

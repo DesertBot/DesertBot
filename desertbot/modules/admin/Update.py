@@ -35,7 +35,7 @@ class Update(BotCommand):
         changes = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         if len(changes) == 0:
-            return IRCResponse(ResponseType.Say, 'The bot is already up to date', message.ReplyTo)
+            return IRCResponse(ResponseType.Say, 'The bot is already up to date', message.replyTo)
 
         changes = list(reversed(changes))
         response = u'New commits: {}'.format(u' | '.join(changes))
@@ -48,7 +48,7 @@ class Update(BotCommand):
         if returnCode != 0:
             return IRCResponse(ResponseType.Say,
                                'Merge after update failed, please merge manually',
-                               message.ReplyTo)
+                               message.replyTo)
 
         if 'requirements.txt' in changedFiles:
             try:
@@ -90,7 +90,7 @@ class Update(BotCommand):
 
         return IRCResponse(ResponseType.Say,
                            response,
-                           message.ReplyTo)
+                           message.replyTo)
 
 
 update = Update()

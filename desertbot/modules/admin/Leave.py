@@ -23,10 +23,10 @@ class Leave(BotCommand):
 
     @admin('Only my admins can tell me to leave')
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
-            return IRCResponse(ResponseType.Raw, 'PART {} :{}'.format(message.ReplyTo, message.Parameters), '')
+        if len(message.parameterList) > 0:
+            return IRCResponse(ResponseType.Raw, 'PART {} :{}'.format(message.replyTo, message.parameters), '')
         else:
-            return IRCResponse(ResponseType.Raw, 'PART {} :toodles!'.format(message.ReplyTo), '')
+            return IRCResponse(ResponseType.Raw, 'PART {} :toodles!'.format(message.replyTo), '')
 
 
 leave = Leave()

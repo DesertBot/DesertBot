@@ -3,17 +3,17 @@
 
 class IRCUser(object):
     def __init__(self, user: str):
-        self.User = None
-        self.Hostmask = None
+        self.user = None
+        self.hostmask = None
 
         if '!' in user:
             userArray = user.split('!')
-            self.Name = userArray[0]
+            self.name = userArray[0]
             if len(userArray) > 1:
                 userArray = userArray[1].split('@')
-                self.User = userArray[0]
-                self.Hostmask = userArray[1]
-            self.String = "{}!{}@{}".format(self.Name, self.User, self.Hostmask)
+                self.user = userArray[0]
+                self.hostmask = userArray[1]
+            self.string = "{}!{}@{}".format(self.name, self.user, self.hostmask)
         else:
-            self.Name = user
-            self.String = "{}!{}@{}".format(self.Name, None, None)
+            self.name = user
+            self.string = "{}!{}@{}".format(self.name, None, None)

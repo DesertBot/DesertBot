@@ -22,7 +22,7 @@ class Source(BotCommand):
         return "source - returns a link to {0}'s source".format(self.bot.nickname)
 
     def execute(self, message: IRCMessage):
-        return IRCResponse(ResponseType.Say, self.bot.sourceURL, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, self.bot.sourceURL, message.replyTo)
 
 
 source = Source()

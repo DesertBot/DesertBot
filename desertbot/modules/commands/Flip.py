@@ -84,12 +84,12 @@ class Flip(BotCommand):
         self.translation = {ord(k): v for k,v in iteritems(table)}
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
-            translated = message.Parameters.translate(self.translation)
+        if len(message.parameterList) > 0:
+            translated = message.parameters.translate(self.translation)
             reversed = translated[::-1]
-            return IRCResponse(ResponseType.Say, reversed, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, reversed, message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, 'Flip what?', message.ReplyTo)
+            return IRCResponse(ResponseType.Say, 'Flip what?', message.replyTo)
 
 
 flip = Flip()

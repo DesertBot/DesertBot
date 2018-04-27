@@ -28,15 +28,15 @@ class Roll(BotCommand):
 
     def execute(self, message: IRCMessage):
         verbose = False
-        if message.Command.lower().endswith('v'):
+        if message.command.lower().endswith('v'):
             verbose = True
 
         try:
-            result = self.roller.parse(message.Parameters)
+            result = self.roller.parse(message.parameters)
         except OverflowError:
             return IRCResponse(ResponseType.Say,
                                u'Error: result too large to calculate',
-                               message.ReplyTo)
+                               message.replyTo)
         except (ZeroDivisionError,
                 dice.UnknownCharacterException,
                 dice.SyntaxErrorException,
@@ -45,7 +45,7 @@ class Roll(BotCommand):
                 NotImplementedError) as e:
             return IRCResponse(ResponseType.Say,
                                u'Error: {}'.format(e),
-                               message.ReplyTo)
+                               message.replyTo)
 
         if verbose:
             rollStrings = self.roller.getRollStrings()
@@ -54,15 +54,15 @@ class Roll(BotCommand):
             if len(rollString) > 200:
                 rollString = u"LOTS O' DICE"
 
-            response = u'{} rolled: [{}] {}'.format(message.User.Name, rollString, result)
+            response = u'{} rolled: [{}] {}'.format(message.user.name, rollString, result)
 
         else:
-            response = u'{} rolled: {}'.format(message.User.Name, result)
+            response = u'{} rolled: {}'.format(message.user.name, result)
 
         if self.roller.description:
             response += u' {}'.format(self.roller.description)
 
-        return IRCResponse(ResponseType.Say, response, message.ReplyTo, {'rollTotal': result})
+        return IRCResponse(ResponseType.Say, response, message.replyTo, {'rollTotal': result})
 
 
 roll = Roll()

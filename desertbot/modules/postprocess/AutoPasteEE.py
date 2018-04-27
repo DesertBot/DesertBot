@@ -27,14 +27,14 @@ class AutoPasteEE(BotModule):
     def execute(self, response: IRCResponse):
         limit = 700  # chars
         expire = 10  # minutes
-        if len(response.Response) > limit:
-            description = u'Response longer than {} chars intended for {}'.format(limit, response.Target)
+        if len(response.response) > limit:
+            description = u'Response longer than {} chars intended for {}'.format(limit, response.target)
             replaced = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
-                                                                  string.stripFormatting(response.Response),
+                                                                  string.stripFormatting(response.response),
                                                                   description,
                                                                   expire)
 
-            response.Response = u'Response too long, pasted here instead: {} (Expires in {} minutes)'.format(replaced,
+            response.response = u'Response too long, pasted here instead: {} (Expires in {} minutes)'.format(replaced,
                                                                                                              expire)
 
 

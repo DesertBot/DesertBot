@@ -17,7 +17,7 @@ class CommandHandler(BotModule):
                                                         ('message-user', 1, self.handleCommand)]
 
     def handleCommand(self, message):
-        if message.Command:
+        if message.command:
             return self.bot.moduleHandler.runGatheringAction('botmessage', message)
 
 

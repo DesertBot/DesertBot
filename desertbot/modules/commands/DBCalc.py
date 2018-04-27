@@ -20,15 +20,15 @@ class DBCalc(BotCommand):
            'or how many hours will be bussed for a given amount of money'
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) < 2:
-            return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
+        if len(message.parameterList) < 2:
+            return IRCResponse(ResponseType.Say, self.help, message.replyTo)
 
-        if message.ParameterList[0].lower() == 'hours':
-            return IRCResponse(ResponseType.Say, DBCalc.hours(message.ParameterList[1]), message.ReplyTo)
-        elif message.ParameterList[0].lower() == 'money':
-            return IRCResponse(ResponseType.Say, DBCalc.money(message.ParameterList[1]), message.ReplyTo)
+        if message.parameterList[0].lower() == 'hours':
+            return IRCResponse(ResponseType.Say, DBCalc.hours(message.parameterList[1]), message.replyTo)
+        elif message.parameterList[0].lower() == 'money':
+            return IRCResponse(ResponseType.Say, DBCalc.money(message.parameterList[1]), message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.help, message.replyTo)
 
     @classmethod
     def hours(cls, hours):

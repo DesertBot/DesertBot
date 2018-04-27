@@ -18,22 +18,22 @@ from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
 logFuncs = {
-    'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.User.Name, m.MessageString),
-    'ACTION': lambda m: u'*{0} {1}*'.format(m.User.Name, m.MessageString),
-    'NOTICE': lambda m: u'[{0}] {1}'.format(m.User.Name, m.MessageString),
-    'JOIN': lambda m: u' >> {0} ({1}@{2}) joined {3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo),
-    'NICK': lambda m: u'{0} is now known as {1}'.format(m.User.Name, m.MessageString),
-    'PART': lambda m: u' << {0} ({1}@{2}) left {3}{4}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo, m.MessageString),
-    'QUIT': lambda m: u' << {0} ({1}@{2}) quit{3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.MessageString),
-    'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.Kickee, m.User.Name, m.MessageString),
-    'TOPIC': lambda m: u'# {0} set the topic to: {1}'.format(m.User.Name, m.MessageString),
-    'MODE': lambda m: u'# {0} sets mode: {1}{2} {3}'.format(m.User.Name, m.ModeOperator, m.Modes, ' '.join(m.ModeArgs)),
+    'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.user.name, m.messageString),
+    'ACTION': lambda m: u'*{0} {1}*'.format(m.user.name, m.messageString),
+    'NOTICE': lambda m: u'[{0}] {1}'.format(m.user.name, m.messageString),
+    'JOIN': lambda m: u' >> {0} ({1}@{2}) joined {3}'.format(m.user.name, m.user.user, m.user.hostmask, m.replyTo),
+    'NICK': lambda m: u'{0} is now known as {1}'.format(m.user.name, m.messageString),
+    'PART': lambda m: u' << {0} ({1}@{2}) left {3}{4}'.format(m.user.name, m.user.user, m.user.hostmask, m.replyTo, m.messageString),
+    'QUIT': lambda m: u' << {0} ({1}@{2}) quit{3}'.format(m.user.name, m.user.user, m.user.hostmask, m.messageString),
+    'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.kickee, m.user.name, m.messageString),
+    'TOPIC': lambda m: u'# {0} set the topic to: {1}'.format(m.user.name, m.messageString),
+    'MODE': lambda m: u'# {0} sets mode: {1}{2} {3}'.format(m.user.name, m.modeOperator, m.modes, ' '.join(m.modeArgs)),
 }
 
 logSelfFuncs = {
-    ResponseType.Say: lambda nick, r: u'<{0}> {1}'.format(nick, r.Response),
-    ResponseType.Do: lambda nick, r: u'*{0} {1}*'.format(nick, r.Response),
-    ResponseType.Notice: lambda nick, r: u'[{0}] {1}'.format(nick, r.Response),
+    ResponseType.Say: lambda nick, r: u'<{0}> {1}'.format(nick, r.response),
+    ResponseType.Do: lambda nick, r: u'*{0} {1}*'.format(nick, r.response),
+    ResponseType.Notice: lambda nick, r: u'[{0}] {1}'.format(nick, r.response),
 }
 
 
@@ -85,15 +85,15 @@ class Log(BotCommand):
             #"yyyy-mm-dd links to the log for the specified date"
 
     def input(self, message: IRCMessage):
-        if message.Type in logFuncs:
-            logString = logFuncs[message.Type](message)
-            log(os.path.join(self.bot.logPath, self.bot.server), message.ReplyTo, logString)
+        if message.type in logFuncs:
+            logString = logFuncs[message.type](message)
+            log(os.path.join(self.bot.logPath, self.bot.server), message.replyTo, logString)
 
     def output(self, response: IRCResponse):
-        if response.Type in logSelfFuncs:
-            logString = logSelfFuncs[response.Type](self.bot.nickname, response)
+        if response.type in logSelfFuncs:
+            logString = logSelfFuncs[response.type](self.bot.nickname, response)
             log(os.path.join(self.bot.logPath, self.bot.server),
-                response.Target,
+                response.target,
                 logString)
 
         return response

@@ -27,19 +27,19 @@ class Gif(BotCommand):
         baseURL = "http://greywool.com/desertbus/{}/gifs/random.php"
         years = range(7, 11)
 
-        if len(message.ParameterList) > 0:
+        if len(message.parameterList) > 0:
             invalid = u"'{}' is not a valid year, valid years are {} to {}"\
-                .format(message.ParameterList[0], years[0], years[-1])
+                .format(message.parameterList[0], years[0], years[-1])
             try:
-                if len(message.ParameterList[0]) < 4:
-                    year = int(message.ParameterList[0])
+                if len(message.parameterList[0]) < 4:
+                    year = int(message.parameterList[0])
                 else:
                     raise ValueError
             except ValueError:
-                return IRCResponse(ResponseType.Say, invalid, message.ReplyTo)
+                return IRCResponse(ResponseType.Say, invalid, message.replyTo)
 
             if year not in years:
-                return IRCResponse(ResponseType.Say, invalid, message.ReplyTo)
+                return IRCResponse(ResponseType.Say, invalid, message.replyTo)
         else:
             year = random.choice(years)
 
@@ -51,7 +51,7 @@ class Gif(BotCommand):
 
         return IRCResponse(ResponseType.Say,
                            u"Random DB{} gif: {}".format(year, link),
-                           message.ReplyTo)
+                           message.replyTo)
 
 
 gif = Gif()

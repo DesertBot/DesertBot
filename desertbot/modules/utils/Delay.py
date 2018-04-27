@@ -29,19 +29,19 @@ class Delay(BotCommand):
         return 'delay <duration> <command> (<parameters>) - executes the given command after the specified delay'
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) < 2:
-            return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
+        if len(message.parameterList) < 2:
+            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
-        command = message.ParameterList[1].lower()
-        delay = timeparse(message.ParameterList[0])
+        command = message.parameterList[1].lower()
+        delay = timeparse(message.parameterList[0])
         delayDelta = datetime.timedelta(seconds=delay)
         delayString = string.deltaTimeToString(delayDelta, 's')
-        params = message.ParameterList[2:]
+        params = message.parameterList[2:]
         commandString = u'{}{} {}'.format(self.bot.commandChar, command, u' '.join(params))
         commandString = commandString.replace('$delayString', delayString)
         commandString = commandString.replace('$delay', str(delay))
 
-        newMessage = IRCMessage(message.Type, message.User.String, message.Channel, commandString, self.bot)
+        newMessage = IRCMessage(message.type, message.user.string, message.channel, commandString, self.bot)
 
         moduleHandler = self.bot.moduleHandler
         if command in moduleHandler.mappedTriggers:
@@ -49,24 +49,24 @@ class Delay(BotCommand):
             d.addCallback(self.bot.sendResponse)
             return IRCResponse(ResponseType.Say,
                                "OK, I'll execute that in {}".format(delayString),
-                               message.ReplyTo,
+                               message.replyTo,
                                {'delay': delay, 'delayString': delayString})
         else:
             if 'Alias' not in moduleHandler.commands:
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is not a recognized command".format(command),
-                                   message.ReplyTo)
+                                   message.replyTo)
 
             if command not in moduleHandler.commands['Alias'].aliases:
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is not a recognized command or alias".format(command),
-                                   message.ReplyTo)
+                                   message.replyTo)
 
             d = task.deferLater(reactor, delay, moduleHandler.commands['Alias'].execute, newMessage)
             d.addCallback(self.bot.sendResponse)
             return IRCResponse(ResponseType.Say,
                                "OK, I'll execute that in {}".format(delayString),
-                               message.ReplyTo)
+                               message.replyTo)
 
 
 delay = Delay()

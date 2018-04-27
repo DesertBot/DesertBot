@@ -149,7 +149,7 @@ class Responses(BotCommand):
             def ducktapeTalkwords(message):
                 return [IRCResponse(ResponseType.Say,
                                     'Just saying, %s is a dick in Minecraft' % self.ductMatch.group('duc'),
-                                    message.ReplyTo)]
+                                    message.replyTo)]
 
             ducktape = MobroResponse('ducktape', '', '')
             ducktape.match = ducktapeMatch
@@ -196,16 +196,16 @@ class Responses(BotCommand):
 
             def animalTalkwords(message):
                 # Specific user animals
-                if self.animal == 'cow' and message.User.Name.lower() == 'neo-gabi':
+                if self.animal == 'cow' and message.user.name.lower() == 'neo-gabi':
                     return [IRCResponse(ResponseType.Do,
                                         'points at {0}, and says "{0} was the cow all along!"'
-                                        .format(message.User.Name),
-                                        message.ReplyTo)]
+                                        .format(message.user.name),
+                                        message.replyTo)]
 
                 randomChance = random.randint(1, 20)
 
                 # Emily Bonus
-                if message.User.Name == 'Emily':
+                if message.user.name == 'Emily':
                     randomChance = random.randint(1, 25)
                     
                 article = 'an' if self.animal[0] in 'aeiou' else 'a'
@@ -215,66 +215,66 @@ class Responses(BotCommand):
                     ''' User Critically Failed '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY NOT the droid you are looking for.'.format(message.User.Name),
-                                            message.ReplyTo)]
+                                            '{} is DEFINITELY NOT the droid you are looking for.'.format(message.user.name),
+                                            message.replyTo)]
                     elif self.animal == 'goose':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is a clown!'.format(message.User.Name),
-                                            message.ReplyTo)]
+                                            '{} is a clown!'.format(message.user.name),
+                                            message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} critically fails at being {} {}.'.format(message.User.Name, article, self.animal),
-                                            message.ReplyTo)]
+                                            '{} critically fails at being {} {}.'.format(message.user.name, article, self.animal),
+                                            message.replyTo)]
 
                 elif randomChance <= 8:
                     ''' User Is Not A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not the droid you are looking for.'.format(message.User.Name),
-                                            message.ReplyTo)]
+                                            '{} is not the droid you are looking for.'.format(message.user.name),
+                                            message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not {} {}.'.format(message.User.Name, article, self.animal),
-                                            message.ReplyTo)]
+                                            '{} is not {} {}.'.format(message.user.name, article, self.animal),
+                                            message.replyTo)]
                 elif randomChance <= 14:
                     '''User Might Be A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} might be the droid you are looking for.'.format(message.User.Name),
-                                            message.ReplyTo)]
+                                            '{} might be the droid you are looking for.'.format(message.user.name),
+                                            message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} /might/ be {} {}.'.format(message.User.Name, article, self.animal),
-                                            message.ReplyTo)]
+                                            '{} /might/ be {} {}.'.format(message.user.name, article, self.animal),
+                                            message.replyTo)]
                 elif randomChance <= 19:
                     ''' User Is A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is the droid you are looking for.'.format(message.User.Name),
-                                            message.ReplyTo)]
+                                            '{} is the droid you are looking for.'.format(message.user.name),
+                                            message.replyTo)]
                     elif self.animal == 'puppeh':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is such doge. wow.'.format(message.User.Name),
-                                            message.ReplyTo)]
+                                            '{} is such doge. wow.'.format(message.user.name),
+                                            message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY {} {}.'.format(message.User.Name, article, self.animal),
-                                            message.ReplyTo)]
+                                            '{} is DEFINITELY {} {}.'.format(message.user.name, article, self.animal),
+                                            message.replyTo)]
                 elif randomChance == 20:
                     ''' User Is A Critical [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY the droid you are looking for.'.format(message.User.Name),
-                                            message.ReplyTo)]
+                                            '{} is DEFINITELY the droid you are looking for.'.format(message.user.name),
+                                            message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is a CRITICAL {}!'.format(message.User.Name, self.animal),
-                                            message.ReplyTo)]
+                                            '{} is a CRITICAL {}!'.format(message.user.name, self.animal),
+                                            message.replyTo)]
                 else:
                     ''' Roll is outside of bounds, Magic! '''
                     return [IRCResponse(ResponseType.Say,
                                         'You are clearly a magician rolling out of bounds like that!',
-                                        message.ReplyTo)]
+                                        message.replyTo)]
 
             animalResponse = MobroResponse('animal', '', '', seconds=0)
             animalResponse.match = animalMatch
@@ -395,7 +395,7 @@ class Responses(BotCommand):
                     ]
                 return [IRCResponse(ResponseType.Say,
                                     'Boop! {}'.format(random.choice(boops)),
-                                    message.ReplyTo)]
+                                    message.replyTo)]
 
             boop = MobroResponse('boop', '', '', seconds=120)
             boop.match = boopMatch
@@ -412,7 +412,7 @@ class Responses(BotCommand):
 
     @ignore
     def respond(self, message: IRCMessage):
-        if message.Command:
+        if message.command:
             return
 
         triggers = []
@@ -428,9 +428,9 @@ class Responses(BotCommand):
 
     @ignore
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
+        if len(message.parameterList) > 0:
             enableds = []
-            for param in message.ParameterList:
+            for param in message.parameterList:
                 enableds.append(self.responses.toggle(param, message))
             return enableds
         else:
@@ -447,10 +447,10 @@ class Responses(BotCommand):
 
             return [IRCResponse(ResponseType.Say,
                                 'Enabled responses: {}'.format(', '.join(enabled)),
-                                message.ReplyTo),
+                                message.replyTo),
                     IRCResponse(ResponseType.Say,
                                 'Disabled responses: {}'.format(', '.join(disabled)),
-                                message.ReplyTo)]
+                                message.replyTo)]
 
 
 class MobroResponse(object):
@@ -484,7 +484,7 @@ class MobroResponse(object):
                 self.match(message))
 
     def chat(self, saywords: str, chatMessage: IRCMessage) -> IRCResponse:
-        return IRCResponse(self.responseType, saywords, chatMessage.ReplyTo)
+        return IRCResponse(self.responseType, saywords, chatMessage.replyTo)
 
     def toggle(self, chatMessage: IRCMessage):
         self.enabled = not self.enabled
@@ -500,7 +500,7 @@ class MobroResponse(object):
         return responses
 
     def trigger(self, chatMessage: IRCMessage):
-        if self.eligible(chatMessage.MessageString):
+        if self.eligible(chatMessage.messageString):
             self.lastTriggered = datetime.datetime.utcnow()
             return self.talkwords(chatMessage)
 

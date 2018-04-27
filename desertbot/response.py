@@ -12,28 +12,28 @@ class ResponseType(Enum):
 
 
 class IRCResponse(object):
-    Type = ResponseType.Say
-    Response = ''
-    Target = ''
+    type = ResponseType.Say
+    response = ''
+    target = ''
 
     def __init__(self, messageType: ResponseType, response: str, target: str, extraVars: Dict=None, metadata: Dict=None):
         if extraVars is None:
             extraVars = {}
         if metadata is None:
             metadata = {}
-        self.Type = messageType
+        self.type = messageType
         try:
-            self.Response = str(response, 'utf-8')
+            self.response = str(response, 'utf-8')
         except TypeError:  # Already utf-8?
-            self.Response = response
+            self.response = response
         try:
-            self.Target = str(target, 'utf-8')
+            self.target = str(target, 'utf-8')
         except TypeError:  # Already utf-8?
-            self.Target = target
+            self.target = target
 
         # remove CTCP chars
-        if not self.Type == ResponseType.Raw:
-            self.Response = self.Response.replace('\x01', '')
+        if not self.type == ResponseType.Raw:
+            self.response = self.response.replace('\x01', '')
 
         self.ExtraVars = extraVars
         self.Metadata = metadata

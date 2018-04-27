@@ -69,7 +69,7 @@ class Splatoon(BotCommand):
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         jsonResponse = json.loads(response.body)
 
-        if len(message.ParameterList) < 1:
+        if len(message.parameterList) < 1:
             # do everything
             data = []
             data += filter(None, [self._regular(jsonResponse, short=True)])
@@ -78,7 +78,7 @@ class Splatoon(BotCommand):
             data += filter(None, [self._fest(jsonResponse, short=True)])
             return IRCResponse(ResponseType.Say,
                                self.graySplitter.join(data),
-                               message.ReplyTo)
+                               message.replyTo)
         else:
             subCommands = {
                 'regular': self._regular,
@@ -86,13 +86,13 @@ class Splatoon(BotCommand):
                 'league': self._league,
                 'fest': self._fest
             }
-            subCommand = message.ParameterList[0].lower()
+            subCommand = message.parameterList[0].lower()
             if subCommand in subCommands:
                 return IRCResponse(ResponseType.Say,
                                    subCommands[subCommand](jsonResponse, short=False),
-                                   message.ReplyTo)
+                                   message.replyTo)
             else:
-                return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
+                return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
 
 splatoon = Splatoon()

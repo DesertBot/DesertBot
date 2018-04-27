@@ -42,21 +42,21 @@ class Rainbow(BotCommand):
                  ]
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) == 0:
-            return IRCResponse(ResponseType.Say, "You didn't give me any text to rainbow!", message.ReplyTo)
+        if len(message.parameterList) == 0:
+            return IRCResponse(ResponseType.Say, "You didn't give me any text to rainbow!", message.replyTo)
 
         outputMessage = u''
 
-        if message.Command == 'rainbow':
-            for i, c in enumerate(message.Parameters):
+        if message.command == 'rainbow':
+            for i, c in enumerate(message.parameters):
                 outputMessage += self.colours[i % len(self.colours)] + c
         else:
-            for i, c in enumerate(message.Parameters):
+            for i, c in enumerate(message.parameters):
                 outputMessage += self.bgcolours[i % len(self.bgcolours)] + c
 
         outputMessage += assembleFormattedText(A.normal[''])
 
-        return IRCResponse(ResponseType.Say, outputMessage, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, outputMessage, message.replyTo)
 
 
 rainbow = Rainbow()

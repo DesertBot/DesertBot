@@ -5,22 +5,22 @@ from typing import Any
 
 class IRCChannel(object):
     def __init__(self, name: str):
-        self.Name = name
-        self.Topic = ''
-        self.TopicSetBy = ''
-        self.Users = {}
-        self.Ranks = {}
-        self.Modes = {}
+        self.name = name
+        self.topic = ''
+        self.topicSetBy = ''
+        self.users = {}
+        self.ranks = {}
+        self.modes = {}
 
     def __str__(self):
-        return self.Name
+        return self.name
 
     def getHighestStatusOfUser(self, nickname: str) -> Any:
-        if not self.Ranks[nickname]:
+        if not self.ranks[nickname]:
             return None
 
-        for mode in serverinfo.StatusOrder:
-            if mode in self.Ranks[nickname]:
+        for mode in serverinfo.statusOrder:
+            if mode in self.ranks[nickname]:
                 return mode
 
         return None
