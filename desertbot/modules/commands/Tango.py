@@ -55,13 +55,13 @@ class Tango(BotCommand):
         return 'tango <words> - reproduces <words> with the NATO phonetic alphabet, because reasons.'
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) == 0:
+        if len(message.parameterList) == 0:
             return
 
-        response = ' '.join(tang[letter.upper()] if letter.upper() in tang else letter for letter in message.Parameters)
+        response = ' '.join(tang[letter.upper()] if letter.upper() in tang else letter for letter in message.parameters)
         return IRCResponse(ResponseType.Say,
                            response,
-                           message.ReplyTo)
+                           message.replyTo)
 
 
 tango = Tango()

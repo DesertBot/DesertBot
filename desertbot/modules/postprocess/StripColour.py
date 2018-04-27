@@ -25,10 +25,10 @@ class StripColour(BotModule):
                "if colours are blocked by channel mode"
 
     def execute(self, response: IRCResponse):
-        channel = self.bot.getChannel(response.Target)
-        if channel is not None and 'c' in channel.Modes:
+        channel = self.bot.getChannel(response.target)
+        if channel is not None and 'c' in channel.modes:
             # strip formatting if colours are blocked on the channel
-            response.Response = string.stripFormatting(response.Response)
+            response.response = string.stripFormatting(response.response)
 
 
 stripcolour = StripColour()

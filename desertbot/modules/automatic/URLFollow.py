@@ -54,29 +54,29 @@ class URLFollow(BotCommand):
         self.autoFollow = True
     
     def execute(self, message: IRCMessage):
-        if message.ParameterList[0].lower() == 'on':
+        if message.parameterList[0].lower() == 'on':
             self.autoFollow = True
-            return IRCResponse(ResponseType.Say, 'Auto-follow on', message.ReplyTo)
-        if message.ParameterList[0].lower() == 'off':
+            return IRCResponse(ResponseType.Say, 'Auto-follow on', message.replyTo)
+        if message.parameterList[0].lower() == 'off':
             self.autoFollow = False
-            return IRCResponse(ResponseType.Say, 'Auto-follow off', message.ReplyTo)
+            return IRCResponse(ResponseType.Say, 'Auto-follow off', message.replyTo)
 
         return self.handleURL(message, auto=False)
 
     def handleURL(self, message, auto=True):
-        if auto and message.Command:
+        if auto and message.command:
             return
         if auto and not self.autoFollow:
             return
         if auto and self.checkIgnoreList(message):
             return
 
-        match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
+        match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.messageString, re.IGNORECASE)
         if not match:
             if not auto:
                 return IRCResponse(ResponseType.Say,
                                    u'[no url recognized]',
-                                   message.ReplyTo,
+                                   message.replyTo,
                                    {'urlfollowURL': u'[no url recognized]'})
             return
 
@@ -85,12 +85,12 @@ class URLFollow(BotCommand):
             if not auto:
                 return IRCResponse(ResponseType.Say,
                                    u'[no follows worked for {}]'.format(match.group('url')),
-                                   message.ReplyTo,
+                                   message.replyTo,
                                    {'urlfollowURL': u'[no follows worked for {}]'})
             return
         text, url = follows
 
-        return IRCResponse(ResponseType.Say, text, message.ReplyTo, {'urlfollowURL': url})
+        return IRCResponse(ResponseType.Say, text, message.replyTo, {'urlfollowURL': url})
 
     def dispatchToFollows(self, _: IRCMessage, url: str):
         youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)

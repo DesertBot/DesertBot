@@ -22,10 +22,10 @@ class Notice(BotCommand):
         return 'notice <target> <text> - makes the bot send the specified text as a notice to the specified target'
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 1:
-            return IRCResponse(ResponseType.Notice, " ".join(message.ParameterList[1:]), message.ParameterList[0])
+        if len(message.parameterList) > 1:
+            return IRCResponse(ResponseType.Notice, " ".join(message.parameterList[1:]), message.parameterList[0])
         else:
-            return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
 
 notice = Notice()

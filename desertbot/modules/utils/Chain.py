@@ -32,7 +32,7 @@ class Chain(BotCommand):
 
     def execute(self, message: IRCMessage):
         # split on unescaped |
-        chain = re.split(r'(?<!\\)\|', message.Parameters)
+        chain = re.split(r'(?<!\\)\|', message.parameters)
 
         response = None
         extraVars = {}
@@ -44,8 +44,8 @@ class Chain(BotCommand):
                 if hasattr(response, '__iter__'):
                     return IRCResponse(ResponseType.Say,
                                        u"Chain Error: segment before '{}' returned a list".format(link),
-                                       message.ReplyTo)
-                link = link.replace('$output', response.Response)  # replace $output with output of previous command
+                                       message.replyTo)
+                link = link.replace('$output', response.response)  # replace $output with output of previous command
                 extraVars.update(response.ExtraVars)
                 for var, value in iteritems(extraVars):
                     link = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), link)
@@ -54,29 +54,29 @@ class Chain(BotCommand):
                 # (or this is the first command in the chain, but for some reason has $output as a param)
                 link = link.replace('$output', '')
             
-            link = link.replace('$sender', message.User.Name)
-            if message.Channel is not None:
-                link = link.replace('$channel', message.Channel.Name)
+            link = link.replace('$sender', message.user.name)
+            if message.channel is not None:
+                link = link.replace('$channel', message.channel.Name)
             else:
-                link = link.replace('$channel', message.User.Name)
+                link = link.replace('$channel', message.user.name)
 
             # build a new message out of this 'link' in the chain
-            inputMessage = IRCMessage(message.Type, message.User.String, message.Channel,
+            inputMessage = IRCMessage(message.type, message.user.string, message.channel,
                                       self.bot.commandChar + link.lstrip(),
                                       self.bot)
             inputMessage.chained = True  # might be used at some point to tell commands they're being called from Chain
 
-            if inputMessage.Command.lower() in self.bot.moduleHandler.mappedTriggers:
-                response = self.bot.moduleHandler.mappedTriggers[inputMessage.Command.lower()].execute(inputMessage)
+            if inputMessage.command.lower() in self.bot.moduleHandler.mappedTriggers:
+                response = self.bot.moduleHandler.mappedTriggers[inputMessage.command.lower()].execute(inputMessage)
             else:
                 return IRCResponse(ResponseType.Say,
-                                   "'{0}' is not a recognized command trigger".format(inputMessage.Command),
-                                   message.ReplyTo)
+                                   "'{0}' is not a recognized command trigger".format(inputMessage.command),
+                                   message.replyTo)
 
-        if response.Response is not None:
+        if response.response is not None:
             # limit response length (chains can get pretty large)
-            response.Response = list(string.splitUTF8(response.Response.encode('utf-8'), 700))[0]
-            response.Response = str(response.Response, 'utf-8')
+            response.response = list(string.splitUTF8(response.response.encode('utf-8'), 700))[0]
+            response.response = str(response.response, 'utf-8')
         return response
 
 

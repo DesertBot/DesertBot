@@ -44,12 +44,12 @@ class Conversation(BotModule):
                                                                                          self.bot.nickname)
 
         match = re.search(regex,
-                          message.MessageString,
+                          message.messageString,
                           re.IGNORECASE)
         if match:
             return IRCResponse(ResponseType.Say,
-                               '{0} {1}'.format(match.group('greeting'), message.User.Name),
-                               message.ReplyTo)
+                               '{0} {1}'.format(match.group('greeting'), message.user.name),
+                               message.replyTo)
 
 
 conversation = Conversation()

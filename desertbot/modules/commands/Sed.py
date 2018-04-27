@@ -45,32 +45,32 @@ class Sed(BotCommand):
 
     @ignore
     def handleSed(self, message):
-        if message.Command and message.Command.lower() in self.bot.moduleHandler.mappedTriggers:
+        if message.command and message.command.lower() in self.bot.moduleHandler.mappedTriggers:
             return
 
-        match = self.match(message.MessageString)
+        match = self.match(message.messageString)
 
         return self.sed(message, match)
 
     def execute(self, message: IRCMessage):
-        match = self.match(message.Parameters)
+        match = self.match(message.parameters)
 
         return self.sed(message, match)
 
     def sed(self, message, match):
         if match:
             search, replace, flags, text = match
-            response = self.substitute(search, replace, flags, text, message, message.ReplyTo)
+            response = self.substitute(search, replace, flags, text, message, message.replyTo)
 
             if response is not None:
                 responseType = ResponseType.Say
-                if response.Type == 'ACTION':
+                if response.type == 'ACTION':
                     responseType = ResponseType.Do
 
-                return IRCResponse(responseType, response.MessageString, message.ReplyTo)
+                return IRCResponse(responseType, response.messageString, message.replyTo)
 
             else:
-                return IRCResponse(ResponseType.Say, "No text matching '{}' found in the last {} messages".format(search, self.historySize), message.ReplyTo)
+                return IRCResponse(ResponseType.Say, "No text matching '{}' found in the last {} messages".format(search, self.historySize), message.replyTo)
 
         else:
             self.storeMessage(message)
@@ -123,14 +123,14 @@ class Sed(BotCommand):
                 searchC = re2.compile(search, subFlags)
                 new = searchC.sub(replace, text, count)
             except sre_constants.error as e:
-                newMessage.MessageString = "[Regex Error in Sed pattern: {}]".format(e.message)
+                newMessage.messageString = "[Regex Error in Sed pattern: {}]".format(e.message)
                 return newMessage
             
             if new != text:
-                newMessage.MessageString = new
+                newMessage.messageString = new
                 self.storeMessage(newMessage, False)
             else:
-                newMessage.MessageString = text
+                newMessage.messageString = text
                 self.storeMessage(newMessage, False)
             
             return newMessage
@@ -138,32 +138,32 @@ class Sed(BotCommand):
         for message in reversed(messages):
             try:
                 searchC = re2.compile(search, subFlags)
-                new = searchC.sub(replace, message.MessageString, count)
+                new = searchC.sub(replace, message.messageString, count)
             except sre_constants.error as e:
                 newMessage = copy.copy(inputMessage)
-                newMessage.MessageString = "[Regex Error in Sed pattern: {}]".format(e.message)
+                newMessage.messageString = "[Regex Error in Sed pattern: {}]".format(e.message)
                 return newMessage
 
             new = new[:300]
 
-            if searchC.search(message.MessageString):
+            if searchC.search(message.messageString):
                 newMessage = copy.copy(message)
-                newMessage.MessageString = new
+                newMessage.messageString = new
                 self.storeMessage(newMessage, False)
                 return newMessage
 
         return None
 
     def storeMessage(self, message, unmodified=True):
-        if message.ReplyTo not in self.messages:
-            self.messages[message.ReplyTo] = []
-            self.unmodifiedMessages[message.ReplyTo] = []
-        self.messages[message.ReplyTo].append(message)
-        self.messages[message.ReplyTo] = self.messages[message.ReplyTo][-self.historySize:]
+        if message.replyTo not in self.messages:
+            self.messages[message.replyTo] = []
+            self.unmodifiedMessages[message.replyTo] = []
+        self.messages[message.replyTo].append(message)
+        self.messages[message.replyTo] = self.messages[message.replyTo][-self.historySize:]
 
         if unmodified:
-            self.unmodifiedMessages[message.ReplyTo].append(message)
-            self.unmodifiedMessages[message.ReplyTo] = self.unmodifiedMessages[message.ReplyTo][-self.historySize:]
+            self.unmodifiedMessages[message.replyTo].append(message)
+            self.unmodifiedMessages[message.replyTo] = self.unmodifiedMessages[message.replyTo][-self.historySize:]
 
 
 sed = Sed()

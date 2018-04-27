@@ -24,7 +24,7 @@ class Mtg(BotCommand):
 
     def execute(self, message: IRCMessage):
         searchTerm = 'http://gatherer.wizards.com/pages/search/default.aspx?name='
-        for param in message.ParameterList:
+        for param in message.parameterList:
             searchTerm += '+[%s]' % param
 
         webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', searchTerm)
@@ -35,11 +35,11 @@ class Mtg(BotCommand):
         if name is None:
             searchResults = soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_searchResultsContainer'})
             if searchResults is None:
-                return IRCResponse(ResponseType.Say, 'No cards found: ' + searchTerm, message.ReplyTo)
+                return IRCResponse(ResponseType.Say, 'No cards found: ' + searchTerm, message.replyTo)
             else:
                 cardItems = searchResults.find_all(class_='cardItem')
                 # potentially return first item here
-                return IRCResponse(ResponseType.Say, '{0} cards found: {1}'.format(len(cardItems), searchTerm), message.ReplyTo)
+                return IRCResponse(ResponseType.Say, '{0} cards found: {1}'.format(len(cardItems), searchTerm), message.replyTo)
 
         name = name.find('div', 'value').text.strip()
         types = u' | T: ' + soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_typeRow'}).find('div', 'value').text.strip()
@@ -73,7 +73,7 @@ class Mtg(BotCommand):
             cardText = u''
 
         flavText = soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_FlavorText'})
-        if message.Command.endswith('f') and flavText is not None:
+        if message.command.endswith('f') and flavText is not None:
             flavTexts = flavText.find_all('div', 'cardtextbox')
             texts = []
             for text in flavTexts:
@@ -90,7 +90,7 @@ class Mtg(BotCommand):
 
         reply = name + manaCost + convCost + types + cardText + flavText + powTough + rarity
 
-        return IRCResponse(ResponseType.Say, reply, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, reply, message.replyTo)
 
     @classmethod
     def translateSymbols(cls, text):

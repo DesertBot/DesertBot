@@ -31,32 +31,32 @@ class GPSLookup(BotCommand):
         self.api_key = load_key(u'Bing Maps')
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
+        if len(message.parameterList) > 0:
             if self.api_key is None:
-                return IRCResponse(ResponseType.Say, "[Bing Maps API key not found]", message.ReplyTo)
+                return IRCResponse(ResponseType.Say, "[Bing Maps API key not found]", message.replyTo)
 
-            url = "http://dev.virtualearth.net/REST/v1/Locations?q={0}&key={1}".format(urllib.quote_plus(message.Parameters), self.api_key)
+            url = "http://dev.virtualearth.net/REST/v1/Locations?q={0}&key={1}".format(urllib.quote_plus(message.parameters), self.api_key)
 
             page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             result = json.loads(page.body)
 
             if result['resourceSets'][0]['estimatedTotal'] == 0:
-                self.logger.warning("Could not find GPS record for {}".format(message.Parameters))
+                self.logger.warning("Could not find GPS record for {}".format(message.parameters))
                 self.logger.debug(result)
                 return IRCResponse(ResponseType.Say,
-                                   "Couldn't find GPS coords for '{0}', sorry!".format(message.Parameters),
-                                   message.ReplyTo)
+                                   "Couldn't find GPS coords for '{0}', sorry!".format(message.parameters),
+                                   message.replyTo)
 
             coords = result['resourceSets'][0]['resources'][0]['point']['coordinates']
 
             return IRCResponse(ResponseType.Say,
-                               "GPS coords for '{0}' are: {1},{2}".format(message.Parameters, coords[0], coords[1]),
-                               message.ReplyTo)
+                               "GPS coords for '{0}' are: {1},{2}".format(message.parameters, coords[0], coords[1]),
+                               message.replyTo)
 
         else:
             return IRCResponse(ResponseType.Say,
                                "You didn't give an address to look up",
-                               message.ReplyTo)
+                               message.replyTo)
 
 
 gpsLookup = GPSLookup()

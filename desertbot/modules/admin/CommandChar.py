@@ -23,15 +23,15 @@ class CommandChar(BotCommand):
 
     @admin("Only my admins can change my command character")
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
-            self.bot.commandChar = message.ParameterList[0]
+        if len(message.parameterList) > 0:
+            self.bot.commandChar = message.parameterList[0]
             self.bot.config['commandChar'] = self.bot.commandChar
             self.bot.config.writeConfig()
             return IRCResponse(ResponseType.Say,
                                'Command prefix char changed to \'{0}\'!'.format(self.bot.commandChar),
-                               message.ReplyTo)
+                               message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, 'Change my command character to what?', message.ReplyTo)
+            return IRCResponse(ResponseType.Say, 'Change my command character to what?', message.replyTo)
 
 
 commandchar = CommandChar()

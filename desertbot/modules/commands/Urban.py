@@ -28,12 +28,12 @@ class Urban(BotCommand):
         return "urban <search term> - returns the definition of the given search term from UrbanDictionary.com"
     
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) == 0:
+        if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give a word! Usage: {0}".format(self.help),
-                               message.ReplyTo)
+                               message.replyTo)
         
-        search = quote(message.Parameters)
+        search = quote(message.parameters)
 
         url = 'http://api.urbandictionary.com/v0/define?term={0}'.format(search)
         
@@ -43,8 +43,8 @@ class Urban(BotCommand):
 
         if len(response['list']) == 0:
             return IRCResponse(ResponseType.Say,
-                               "No entry found for '{0}'".format(message.Parameters),
-                               message.ReplyTo)
+                               "No entry found for '{0}'".format(message.parameters),
+                               message.replyTo)
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
@@ -65,8 +65,8 @@ class Urban(BotCommand):
         
         more = 'http://{}.urbanup.com/'.format(word.replace(' ', '-'))
 
-        if word.lower() != message.Parameters.lower():
-            word = "{0} (Contains '{1}')".format(word, message.Parameters)
+        if word.lower() != message.parameters.lower():
+            word = "{0} (Contains '{1}')".format(word, message.parameters)
 
         defFormatString = str(assembleFormattedText(A.normal[A.bold["{0}:"], " {1}"]))
         exampleFormatString = str(assembleFormattedText(A.normal[A.bold["Example(s):"], " {0}"]))
@@ -79,13 +79,13 @@ class Urban(BotCommand):
                                                                 "More defs: {3}"]))
         responses = [IRCResponse(ResponseType.Say,
                                  defFormatString.format(word, definition),
-                                 message.ReplyTo),
+                                 message.replyTo),
                      IRCResponse(ResponseType.Say,
                                  exampleFormatString.format(example),
-                                 message.ReplyTo),
+                                 message.replyTo),
                      IRCResponse(ResponseType.Say,
                                  byFormatString.format(author, up, down, more),
-                                 message.ReplyTo)]
+                                 message.replyTo)]
         
         return responses
 

@@ -28,7 +28,7 @@ class DesertBot(irc.IRCClient, object):
         self.username = self.config.getWithDefault('username', self.nickname)
 
         self.channels = {}
-        self.userModes = {}
+        self.usermodes = {}
 
         self.fingerReply = self.config.getWithDefault('finger', 'GET YOUR FINGER OUT OF THERE')
 
@@ -94,14 +94,14 @@ class DesertBot(irc.IRCClient, object):
 
         for key in self.channels:
             channel = self.channels[key]
-            for userKey in channel.Users:
-                user = channel.Users[userKey]
+            for userKey in channel.users:
+                user = channel.users[userKey]
                 if userKey == oldNick:
-                    channel.Users[newNick] = IRCUser('{0}!{1}@{2}'.format(newNick, user.User, user.Hostmask))
-                    del channel.Users[oldNick]
-                    if oldNick in channel.Ranks:
-                        channel.Ranks[newNick] = channel.Ranks[oldNick]
-                        del channel.Ranks[oldNick]
+                    channel.users[newNick] = IRCUser('{0}!{1}@{2}'.format(newNick, user.user, user.hostmask))
+                    del channel.users[oldNick]
+                    if oldNick in channel.ranks:
+                        channel.ranks[newNick] = channel.ranks[oldNick]
+                        del channel.ranks[oldNick]
                     message = IRCMessage('NICK', prefix, channel, newNick, self)
                     self.handleMessage(message)
 
@@ -116,12 +116,12 @@ class DesertBot(irc.IRCClient, object):
 
         message = IRCMessage('JOIN', prefix, channel, u'', self)
 
-        if message.User.Name == self.nickname:
-            self.channels[message.ReplyTo] = channel
-            self.sendLine('WHO ' + message.ReplyTo)
-            self.sendLine('MODE ' + message.ReplyTo)
+        if message.user.name == self.nickname:
+            self.channels[message.replyTo] = channel
+            self.sendLine('WHO ' + message.replyTo)
+            self.sendLine('MODE ' + message.replyTo)
         else:
-            channel.Users[message.User.Name] = message.User
+            channel.users[message.user.name] = message.user
 
         self.handleMessage(message)
 
@@ -132,7 +132,7 @@ class DesertBot(irc.IRCClient, object):
             channel = IRCChannel(params[0])
         message = IRCMessage('INVITE', prefix, channel, u'', self)
 
-        self.join(channel.Name)
+        self.join(channel.name)
 
         self.handleMessage(message)
 
@@ -143,12 +143,12 @@ class DesertBot(irc.IRCClient, object):
         channel = self.channels[params[0]]
         message = IRCMessage('PART', prefix, channel, partMessage, self)
 
-        if message.User.Name == self.nickname:
-            del self.channels[message.ReplyTo]
+        if message.user.name == self.nickname:
+            del self.channels[message.replyTo]
         else:
-            del channel.Users[message.User.Name]
-            if message.User.Name in channel.Ranks:
-                del channel.Ranks[message.User.Name]
+            del channel.users[message.user.name]
+            if message.user.name in channel.ranks:
+                del channel.ranks[message.user.name]
 
         self.handleMessage(message)
 
@@ -159,14 +159,14 @@ class DesertBot(irc.IRCClient, object):
 
         channel = self.channels[params[0]]
         message = IRCMessage('KICK', prefix, channel, kickMessage, self)
-        message.Kickee = params[1]
+        message.kickee = params[1]
 
-        if message.Kickee == self.nickname:
-            del self.channels[message.ReplyTo]
+        if message.kickee == self.nickname:
+            del self.channels[message.replyTo]
         else:
-            del channel.Users[message.Kickee]
-            if message.Kickee in channel.Ranks:
-                del channel.Ranks[message.Kickee]
+            del channel.users[message.kickee]
+            if message.kickee in channel.ranks:
+                del channel.ranks[message.kickee]
 
         self.handleMessage(message)
 
@@ -178,10 +178,10 @@ class DesertBot(irc.IRCClient, object):
         for key in self.channels:
             channel = self.channels[key]
             message = IRCMessage('QUIT', prefix, channel, quitMessage, self)
-            if message.User.Name in channel.Users:
-                del channel.Users[message.User.Name]
-                if message.User.Name in channel.Ranks:
-                    del channel.Ranks[message.User.Name]
+            if message.user.name in channel.users:
+                del channel.users[message.user.name]
+                if message.user.name in channel.ranks:
+                    del channel.ranks[message.user.name]
                 self.handleMessage(message)
 
     def irc_RPL_WHOREPLY(self, _, params):
@@ -189,12 +189,12 @@ class DesertBot(irc.IRCClient, object):
         channel = self.channels[params[1]]
         flags = params[6][2:] if '*' in params[6] else params[6][1:]
 
-        statusModes = ''
+        statusmodes = ''
         for flag in flags:
-            statusModes = statusModes + serverinfo.StatusesReverse[flag]
+            statusmodes = statusmodes + serverinfo.statusesReverse[flag]
 
-        channel.Users[user.Name] = user
-        channel.Ranks[user.Name] = statusModes
+        channel.users[user.name] = user
+        channel.ranks[user.name] = statusmodes
 
     def irc_RPL_CHANNELMODEIS(self, _, params):
         channel = self.channels[params[1]]
@@ -202,69 +202,69 @@ class DesertBot(irc.IRCClient, object):
         modeParams = params[3:]
 
         for mode in modeString:
-            if mode in serverinfo.ChannelSetArgsModes or mode in serverinfo.ChannelSetUnsetArgsModes:
+            if mode in serverinfo.channelSetArgsmodes or mode in serverinfo.channelSetUnsetArgsmodes:
                 # Mode takes an argument
-                channel.Modes[mode] = modeParams[0]
+                channel.modes[mode] = modeParams[0]
                 del modeParams[0]
             else:
-                channel.Modes[mode] = None
+                channel.modes[mode] = None
 
     def irc_RPL_MYINFO(self, prefix, params):
-        serverinfo.UserModes = params[3]
+        serverinfo.usermodes = params[3]
 
     def isupport(self, options):
         for item in options:
             if '=' in item:
                 option = item.split('=')
                 if option[0] == 'CHANTYPES':
-                    serverinfo.ChannelTypes = option[1]
+                    serverinfo.channelTypes = option[1]
                 elif option[0] == 'CHANMODES':
                     modes = option[1].split(',')
-                    serverinfo.ChannelListModes = modes[0]
-                    serverinfo.ChannelSetUnsetArgsModes = modes[1]
-                    serverinfo.ChannelSetArgsModes = modes[2]
-                    serverinfo.ChannelNormalModes = modes[3]
+                    serverinfo.channelListmodes = modes[0]
+                    serverinfo.channelSetUnsetArgsmodes = modes[1]
+                    serverinfo.channelSetArgsmodes = modes[2]
+                    serverinfo.channelNormalmodes = modes[3]
                 elif option[0] == 'PREFIX':
                     prefixes = option[1]
                     statusChars = prefixes[:prefixes.find(')')]
                     statusSymbols = prefixes[prefixes.find(')'):]
-                    serverinfo.StatusOrder = statusChars
+                    serverinfo.statusOrder = statusChars
                     for i in range(1, len(statusChars)):
-                        serverinfo.Statuses[statusChars[i]] = statusSymbols[i]
-                        serverinfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
+                        serverinfo.statuses[statusChars[i]] = statusSymbols[i]
+                        serverinfo.statusesReverse[statusSymbols[i]] = statusChars[i]
 
     def modeChanged(self, user, channel, set, modes, args):
         message = IRCMessage('MODE', user, self.getChannel(channel), u'', self)
-        if not message.Channel:
+        if not message.channel:
             # Setting a usermode
             for mode, arg in zip(modes, args):
                 if set:
-                    self.userModes[mode] = arg
+                    self.usermodes[mode] = arg
                 else:
-                    del self.userModes[mode]
+                    del self.usermodes[mode]
         else:
             # Setting a chanmode
             for mode, arg in zip(modes, args):
-                if mode in serverinfo.Statuses:
+                if mode in serverinfo.statuses:
                     # Setting a status mode
                     if set:
-                        if arg not in self.channels[channel].Ranks:
-                            self.channels[channel].Ranks[arg] = mode
+                        if arg not in self.channels[channel].ranks:
+                            self.channels[channel].ranks[arg] = mode
                         else:
-                            self.channels[channel].Ranks[arg] = self.channels[channel].Ranks[arg] + mode
+                            self.channels[channel].ranks[arg] = self.channels[channel].ranks[arg] + mode
                     else:
-                        self.channels[channel].Ranks[arg] = self.channels[channel].Rank[arg].replace(mode, '')
+                        self.channels[channel].ranks[arg] = self.channels[channel].ranks[arg].replace(mode, '')
                 else:
                     # Setting a normal chanmode
                     if set:
-                        self.channels[channel].Modes[mode] = arg
+                        self.channels[channel].modes[mode] = arg
                     else:
-                        del self.channels[channel].Modes[mode]
+                        del self.channels[channel].modes[mode]
 
-        message.ModeArgs = [arg for arg in args if arg is not None]
-        message.Modes = modes
-        message.ModeOperator = '+' if set else '-'
-        message.ReplyTo = message.ReplyTo if message.Channel else ''
+        message.modeArgs = [arg for arg in args if arg is not None]
+        message.modes = modes
+        message.modeOperator = '+' if set else '-'
+        message.replyTo = message.replyTo if message.channel else ''
 
         self.handleMessage(message)
 
@@ -276,8 +276,8 @@ class DesertBot(irc.IRCClient, object):
             return None
 
     def topicUpdated(self, user, channel, newTopic):
-        self.channels[channel].Topic = newTopic
-        self.channels[channel].TopicSetBy = user
+        self.channels[channel].topic = newTopic
+        self.channels[channel].topicSetBy = user
 
         message = IRCMessage('TOPIC', user, self.getChannel(channel), newTopic, self)
 

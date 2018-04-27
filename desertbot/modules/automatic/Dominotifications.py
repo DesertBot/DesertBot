@@ -39,10 +39,10 @@ class Dominotifications(BotModule):
         orderID = match.group('orderID')
 
         if orderID not in self.trackers:
-            self.trackers[orderID] = TrackingDetails(message.User.Name, message.Channel,
+            self.trackers[orderID] = TrackingDetails(message.user.name, message.channel,
                                                      task.LoopingCall(self._pizzaLoop, orderID))
             self._startPizzaTracker(orderID)
-            return u"PIZZA DETECTED! Now tracking {}'s Domino's pizza order!".format(message.User.Name), ''
+            return u"PIZZA DETECTED! Now tracking {}'s Domino's pizza order!".format(message.user.name), ''
         else:
             return u"I'm already tracking that pizza for {}".format(self.trackers[orderID].orderer), ''
 

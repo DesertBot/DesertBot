@@ -22,9 +22,9 @@ class Join(BotCommand):
         return 'join <channel> - makes the bot join the specified channel(s)'
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) > 0:
+        if len(message.parameterList) > 0:
             responses = []
-            for param in message.ParameterList:
+            for param in message.parameterList:
                 channel = param
                 if not channel.startswith('#'):
                     channel = '#' + channel
@@ -32,8 +32,8 @@ class Join(BotCommand):
             return responses
         else:
             return IRCResponse(ResponseType.Say,
-                               "{0}, you didn't say where I should join".format(message.User.Name),
-                               message.ReplyTo)
+                               "{0}, you didn't say where I should join".format(message.user.name),
+                               message.replyTo)
 
 
 join = Join()

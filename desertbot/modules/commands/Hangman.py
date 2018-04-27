@@ -214,14 +214,14 @@ class Hangman(BotCommand):
     
     def _start(self, message):
         """start - starts a game of hangman!"""
-        channel = message.ReplyTo.lower()
+        channel = message.replyTo.lower()
         if channel in self.gameStates:
             return [IRCResponse(ResponseType.Say,
                                 u'[Hangman] game is already in progress!',
                                 channel),
                     IRCResponse(ResponseType.Say,
                                 self.gameStates[channel].render(),
-                                message.ReplyTo)]
+                                message.replyTo)]
 
         responses = []
 
@@ -229,10 +229,10 @@ class Hangman(BotCommand):
         self.gameStates[channel] = GameState(word, self.maxBadGuesses)
         responses.append(IRCResponse(ResponseType.Say,
                                      u'[Hangman] started!',
-                                     message.ReplyTo))
+                                     message.replyTo))
         responses.append(IRCResponse(ResponseType.Say,
                                      self.gameStates[channel].render(),
-                                     message.ReplyTo))
+                                     message.replyTo))
 
         return responses
 
@@ -242,54 +242,54 @@ class Hangman(BotCommand):
             if not self.checkPermissions(message):
                 return IRCResponse(ResponseType.Say,
                                    u'[Hangman] only my admins can stop games!',
-                                   message.ReplyTo)
-        channel = message.ReplyTo.lower()
+                                   message.replyTo)
+        channel = message.replyTo.lower()
         if channel in self.gameStates:
             del self.gameStates[channel]
             if not suppressMessage:
                 return IRCResponse(ResponseType.Say,
                                    u'[Hangman] game stopped!',
-                                   message.ReplyTo)
+                                   message.replyTo)
 
     @admin("[Hangman] only my admins can set the maximum bad guesses!")
     def _setMaxBadGuesses(self, message):
         """max <num> - sets the maximum number of bad guesses allowed in future games. Must be between 1 and 20. \
         Bot-admin only"""
         try:
-            if len(message.ParameterList[1]) < 3:
-                maxBadGuesses = int(message.ParameterList[1])
+            if len(message.parameterList[1]) < 3:
+                maxBadGuesses = int(message.parameterList[1])
             else:
                 raise ValueError
             if 0 < maxBadGuesses < 21:
                 response = u'[Hangman] maximum bad guesses changed from {} to {}'.format(self.maxBadGuesses,
                                                                                              maxBadGuesses)
                 self.maxBadGuesses = maxBadGuesses
-                return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+                return IRCResponse(ResponseType.Say, response, message.replyTo)
             else:
                 raise ValueError
         except ValueError:
             return IRCResponse(ResponseType.Say,
                                u'[Hangman] maximum bad guesses should be an integer between 1 and 20',
-                               message.ReplyTo)
+                               message.replyTo)
 
     def _guess(self, message: IRCMessage) -> IRCResponse:
-        channel = message.ReplyTo.lower()
+        channel = message.replyTo.lower()
         if channel not in self.gameStates:
             return IRCResponse(ResponseType.Say,
                                u'[Hangman] no game running, use {}hangman start to begin!'.format(self.bot.commandChar),
-                               message.ReplyTo)
+                               message.replyTo)
 
         responses = []
         gs = self.gameStates[channel]
 
-        guess = message.Parameters.lower()
+        guess = message.parameters.lower()
         # single letter
         if len(guess) == 1:
             try:
                 correct = gs.guessLetter(guess)
             except (AlreadyGuessedException,
                     InvalidCharacterException) as e:
-                return self._exceptionFormatter(e, message.ReplyTo)
+                return self._exceptionFormatter(e, message.replyTo)
         # whole phrase
         else:
             try:
@@ -297,9 +297,9 @@ class Hangman(BotCommand):
             except (WrongPhraseLengthException,
                     PhraseMismatchesGuessesException,
                     PhraseUsesKnownBadLettersException) as e:
-                return self._exceptionFormatter(e, message.ReplyTo)
+                return self._exceptionFormatter(e, message.replyTo)
 
-        user = message.User.Name
+        user = message.user.name
         # split the username with a zero-width space
         # hopefully this kills client highlighting on nick mentions
         #user = user[:1] + u'\u200b' + user[1:]
@@ -311,19 +311,19 @@ class Hangman(BotCommand):
             colUser = assembleFormattedText(A.normal[A.fg.red[colUser]])
         responses.append(IRCResponse(ResponseType.Say,
                                      u'{} - {}'.format(gs.render(), colUser),
-                                     message.ReplyTo))
+                                     message.replyTo))
 
         if gs.finished:
             if correct:
                 responses.append(IRCResponse(ResponseType.Say,
                                              u'[Hangman] Congratulations {}!'.format(user),
-                                             message.ReplyTo))
+                                             message.replyTo))
             else:
                 responses.append(IRCResponse(ResponseType.Say,
                                              u'[Hangman] {} blew up the bomb! The {} was {}'.format(user,
                                                                                                     gs.wOrP(),
                                                                                                     gs.phrase),
-                                             message.ReplyTo))
+                                             message.replyTo))
             self._stop(message, suppressMessage=True)
 
         return responses
@@ -339,10 +339,10 @@ class Hangman(BotCommand):
     ])
 
     def help(self, message: IRCMessage):
-        if len(message.ParameterList) == 1:
+        if len(message.parameterList) == 1:
             return self._helpText
 
-        subCommand = message.ParameterList[1].lower()
+        subCommand = message.parameterList[1].lower()
         if subCommand in self.subCommands:
             if getattr(self.subCommands[subCommand], '__doc__'):
                 docstring = self.subCommands[subCommand].__doc__
@@ -355,10 +355,10 @@ class Hangman(BotCommand):
             return self._helpText
 
     def execute(self, message: IRCMessage):
-        if len(message.ParameterList) == 0:
+        if len(message.parameterList) == 0:
             return self._start(message)
 
-        subCommand = message.ParameterList[0].lower()
+        subCommand = message.parameterList[0].lower()
         if subCommand in self.subCommands:
             return self.subCommands[subCommand](self, message)
         else:

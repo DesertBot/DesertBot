@@ -30,8 +30,8 @@ class Dinner(BotCommand):
         options = {'meat': 'index.php', 'veg': 'veg.php', 'drink': 'drinks.php'}
 
         option = 'meat'
-        if len(message.ParameterList) > 0:
-            option = message.ParameterList[0]
+        if len(message.parameterList) > 0:
+            option = message.parameterList[0]
 
         if option in options:
             webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', wtfsimfd.format(options[option]))
@@ -44,12 +44,12 @@ class Dinner(BotCommand):
 
             return IRCResponse(ResponseType.Say,
                                u"{}... {} {}".format(phrase, item.text, link),
-                               message.ReplyTo)
+                               message.replyTo)
 
         else:
             error = u"'{}' is not a recognized dinner type, please choose one of {}"\
                 .format(option, u'/'.join(options.keys()))
-            return IRCResponse(ResponseType.Say, error, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, error, message.replyTo)
 
 
 dinner = Dinner()

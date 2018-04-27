@@ -45,8 +45,8 @@ class Time(BotCommand):
         return self._commands[query[0].lower()].__doc__
 
     def execute(self, message: IRCMessage):
-        response = self._commands[message.Command](self, message.Parameters)
-        return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+        response = self._commands[message.command](self, message.parameters)
+        return IRCResponse(ResponseType.Say, response, message.replyTo)
 
 
 time = Time()

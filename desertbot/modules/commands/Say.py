@@ -22,13 +22,13 @@ class Say(BotCommand):
         return 'say [channel] <text> - makes the bot repeat the specified text'
 
     def execute(self, message: IRCMessage):
-        if not message.ParameterList:
-            return IRCResponse(ResponseType.Say, 'Say what?', message.ReplyTo)
+        if not message.parameterList:
+            return IRCResponse(ResponseType.Say, 'Say what?', message.replyTo)
         
-        if message.ParameterList[0] in self.bot.channels:
-            return IRCResponse(ResponseType.Say, u" ".join(message.ParameterList[1:]), message.ParameterList[0])
+        if message.parameterList[0] in self.bot.channels:
+            return IRCResponse(ResponseType.Say, u" ".join(message.parameterList[1:]), message.parameterList[0])
         
-        return IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, message.parameters, message.replyTo)
 
 
 say = Say()

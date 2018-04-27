@@ -31,7 +31,7 @@ class Uptime(BotCommand):
         
         return IRCResponse(ResponseType.Say,
                            'Uptime: %s' % str(uptime).split('.')[0],
-                           message.ReplyTo)
+                           message.replyTo)
 
 
 uptime = Uptime()

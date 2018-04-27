@@ -22,26 +22,26 @@ class Apples(BotCommand):
     playApples = 0
 
     def handleApples(self, message):
-        if self.playApples == 1 and message.User.Name.lower() == "robobo":
-            msgArr = message.MessageList
+        if self.playApples == 1 and message.user.name.lower() == "robobo":
+            msgArr = message.messageList
             name = msgArr.pop(0).strip()
             cmd = " ".join(msgArr).strip()
             if cmd == "to Apples! You have 60 seconds to join.":
-                return IRCResponse(ResponseType.Say, "!join", message.ReplyTo)
+                return IRCResponse(ResponseType.Say, "!join", message.replyTo)
             elif name.lower() == self.bot.nickname and cmd == "is judging.":
-                return IRCResponse(ResponseType.Say, "!pick 0", message.ReplyTo)
+                return IRCResponse(ResponseType.Say, "!pick 0", message.replyTo)
             elif name.lower() != self.bot.nickname and (cmd == "is judging next." or cmd == "is judging first."):
-                return IRCResponse(ResponseType.Say, "!play 0", message.ReplyTo)
+                return IRCResponse(ResponseType.Say, "!play 0", message.replyTo)
             elif cmd == "wins the game!" or name == "Sorry,":
                 self.playApples = 0
 
     def execute(self, message: IRCMessage):
-        if message.Command.lower() == "playapples":
+        if message.command.lower() == "playapples":
             self.playApples = 1
-            return IRCResponse(ResponseType.Say, "!join", message.ReplyTo)
-        elif message.Command.lower() == "stopapples":
+            return IRCResponse(ResponseType.Say, "!join", message.replyTo)
+        elif message.command.lower() == "stopapples":
             self.playApples = 0
-            return IRCResponse(ResponseType.Say, "!leave", message.ReplyTo)
+            return IRCResponse(ResponseType.Say, "!leave", message.replyTo)
 
 
 apples = Apples()

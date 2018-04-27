@@ -32,40 +32,40 @@ class AsterFix(BotModule):
 
     @ignore
     def asterFix(self, message: IRCMessage):
-        changeMatch = re.match(r"^(?P<change>(\*\*[^\s*]+)|([^\s*]+)\*\*)$", message.MessageString)
+        changeMatch = re.match(r"^(?P<change>(\*\*[^\s*]+)|([^\s*]+)\*\*)$", message.messageString)
         if changeMatch:
             change = changeMatch.group('change').strip('*')
         else:
             self.storeMessage(message)
             return
 
-        lastMessage = self.messages[message.User.Name]
-        lastMessageList = lastMessage.MessageList
+        lastMessage = self.messages[message.user.name]
+        lastmessageList = lastMessage.messageList
 
         # Skip 1-word messages, as it just leads to direct repetition
-        if len(lastMessageList) <= 1:
+        if len(lastmessageList) <= 1:
             return
 
-        likelyChanges = self._getCloseMatches(change, lastMessageList, 5, 0.5)
+        likelyChanges = self._getCloseMatches(change, lastmessageList, 5, 0.5)
         likelyChanges = filter((lambda word: word != change), likelyChanges)
 
         if likelyChanges:
             target = likelyChanges[0]
-            responseList = [change if word == target else word for word in lastMessageList]
+            responseList = [change if word == target else word for word in lastmessageList]
             response = " ".join(responseList)
 
             # Store the modified message so it can be aster-fixed again
-            self.messages[message.User.Name].MessageList = responseList
+            self.messages[message.user.name].messageList = responseList
 
-            if lastMessage.Type == 'ACTION':
+            if lastMessage.type == 'ACTION':
                 responseType = ResponseType.Do
             else:
                 responseType = ResponseType.Say
 
-            return IRCResponse(responseType, response, message.ReplyTo)
+            return IRCResponse(responseType, response, message.replyTo)
 
     def storeMessage(self, message):
-        self.messages[message.User.Name] = message
+        self.messages[message.user.name] = message
 
     @staticmethod
     def _getCloseMatches(change, messageList, n, threshold):

@@ -70,8 +70,8 @@ class LRR(BotCommand):
         return responses
 
     def execute(self, message: IRCMessage):
-        if len(message.Parameters.strip()) > 0:
-            feed = self.handleAliases(message.Parameters)
+        if len(message.parameters.strip()) > 0:
+            feed = self.handleAliases(message.parameters)
             lowerMap = {key.lower(): key for key in DataStore.LRRChecker}
             if feed.lower() in lowerMap:
                 feedName = lowerMap[feed.lower()]
@@ -80,13 +80,13 @@ class LRR(BotCommand):
 
                 response = u'Latest {0}: {1} | {2}'.format(feedName, feedLatest, feedLink)
 
-                return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+                return IRCResponse(ResponseType.Say, response, message.replyTo)
 
             return IRCResponse(ResponseType.Say,
                                u"{0} is not one of the LRR series being monitored "
                                u"(leave a tell for Tyranic-Moron if it's a new series or "
-                               u"should be an alias!)".format(message.Parameters.strip()),
-                               message.ReplyTo)
+                               u"should be an alias!)".format(message.parameters.strip()),
+                               message.replyTo)
         else:
             latestDate = datetime.datetime.utcnow() - datetime.timedelta(days=365 * 10)
             latestFeed = None
@@ -100,7 +100,7 @@ class LRR(BotCommand):
                     latestLink = feedDeets['lastLink']
 
             response = u'Latest {0}: {1} | {2}'.format(latestFeed, latestTitle, latestLink)
-            return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, response, message.replyTo)
 
     @classmethod
     def handleAliases(cls, series):
