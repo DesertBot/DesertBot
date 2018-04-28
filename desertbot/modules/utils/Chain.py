@@ -56,7 +56,7 @@ class Chain(BotCommand):
             
             link = link.replace('$sender', message.user.name)
             if message.channel is not None:
-                link = link.replace('$channel', message.channel.Name)
+                link = link.replace('$channel', message.channel.name)
             else:
                 link = link.replace('$channel', message.user.name)
 

@@ -71,7 +71,7 @@ class Dominotifications(BotModule):
             self.bot.sendResponse(IRCResponse(ResponseType.Say,
                                   u"The pizza tracking page linked by {} "
                                   u"had some kind of error, tracking stopped".format(trackingDetails.orderer),
-                                  trackingDetails.channel.Name))
+                                  trackingDetails.channel.name))
             return
 
         j = json.loads(page.body)
@@ -80,7 +80,7 @@ class Dominotifications(BotModule):
             self._stopPizzaTracker(orderID)
             self.bot.sendResponse(IRCResponse(ResponseType.Say,
                                   u"There are no pizza tracking details at the page linked by {}.".format(trackingDetails.orderer),
-                                  trackingDetails.channel.Name))
+                                  trackingDetails.channel.name))
             return
         
         response = None
@@ -90,7 +90,7 @@ class Dominotifications(BotModule):
             trackingDetails.step = step
             response = IRCResponse(ResponseType.Say,
                                    steps[step].format(trackingDetails.orderer),
-                                   trackingDetails.channel.Name)
+                                   trackingDetails.channel.name)
 
         if step == 3:
             self._stopPizzaTracker(orderID)

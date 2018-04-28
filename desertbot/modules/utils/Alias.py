@@ -353,7 +353,7 @@ class Alias(BotCommand):
 
         newMsg = newMsg.replace("$sender", message.user.name)
         if message.channel is not None:
-            newMsg = newMsg.replace("$channel", message.channel.Name)
+            newMsg = newMsg.replace("$channel", message.channel.name)
         else:
             newMsg = newMsg.replace("$channel", message.user.name)
 

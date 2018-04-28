@@ -37,7 +37,7 @@ class Responses(BotCommand):
             ##################################
 
             # '''Example'''
-            # self.responses.add(MobroResponse(	Name,
+            # self.responses.add(MobroResponse(	name,
             #                    Response Message(s),
             #                    Regex(es),
             #                    ResponseType (default Say),
