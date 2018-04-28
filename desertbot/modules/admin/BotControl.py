@@ -33,8 +33,8 @@ class BotControl(BotCommand):
             reactor.addSystemEventTrigger('after',
                                           'shutdown',
                                           lambda: os.execl(sys.executable, sys.executable, *sys.argv))
-            if message.Parameters:
-                self.bot.quit(message=message.Parameters)
+            if message.parameters:
+                self.bot.quit(message=message.parameters)
             else:
                 self.bot.quit(message=self.bot.config.getWithDefault('restartMessage', 'restarting'))
             reactor.callLater(2.0, reactor.stop)
@@ -45,8 +45,8 @@ class BotControl(BotCommand):
         # can't shutdown within 10 seconds of starting (avoids chanhistory triggering another shutdown)
         if datetime.datetime.utcnow() - self.bot.startTime > datetime.timedelta(seconds=10):
             self.bot.quitting = True
-            if message.Parameters:
-                self.bot.quit(message=message.Parameters)
+            if message.parameters:
+                self.bot.quit(message=message.parameters)
             else:
                 self.bot.quit(message=self.bot.config.getWithDefault('quitMessage', 'quitting'))
             reactor.callLater(2.0, reactor.stop)
