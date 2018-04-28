@@ -141,7 +141,7 @@ class Schedule(BotCommand):
 
         self.schedule[taskName] = Task('cron', cronStr, command, params,
                                        message.user.string,
-                                       message.Channel.Name,
+                                       message.channel.Name,
                                        self.bot)
         self.schedule[taskName].start()
 

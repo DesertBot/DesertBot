@@ -352,8 +352,8 @@ class Alias(BotCommand):
         newMsg = u"{0}{1}".format(self.bot.commandChar, alias)
 
         newMsg = newMsg.replace("$sender", message.user.name)
-        if message.Channel is not None:
-            newMsg = newMsg.replace("$channel", message.Channel.Name)
+        if message.channel is not None:
+            newMsg = newMsg.replace("$channel", message.channel.Name)
         else:
             newMsg = newMsg.replace("$channel", message.user.name)
 
@@ -374,7 +374,7 @@ class Alias(BotCommand):
 
         newMsg = self._unmangleReplacementPoints(newMsg)
 
-        return IRCMessage(message.type, message.user.string, message.Channel, newMsg, self.bot)
+        return IRCMessage(message.type, message.user.string, message.channel, newMsg, self.bot)
 
     @staticmethod
     def _mangleReplacementPoints(string):
