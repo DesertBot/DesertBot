@@ -3,6 +3,7 @@ from twisted.plugin import IPlugin
 from desertbot.channel import IRCChannel
 from desertbot.moduleinterface import IModule, BotModule
 from zope.interface import implementer
+from typing import Dict
 
 import re
 import json
@@ -23,7 +24,7 @@ class Dominotifications(BotModule):
            "informing you of the progress of your pizza until delivery"
 
     def onLoad(self):
-        self.trackers = {}
+        self.trackers = Dict[str, TrackingDetails]
 
     def onUnload(self):
         self._stopAllPizzaTrackers()
@@ -106,7 +107,7 @@ class Dominotifications(BotModule):
         return False
 
     def _stopAllPizzaTrackers(self):
-        for orderID in self.trackers.keys():
+        for orderID in self.trackers:
             self._stopPizzaTracker(orderID)
 
 
