@@ -4,7 +4,7 @@ python:
 before_install:
   - "sudo add-apt-repository ppa:nelhage/livegrep -y"
   - "sudo apt-get update -q"
-  - "sudo apt-get install libre2 -y"
+  - "sudo apt-get install libre2-1 -y"
 install:
   - "pip install pyflakes"
   - "git clone https://github.com/DesertBot/weercd.git"
