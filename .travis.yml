@@ -2,7 +2,7 @@ language: python
 python:
   - "3.6"
 before_install:
-  - "sudo add-apt-repository ppa:sergey-dryabzhinsky/packages -y"
+  - "sudo add-apt-repository ppa:nelhage/livegrep -y"
   - "sudo apt-get update -q"
   - "sudo apt-get install re2 -y"
 install:
