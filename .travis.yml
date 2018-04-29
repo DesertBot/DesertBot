@@ -1,13 +1,17 @@
 language: python
 python:
   - "3.6"
+before_install:
+  - "sudo add-apt-repository ppa:sergey-dryabzhinsky/packages"
+  - "sudo apt-get update -q"
+  - "sudo apt-get install re2"
 install:
   - "pip install pyflakes"
   - "git clone https://github.com/DesertBot/weercd.git"
-  - "git clone https://code.googlesource.com/re2 && pushd re2 && make && sudo make install && popd"
   - "pip install Cython"
   - "pip install -r requirements.txt"
-cache: pip
+cache:
+  - pip
 script:
   - pyflakes start.py desertbot/
   - "python weercd/weercd.py --file <(echo 'PRIVMSG :!say hi\nPRIVMSG :!help\nPRIVMSG :!shutdown') -w 10.1 &"
