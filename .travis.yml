@@ -7,6 +7,7 @@ install:
   - "git clone https://code.googlesource.com/re2 && pushd re2 && make && make test && sudo make install && make testinstall && popd"
   - "pip install Cython"
   - "pip install -r requirements.txt"
+cache: pip
 script:
   - pyflakes start.py desertbot/
   - "python weercd/weercd.py --file <(echo 'PRIVMSG :!say hi\nPRIVMSG :!help\nPRIVMSG :!shutdown') -w 10.1 &"
