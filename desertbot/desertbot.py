@@ -210,7 +210,8 @@ class DesertBot(irc.IRCClient, object):
                 channel.modes[mode] = None
 
     def irc_RPL_MYINFO(self, prefix, params):
-        serverinfo.usermodes = params[3]
+        if len(params) >= 4:
+            serverinfo.usermodes = params[3]
 
     def isupport(self, options):
         for item in options:
