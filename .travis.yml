@@ -3,6 +3,10 @@ python:
   - "3.6"
 install:
   - "pip install pyflakes"
-script: pyflakes start.py desertbot/
+  - "git clone https://github.com/DesertBot/weercd.git"
+script:
+  - pyflakes start.py desertbot/
+  - python weercd/weercd.py --file <(echo 'PRIVMSG :!say hi\nPRIVMSG :!help\nPRIVMSG :!shutdown') -w 10.1
+  - python DesertBot/start.py -c <(echo 'server: localhost\nport: 7777\nchannels: "#dev"\nadmins: "*"')
 notifications:
 email: false
