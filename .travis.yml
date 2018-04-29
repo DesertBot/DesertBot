@@ -1,8 +1,20 @@
 language: python
 python:
   - "3.6"
+before_install:
+  - "sudo add-apt-repository ppa:nelhage/livegrep -y"
+  - "sudo apt-get update -q"
+  - "sudo apt-get install libre2-dev -y"
 install:
   - "pip install pyflakes"
-script: pyflakes start.py desertbot/
+  - "git clone https://github.com/DesertBot/weercd.git"
+  - "pip install Cython"
+  - "pip install -r requirements.txt"
+cache:
+  - pip
+script:
+  - pyflakes start.py desertbot/
+  - "python weercd/weercd.py --file <(echo 'PRIVMSG :!say hi\nPRIVMSG :!help\nPRIVMSG :!shutdown') -w 10.1 &"
+  - "python start.py -c <(echo 'server: localhost\nport: 7777\nchannels: \"#dev\"\nadmins: \"*\"')"
 notifications:
 email: false
