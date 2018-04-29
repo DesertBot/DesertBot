@@ -4,6 +4,7 @@ python:
 install:
   - "pip install pyflakes"
   - "git clone https://github.com/DesertBot/weercd.git"
+  - "git clone https://code.googlesource.com/re2 && cd re2 && make && make test && make install && make testinstall"
   - "pip install Cython"
   - "pip install -r requirements.txt"
 script:
