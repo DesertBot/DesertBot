@@ -2,9 +2,9 @@ language: python
 python:
   - "3.6"
 before_install:
-  - "sudo add-apt-repository ppa:sergey-dryabzhinsky/packages"
+  - "sudo add-apt-repository ppa:sergey-dryabzhinsky/packages -y"
   - "sudo apt-get update -q"
-  - "sudo apt-get install re2"
+  - "sudo apt-get install re2 -y"
 install:
   - "pip install pyflakes"
   - "git clone https://github.com/DesertBot/weercd.git"
