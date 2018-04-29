@@ -4,7 +4,7 @@ python:
 install:
   - "pip install pyflakes"
   - "git clone https://github.com/DesertBot/weercd.git"
-  - "git clone https://code.googlesource.com/re2 && pushd re2 && make && make test && sudo make install && make testinstall && popd"
+  - "git clone https://code.googlesource.com/re2 && pushd re2 && make && sudo make install && popd"
   - "pip install Cython"
   - "pip install -r requirements.txt"
 cache: pip
