@@ -4,6 +4,7 @@ python:
 install:
   - "pip install pyflakes"
   - "git clone https://github.com/DesertBot/weercd.git"
+  - "pip install Cython"
   - "pip install -r requirements.txt"
 script:
   - pyflakes start.py desertbot/
