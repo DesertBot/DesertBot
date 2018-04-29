@@ -1,4 +1,4 @@
-DesertBot [![Updates](https://pyup.io/repos/github/DesertBot/DesertBot/shield.svg)](https://pyup.io/repos/github/DesertBot/DesertBot/) [![Python 3](https://pyup.io/repos/github/DesertBot/DesertBot/python-3-shield.svg)](https://pyup.io/repos/github/DesertBot/DesertBot/)
+DesertBot [![Build Status](https://travis-ci.org/DesertBot/DesertBot.svg?branch=master)](https://travis-ci.org/DesertBot/DesertBot) [![Updates](https://pyup.io/repos/github/DesertBot/DesertBot/shield.svg)](https://pyup.io/repos/github/DesertBot/DesertBot/)
 =========
 
 A modular IRC bot with extensive aliasing capabilities, written in Python.
@@ -21,7 +21,7 @@ All of these features can be individually enabled/disabled by loading or unloadi
 
 Installation Instructions
 -------------------------
-* Install Python 2.7+
+* Install Python 3+
 * Clone the repo with `git clone https://github.com/DesertBot/DesertBot.git`
 * Create a virtualenv to run the bot in, and activate it
 * Run `pip install -r requirements.txt` to install all the requirements
