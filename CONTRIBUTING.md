@@ -2,9 +2,9 @@ Document initially started on May 25th, 2014, as written by Heufneutje. Update i
 
 Here are some general guidelines when you're contributing to this project. This goes for all members, including the admins.
 
- - Always discuss major changes with the project's admins. These are HubbeKing, MatthewCox and Heufneutje. Do this preferably by means of a GitHub issue.
+ - Always discuss major changes with the project's admins. These are HubbeKing, TyranicMoron and Heufneutje. Do this preferably by means of a GitHub issue.
  - While working on a big change, try using either a branch in a fork of this project, or in a separate branch in the main repository if you are a member.
- - Always test your code before committing anything. Make sure not only your own code works, but the integration of it into the rest of the project as well.
+ - Always test your code before committing anything. Make sure not only your own code works, but the integration of it into the rest of the project as well. When submitting a PR, Travis will automatically launch the bot with your changes to check that it still runs and can execute a few commands. Be sure to check the output from Travis if that fails.
  - When you commit something, use sane commit messages and squash your commits if needed. This way we can keep the commit history as clean as possible and we don't end up with a bunch of meaningless commits.
 
 Secondly a proposal for the coding style. This is very open to suggestion, but for the sake of code readability and management, a good idea to keep in mind. Update these in agreement if necessary.
