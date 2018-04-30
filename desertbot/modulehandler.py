@@ -115,7 +115,7 @@ class ModuleHandler(object):
         return self.loadModule(name)
 
     def sendPRIVMSG(self, message: str, destination: str) -> None:
-        self.bot.msg(destination, message)
+        self.bot.output.cmdPRIVMSG(destination, message)
 
     def handleMessage(self, message: IRCMessage) -> None:
         isChannel = message.targetType == TargetTypes.CHANNEL
@@ -131,6 +131,9 @@ class ModuleHandler(object):
             "NICK": lambda: "usernick",
             "MODE": lambda: "modeschanged-channel" if isChannel else "modeschanged-user",
             "TOPIC": lambda: "channeltopic",
+            "CTCP": lambda: "ctcp-channel" if isChannel else "ctcp-user",
+            "001": lambda: "welcome",
+            "324": lambda: "modes-channel"
         }
         action = typeActionMap[message.type]()
         # fire off a thread for every incoming message
@@ -156,13 +159,13 @@ class ModuleHandler(object):
 
             try:
                 if response.type == ResponseType.Say:
-                    self.bot.msg(response.target, response.response)
+                    self.bot.output.cmdPRIVMSG(response.target, response.response)
                 elif response.type == ResponseType.Do:
-                    self.bot.describe(response.target, response.response)
+                    self.bot.output.ctcpACTION(response.target, response.response)
                 elif response.type == ResponseType.Notice:
-                    self.bot.notice(response.target, response.response)
+                    self.bot.output.cmdNOTICE(response.target, response.response)
                 elif response.type == ResponseType.Raw:
-                    self.bot.sendLine(response.response)
+                    self.bot.sendMessage(response.response)
             except Exception:
                 # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
                 self.logger.exception("Python Execution Error sending responses {!r}".format(responses))

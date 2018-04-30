@@ -83,6 +83,6 @@ class BotModule(object):
 
     def checkIgnoreList(self, message: IRCMessage) -> bool:
         for ignore in self.bot.config.getWithDefault('ignored', []):
-            if fnmatch(message.user.string, ignore):
+            if fnmatch(message.user.fullUserPrefix(), ignore):
                 return True
         return False
