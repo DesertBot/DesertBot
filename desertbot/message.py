@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 import re
 
 from desertbot.user import IRCUser
@@ -13,7 +13,7 @@ class TargetTypes(Enum):
             
 
 class IRCMessage(object):
-    def __init__(self, msgType: str, user: str, channel: IRCChannel, message: str, bot: 'DesertBot', metadata: Dict=None):
+    def __init__(self, msgType: str, user: IRCUser, channel: Optional[IRCChannel], message: str, bot: 'DesertBot', metadata: Dict=None):
         if metadata is None:
             metadata = {}
         self.metadata = metadata
@@ -25,11 +25,11 @@ class IRCMessage(object):
         self.type = msgType
         self.messageList = unicodeMessage.strip().split(' ')
         self.messageString = unicodeMessage
-        self.user = IRCUser(user)
+        self.user = user
 
         self.channel = None
         if channel is None:
-            self.replyTo = self.user.name
+            self.replyTo = self.user.nick
             self.targetType = TargetTypes.USER
         else:
             self.channel = channel
@@ -48,7 +48,7 @@ class IRCMessage(object):
                 self.parameters = u' '.join(self.messageList[2:])
             else:
                 self.parameters = u' '.join(self.messageList[1:])
-        elif re.match('{}[:,]?'.format(re.escape(bot.nickname)), self.messageList[0], re.IGNORECASE):
+        elif re.match('{}[:,]?'.format(re.escape(bot.nick)), self.messageList[0], re.IGNORECASE):
             if len(self.messageList) > 1:
                 self.command = self.messageList[1]
                 self.parameters = u' '.join(self.messageList[2:])

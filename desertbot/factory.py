@@ -31,6 +31,8 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
         if not self.bot.quitting:
             self.logger.error('Connection lost! - {}'.format(reason))
             protocol.ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
+        else:
+            protocol.ClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
         self.logger.error('Connection failed! - {}'.format(reason))
