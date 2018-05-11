@@ -22,15 +22,15 @@ class Apples(BotCommand):
     playApples = 0
 
     def handleApples(self, message):
-        if self.playApples == 1 and message.user.name.lower() == "robobo":
+        if self.playApples == 1 and message.user.nick.lower() == "robobo":
             msgArr = message.messageList
             name = msgArr.pop(0).strip()
             cmd = " ".join(msgArr).strip()
             if cmd == "to Apples! You have 60 seconds to join.":
                 return IRCResponse(ResponseType.Say, "!join", message.replyTo)
-            elif name.lower() == self.bot.nickname and cmd == "is judging.":
+            elif name.lower() == self.bot.nick and cmd == "is judging.":
                 return IRCResponse(ResponseType.Say, "!pick 0", message.replyTo)
-            elif name.lower() != self.bot.nickname and (cmd == "is judging next." or cmd == "is judging first."):
+            elif name.lower() != self.bot.nick and (cmd == "is judging next." or cmd == "is judging first."):
                 return IRCResponse(ResponseType.Say, "!play 0", message.replyTo)
             elif cmd == "wins the game!" or name == "Sorry,":
                 self.playApples = 0

@@ -53,10 +53,10 @@ class BotCommand(BotModule):
 
     def checkPermissions(self, message: IRCMessage) -> bool:
         for owner in self.bot.config.getWithDefault('owners', []):
-            if fnmatch(message.user.string, owner):
+            if fnmatch(message.user.fullUserPrefix(), owner):
                 return True
         for admin in self.bot.config.getWithDefault('admins', []):
-            if fnmatch(message.user.string, admin):
+            if fnmatch(message.user.fullUserPrefix(), admin):
                 return True
         return False
 
@@ -69,7 +69,7 @@ class BotCommand(BotModule):
         except Exception as e:
             self.logger.exception("Python execution error while running command {!r}".format(message.command))
             error_text = "Python execution error while running command {!r}: {}: {}".format(message.command, type(e).__name__, e)
-            self.bot.moduleHandler.sendPRIVMSG(error_text, message.replyTo)
+            self.bot.output.cmdPRIVMSG(error_text, message.replyTo)
 
     def shouldExecute(self, message: IRCMessage) -> bool:
         if message.command.lower() not in [t.lower() for t in self.triggers()]:

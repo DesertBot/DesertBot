@@ -32,7 +32,7 @@ class Join(BotCommand):
             return responses
         else:
             return IRCResponse(ResponseType.Say,
-                               "{0}, you didn't say where I should join".format(message.user.name),
+                               "{0}, you didn't say where I should join".format(message.user.nick),
                                message.replyTo)
 
 

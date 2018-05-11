@@ -299,7 +299,7 @@ class Hangman(BotCommand):
                     PhraseUsesKnownBadLettersException) as e:
                 return self._exceptionFormatter(e, message.replyTo)
 
-        user = message.user.name
+        user = message.user.nick
         # split the username with a zero-width space
         # hopefully this kills client highlighting on nick mentions
         #user = user[:1] + u'\u200b' + user[1:]
