@@ -14,7 +14,7 @@ cache:
   - pip
 script:
   - pyflakes start.py desertbot/
-  - "python weercd/weercd.py --file <(echo 'PRIVMSG :!say hi\nPRIVMSG :!help\nPRIVMSG :!shutdown') -w 10.1 &"
-  - "python start.py -c <(echo 'server: localhost\nport: 7777\nchannels: \"#dev\"\nadmins: \"*\"')"
+  - python weercd/weercd.py --file test/test_commands.txt -w 10.1 &
+  - python start.py -c test/test_config.yaml -l DEBUG
 notifications:
-email: false
+  email: false
