@@ -39,7 +39,7 @@ class AsterFix(BotModule):
             self.storeMessage(message)
             return
 
-        lastMessage = self.messages[message.user.name]
+        lastMessage = self.messages[message.user.nick]
         lastmessageList = lastMessage.messageList
 
         # Skip 1-word messages, as it just leads to direct repetition
@@ -55,7 +55,7 @@ class AsterFix(BotModule):
             response = " ".join(responseList)
 
             # Store the modified message so it can be aster-fixed again
-            self.messages[message.user.name].messageList = responseList
+            self.messages[message.user.nick].messageList = responseList
 
             if lastMessage.type == 'ACTION':
                 responseType = ResponseType.Do
@@ -65,7 +65,7 @@ class AsterFix(BotModule):
             return IRCResponse(responseType, response, message.replyTo)
 
     def storeMessage(self, message):
-        self.messages[message.user.name] = message
+        self.messages[message.user.nick] = message
 
     @staticmethod
     def _getCloseMatches(change, messageList, n, threshold):

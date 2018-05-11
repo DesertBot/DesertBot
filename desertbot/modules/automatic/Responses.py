@@ -196,16 +196,16 @@ class Responses(BotCommand):
 
             def animalTalkwords(message):
                 # Specific user animals
-                if self.animal == 'cow' and message.user.name.lower() == 'neo-gabi':
+                if self.animal == 'cow' and message.user.nick.lower() == 'neo-gabi':
                     return [IRCResponse(ResponseType.Do,
                                         'points at {0}, and says "{0} was the cow all along!"'
-                                        .format(message.user.name),
+                                        .format(message.user.nick),
                                         message.replyTo)]
 
                 randomChance = random.randint(1, 20)
 
                 # Emily Bonus
-                if message.user.name == 'Emily':
+                if message.user.nick == 'Emily':
                     randomChance = random.randint(1, 25)
                     
                 article = 'an' if self.animal[0] in 'aeiou' else 'a'
@@ -215,60 +215,60 @@ class Responses(BotCommand):
                     ''' User Critically Failed '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY NOT the droid you are looking for.'.format(message.user.name),
+                                            '{} is DEFINITELY NOT the droid you are looking for.'.format(message.user.nick),
                                             message.replyTo)]
                     elif self.animal == 'goose':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is a clown!'.format(message.user.name),
+                                            '{} is a clown!'.format(message.user.nick),
                                             message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} critically fails at being {} {}.'.format(message.user.name, article, self.animal),
+                                            '{} critically fails at being {} {}.'.format(message.user.nick, article, self.animal),
                                             message.replyTo)]
 
                 elif randomChance <= 8:
                     ''' User Is Not A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not the droid you are looking for.'.format(message.user.name),
+                                            '{} is not the droid you are looking for.'.format(message.user.nick),
                                             message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not {} {}.'.format(message.user.name, article, self.animal),
+                                            '{} is not {} {}.'.format(message.user.nick, article, self.animal),
                                             message.replyTo)]
                 elif randomChance <= 14:
                     '''User Might Be A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} might be the droid you are looking for.'.format(message.user.name),
+                                            '{} might be the droid you are looking for.'.format(message.user.nick),
                                             message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} /might/ be {} {}.'.format(message.user.name, article, self.animal),
+                                            '{} /might/ be {} {}.'.format(message.user.nick, article, self.animal),
                                             message.replyTo)]
                 elif randomChance <= 19:
                     ''' User Is A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is the droid you are looking for.'.format(message.user.name),
+                                            '{} is the droid you are looking for.'.format(message.user.nick),
                                             message.replyTo)]
                     elif self.animal == 'puppeh':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is such doge. wow.'.format(message.user.name),
+                                            '{} is such doge. wow.'.format(message.user.nick),
                                             message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY {} {}.'.format(message.user.name, article, self.animal),
+                                            '{} is DEFINITELY {} {}.'.format(message.user.nick, article, self.animal),
                                             message.replyTo)]
                 elif randomChance == 20:
                     ''' User Is A Critical [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY the droid you are looking for.'.format(message.user.name),
+                                            '{} is DEFINITELY the droid you are looking for.'.format(message.user.nick),
                                             message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is a CRITICAL {}!'.format(message.user.name, self.animal),
+                                            '{} is a CRITICAL {}!'.format(message.user.nick, self.animal),
                                             message.replyTo)]
                 else:
                     ''' Roll is outside of bounds, Magic! '''

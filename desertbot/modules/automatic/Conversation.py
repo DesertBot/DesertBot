@@ -41,14 +41,14 @@ class Conversation(BotModule):
                      ]
 
         regex = r"^(?P<greeting>{0})( there)?,?[ ]{1}([^a-zA-Z0-9_\|`\[\]\^-]|$)".format('|'.join(greetings),
-                                                                                         self.bot.nickname)
+                                                                                         self.bot.nick)
 
         match = re.search(regex,
                           message.messageString,
                           re.IGNORECASE)
         if match:
             return IRCResponse(ResponseType.Say,
-                               '{0} {1}'.format(match.group('greeting'), message.user.name),
+                               '{0} {1}'.format(match.group('greeting'), message.user.nick),
                                message.replyTo)
 
 

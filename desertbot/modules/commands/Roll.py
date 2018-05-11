@@ -54,10 +54,10 @@ class Roll(BotCommand):
             if len(rollString) > 200:
                 rollString = u"LOTS O' DICE"
 
-            response = u'{} rolled: [{}] {}'.format(message.user.name, rollString, result)
+            response = u'{} rolled: [{}] {}'.format(message.user.nick, rollString, result)
 
         else:
-            response = u'{} rolled: {}'.format(message.user.name, result)
+            response = u'{} rolled: {}'.format(message.user.nick, result)
 
         if self.roller.description:
             response += u' {}'.format(self.roller.description)

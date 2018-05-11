@@ -54,14 +54,14 @@ class Chain(BotCommand):
                 # (or this is the first command in the chain, but for some reason has $output as a param)
                 link = link.replace('$output', '')
             
-            link = link.replace('$sender', message.user.name)
+            link = link.replace('$sender', message.user.nick)
             if message.channel is not None:
                 link = link.replace('$channel', message.channel.name)
             else:
-                link = link.replace('$channel', message.user.name)
+                link = link.replace('$channel', message.user.nick)
 
             # build a new message out of this 'link' in the chain
-            inputMessage = IRCMessage(message.type, message.user.string, message.channel,
+            inputMessage = IRCMessage(message.type, message.user.fullUserPrefix(), message.channel,
                                       self.bot.commandChar + link.lstrip(),
                                       self.bot)
             inputMessage.chained = True  # might be used at some point to tell commands they're being called from Chain

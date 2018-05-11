@@ -191,7 +191,7 @@ class Alias(BotCommand):
                                     u"\n".join(sorted(helpCommands)))
 
         url = self.bot.moduleHandler.runActionUntilValue('upload-pasteee', export,
-                                                         u"Exported {} aliases for {}".format(self.bot.nickname,
+                                                         u"Exported {} aliases for {}".format(self.bot.nick,
                                                                                               self.bot.server),
                                                          60)
         return IRCResponse(ResponseType.Say,
@@ -351,11 +351,11 @@ class Alias(BotCommand):
         alias = self.aliases[message.command.lower()]
         newMsg = u"{0}{1}".format(self.bot.commandChar, alias)
 
-        newMsg = newMsg.replace("$sender", message.user.name)
+        newMsg = newMsg.replace("$sender", message.user.nick)
         if message.channel is not None:
             newMsg = newMsg.replace("$channel", message.channel.name)
         else:
-            newMsg = newMsg.replace("$channel", message.user.name)
+            newMsg = newMsg.replace("$channel", message.user.nick)
 
         paramList = [self._mangleReplacementPoints(param) for param in message.parameterList]
 
@@ -374,7 +374,7 @@ class Alias(BotCommand):
 
         newMsg = self._unmangleReplacementPoints(newMsg)
 
-        return IRCMessage(message.type, message.user.string, message.channel, newMsg, self.bot)
+        return IRCMessage(message.type, message.user.fullUserPrefix(), message.channel, newMsg, self.bot)
 
     @staticmethod
     def _mangleReplacementPoints(string):
