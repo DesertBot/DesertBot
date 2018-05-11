@@ -1,0 +1,6 @@
+server: 'localhost'
+port: 7777
+channels:
+  '#dev': null
+admins:
+  - '*'

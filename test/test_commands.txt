@@ -1,0 +1,3 @@
+:server PRIVMSG DesertBot :!say hi
+:server PRIVMSG DesertBot :!help
+:server PRIVMSG DesertBot :!shutdown
