@@ -7,7 +7,7 @@ server: irc.server.org
 port: 6667
 # the channels to join
 channels:
-- '#channel'
+  '#channel': null
 
 # who can issue admin commands
 admins:
