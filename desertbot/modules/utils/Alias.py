@@ -374,7 +374,7 @@ class Alias(BotCommand):
 
         newMsg = self._unmangleReplacementPoints(newMsg)
 
-        return IRCMessage(message.type, message.user.fullUserPrefix(), message.channel, newMsg, self.bot)
+        return IRCMessage(message.type, message.user), message.channel, newMsg, self.bot)
 
     @staticmethod
     def _mangleReplacementPoints(string):
