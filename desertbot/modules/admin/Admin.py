@@ -36,7 +36,7 @@ class Admin(BotCommand):
             if message.replyTo in self.bot.channels:
                 if adminName in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[adminName]
-                    adminName = u'*!{}@{}'.format(user.user, user.host)
+                    adminName = u'*!{}@{}'.format(user.ident, user.host)
 
             admins = self.bot.config.getWithDefault('admins', [])
             admins.append(adminName)
