@@ -5,6 +5,7 @@ import os
 import sys
 
 from twisted.internet import reactor
+from twisted.python import log
 
 from desertbot.config import Config, ConfigError
 from desertbot.factory import DesertBotFactory
@@ -37,7 +38,10 @@ if __name__ == '__main__':
     streamHandler.setFormatter(logFormatter)
 
     rootLogger.addHandler(streamHandler)
-
+    
+    observer = log.PythonLoggingObserver(loggerName='desertbot.twisted')
+    observer.start()
+    
     config = Config(cmdArgs.config)
     try:
         config.loadConfig()
