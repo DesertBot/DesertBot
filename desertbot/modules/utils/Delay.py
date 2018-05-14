@@ -41,7 +41,7 @@ class Delay(BotCommand):
         commandString = commandString.replace('$delayString', delayString)
         commandString = commandString.replace('$delay', str(delay))
 
-        newMessage = IRCMessage(message.type, message.user.fullUserPrefix(), message.channel, commandString, self.bot)
+        newMessage = IRCMessage(message.type, message.user, message.channel, commandString, self.bot)
 
         moduleHandler = self.bot.moduleHandler
         if command in moduleHandler.mappedTriggers:

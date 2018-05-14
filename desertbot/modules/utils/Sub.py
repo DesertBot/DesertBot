@@ -72,7 +72,7 @@ class Sub(BotCommand):
                 command = re.sub(r'\$\b{}\b'.format(re.escape(var)), u'{}'.format(value), command)
 
             # Build a new message out of this segment
-            inputMessage = IRCMessage(message.type, message.user.fullUserPrefix(), message.channel,
+            inputMessage = IRCMessage(message.type, message.user, message.channel,
                                       self.bot.commandChar + command.lstrip(),
                                       self.bot,
                                       metadata=metadata)

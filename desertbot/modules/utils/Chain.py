@@ -61,7 +61,7 @@ class Chain(BotCommand):
                 link = link.replace('$channel', message.user.nick)
 
             # build a new message out of this 'link' in the chain
-            inputMessage = IRCMessage(message.type, message.user.fullUserPrefix(), message.channel,
+            inputMessage = IRCMessage(message.type, message.user, message.channel,
                                       self.bot.commandChar + link.lstrip(),
                                       self.bot)
             inputMessage.chained = True  # might be used at some point to tell commands they're being called from Chain
