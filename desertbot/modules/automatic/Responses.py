@@ -163,7 +163,7 @@ class Responses(BotCommand):
                     r'nya+n?~?': 'neko ₍˄·͈༝·͈˄₎◞',
                     r'squeak': 'mouse',
                     r'moo+': 'cow',
-                    r'(twee+t|ca+w+)': 'bird',
+                    r'(twee+t|ca+w+|chirp)': 'bird',
                     r'ne+i+gh': 'horse',
                     r'ri+bb+i+t': 'frog',
                     r'bloo+p': 'fish',
