@@ -1,5 +1,6 @@
 server: 'localhost'
 port: 7777
+tls: False
 channels:
   '#dev': null
 admins:

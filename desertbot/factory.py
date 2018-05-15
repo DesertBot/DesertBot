@@ -5,6 +5,12 @@ from twisted.internet import reactor, protocol
 from desertbot.config import Config
 from desertbot.desertbot import DesertBot
 
+# Try to enable SSL support
+try:
+    from twisted.internet import ssl
+except ImportError:
+    ssl = None
+
 
 class DesertBotFactory(protocol.ReconnectingClientFactory):
     def __init__(self, config: Config):
@@ -15,8 +21,16 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
 
         self.server = config['server']
         self.port = config.getWithDefault('port', 6667)
-
-        reactor.connectTCP(self.server, self.port, self)
+        if config.getWithDefault('tls', False):
+            self.logger.info('Attempting secure connection to {}:{}...'.format(self.server, self.port)
+            if ssl is not None:
+                reactor.connectSSL(self.server, self.port, self, ssl.ClientContextFactory()
+            else:
+                self.logger.error('Connection to {}:{} failed; PyOpenSSL is required for secure connections.'.format(
+                                  self.server, self.port)
+        else:
+            self.logger.info('Attempting connection to {}:{}'.format(self.server, self.port)
+            reactor.connectTCP(self.server, self.port, self)
 
     def startedConnecting(self, connector):
         self.logger.info('Started to connect')

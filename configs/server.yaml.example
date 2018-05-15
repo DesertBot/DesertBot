@@ -5,6 +5,9 @@ import: [_defaults]
 server: irc.server.org
 # the port to connect on
 port: 6667
+# whether or not the connection should be secured
+tls: False
+
 # the channels to join
 channels:
   '#channel': null
