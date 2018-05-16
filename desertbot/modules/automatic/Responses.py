@@ -369,7 +369,7 @@ class Responses(BotCommand):
                     "http://i.imgur.com/V35yPa0.gifv",  # 2 dogs boop their snoots in an expert manner
                     "http://i.imgur.com/ihS28BF.gifv",  # dog boops a cat standing on the edge of a bath into it
                     "https://i.imgur.com/GBniOtO.gifv", # touch lamp cat gets booped on the nose
-                    "http://i.imgur.com/GufY1ag.gif",   # puppy boops the camera
+                    #"http://i.imgur.com/GufY1ag.gif",   # puppy boops the camera
                     "http://www.gfycat.com/FarflungTeemingAtlasmoth",   # one cat boops another sitting in a bag, while another in a basket looks on
                     "https://i.imgur.com/NHCSPxj.jpg",  # 2 bunnies boop noses on a towel
                     "https://i.imgur.com/8tZ9wBy.gifv", # a red koala walks up to another and boops it on the nose
