@@ -350,7 +350,7 @@ class Hangman(BotCommand):
                 return u'{1}hangman {0}'.format(docstring, self.bot.commandChar)
             else:
                 return u"Oops! The help text for 'hangman {}' seems to be missing. "\
-                       u"Tell my owner Tyranic-Moron!".format(subCommand)
+                       u"Tell my owners!".format(subCommand)
         else:
             return self._helpText
 

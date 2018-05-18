@@ -84,7 +84,7 @@ class LRR(BotCommand):
 
             return IRCResponse(ResponseType.Say,
                                u"{0} is not one of the LRR series being monitored "
-                               u"(leave a tell for Tyranic-Moron if it's a new series or "
+                               u"(leave a tell for my owners if it's a new series or "
                                u"should be an alias!)".format(message.parameters.strip()),
                                message.replyTo)
         else:
