@@ -11,9 +11,30 @@ from six import iteritems
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-import desertbot.utils.LRRChecker as DataStore
-
 import dateutil.parser as dparser
+
+
+aYearAgo = datetime.datetime.utcnow() - datetime.timedelta(days=365)
+tenMinsAgo = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)
+
+DataStore = {
+    'LRRCast': {
+        'url': 'http://feeds.feedburner.com/lrrcast',
+        'lastUpdate': aYearAgo,
+        'lastTitle': '',
+        'lastLink': '',
+        'lastCheck': tenMinsAgo,
+        'aliases': ["podcast", "cast", "lrrc", "llrc", "lcast", "lc", 'chat'],
+        'suppress': True},
+    'LRR Blog': {
+        'url': 'http://loadingreadyrun.com/blog/feed/',
+        'lastUpdate': aYearAgo,
+        'lastTitle': '',
+        'lastLink': '',
+        'lastCheck': tenMinsAgo,
+        'aliases': ['blog'],
+        'suppress': True}
+}
 
 
 @implementer(IPlugin, IModule)
@@ -28,55 +49,56 @@ class LRR(BotCommand):
         if query[0] in self.triggers():
             return "lrr (<series>) - returns a link to the latest LRR video, " \
                 "or the latest of a series if you specify one; " \
-                "series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
+                "series are: {0}".format(", ".join(DataStore.keys()))
         return "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
 
     def checkLRR(self, _: IRCMessage):
         responses = []
-        for feedName, feedDeets in iteritems(DataStore.LRRChecker):
+        for feedName, feedDeets in iteritems(DataStore):
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
                 continue
-            
-            DataStore.LRRChecker[feedName]['lastCheck'] = datetime.datetime.utcnow()
-            
+
+            DataStore[feedName]['lastCheck'] = datetime.datetime.utcnow()
+
             feedPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', feedDeets['url'])
-            
+
             if feedPage is None:
                 #TODO: log an error here that the feed likely no longer exists!
                 continue
-            
+
             root = ET.fromstring(feedPage.body)
             item = root.find('channel/item')
-            
+
             if item is None:
                 #TODO: log an error here that the feed likely no longer exists!
                 continue
 
             newestDate = dparser.parse(item.find('pubDate').text, fuzzy=True, ignoretz=True)
-            
+
             if newestDate > feedDeets['lastUpdate']:
-                DataStore.LRRChecker[feedName]['lastUpdate'] = newestDate
-                
+                DataStore[feedName]['lastUpdate'] = newestDate
+
                 if feedDeets['suppress']:
-                    DataStore.LRRChecker[feedName]['suppress'] = False
+                    DataStore[feedName]['suppress'] = False
                 else:
                     title = item.find('title').text
-                    DataStore.LRRChecker[feedName]['lastTitle'] = title
-                    link = self.bot.moduleHandler.runActionUntilValue('shorten-url', item.find('link').text)
-                    DataStore.LRRChecker[feedName]['lastLink'] = link
+                    DataStore[feedName]['lastTitle'] = title
+                    link = self.bot.moduleHandler.runActionUntilValue('shorten-url',
+                                                                      item.find('link').text)
+                    DataStore[feedName]['lastLink'] = link
                     response = 'New {0}! Title: {1} | {2}'.format(feedName, title, link)
                     responses.append(IRCResponse(ResponseType.Say, response, '#desertbus'))
-            
+
         return responses
 
     def execute(self, message: IRCMessage):
         if len(message.parameters.strip()) > 0:
             feed = self.handleAliases(message.parameters)
-            lowerMap = {key.lower(): key for key in DataStore.LRRChecker}
+            lowerMap = {key.lower(): key for key in DataStore}
             if feed.lower() in lowerMap:
                 feedName = lowerMap[feed.lower()]
-                feedLatest = DataStore.LRRChecker[feedName]['lastTitle']
-                feedLink = DataStore.LRRChecker[feedName]['lastLink']
+                feedLatest = DataStore[feedName]['lastTitle']
+                feedLink = DataStore[feedName]['lastLink']
 
                 response = u'Latest {0}: {1} | {2}'.format(feedName, feedLatest, feedLink)
 
@@ -92,7 +114,7 @@ class LRR(BotCommand):
             latestFeed = None
             latestTitle = None
             latestLink = None
-            for feedName, feedDeets in iteritems(DataStore.LRRChecker):
+            for feedName, feedDeets in iteritems(DataStore):
                 if feedDeets['lastUpdate'] > latestDate:
                     latestDate = feedDeets['lastUpdate']
                     latestFeed = feedName
@@ -104,7 +126,7 @@ class LRR(BotCommand):
 
     @classmethod
     def handleAliases(cls, series):
-        for feedName, feedDeets in iteritems(DataStore.LRRChecker):
+        for feedName, feedDeets in iteritems(DataStore):
             if series.lower() in feedDeets['aliases']:
                 return feedName
         return series
