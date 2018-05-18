@@ -1,3 +1,8 @@
-:server PRIVMSG DesertBot :!say hi
+:server PRIVMSG DesertBot :!do wakes up
+:server PRIVMSG DesertBot :hi DesertBot
+:server PRIVMSG DesertBot :s/DesertBot/Test Server/
+:server PRIVMSG DesertBot :!alias add alias_test sub {var stat 4d6dl}{rollv $stat + $stat + $stat + $stat + $stat + $stat}
+:server PRIVMSG DesertBot :!alias_test
+:server PRIVMSG DesertBot :!reload alias
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!shutdown
