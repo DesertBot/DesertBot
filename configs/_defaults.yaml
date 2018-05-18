@@ -14,9 +14,10 @@ finger: GET YOUR FINGER OUT OF THERE
 
 # slightly more privileged than admins; can add/remove admins
 owners:
-- "*!~TM@tyranicmoron.uk"
-- "*!TM@tyranicmoron.uk"
+- "*!SG@45.55.60.209"
+- "*!SG@starlitghost.xyz"
 - "*!Heufy@netadmin.dbcommunity.org"
+- "*!hubbe@hubbe.club"
 - "*!hubbe@dbchat-d1d5c6a1.bb.dnainternet.fi"
 
 # modules to load
