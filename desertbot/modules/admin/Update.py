@@ -100,13 +100,14 @@ class Update(BotCommand):
             for moduleName in modulesToReload:
                 if moduleName == "Update":
                     failures.append(moduleName)
-                try:
-                    self.bot.moduleHandler.reloadModule(moduleName)
-                except Exception:
-                    failures.append(moduleName)
-                    self.logger.exception("Exception when auto-reloading module {!r}".format(moduleName))
                 else:
-                    reloadedModules.append(moduleName)
+                    try:
+                        self.bot.moduleHandler.reloadModule(moduleName)
+                    except Exception:
+                        failures.append(moduleName)
+                        self.logger.exception("Exception when auto-reloading module {!r}".format(moduleName))
+                    else:
+                        reloadedModules.append(moduleName)
             if len(reloadedModules) > 0:
                 response += " | Reloaded modules: {}".format(", ".join(reloadedModules))
             if len(failures) > 0:
@@ -115,8 +116,6 @@ class Update(BotCommand):
             loadedModules = []
             failures = []
             for moduleName in modulesToLoad:
-                if moduleName == "Update":
-                    failures.append(moduleName)
                 try:
                     self.bot.moduleHandler.reloadModule(moduleName)
                 except Exception:
