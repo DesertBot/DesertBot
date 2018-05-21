@@ -9,16 +9,19 @@ from twisted.python.rebuild import rebuild
 from twisted.internet import threads
 from enum import Enum
 from six import iteritems
-from typing import Any, List
+from typing import Any, List, TYPE_CHECKING
 
 from desertbot.moduleinterface import IModule
 import desertbot.modules
 from desertbot.message import IRCMessage, TargetTypes
 from desertbot.response import ResponseType
 
+if TYPE_CHECKING:
+    from desertbot.desertbot import DesertBot
+
 
 class ModuleHandler(object):
-    def __init__(self, bot: 'DesertBot'):
+    def __init__(self, bot: DesertBot):
         self.bot = bot
         self.logger = logging.getLogger('desertbot.modulehandler')
 

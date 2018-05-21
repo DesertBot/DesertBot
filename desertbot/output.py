@@ -1,5 +1,11 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from desertbot.desertbot import DesertBot
+
+
 class OutputHandler(object):
-    def __init__(self, bot: 'DesertBot'):
+    def __init__(self, bot: DesertBot):
         self.bot = bot
 
     def cmdINVITE(self, user: str, channel: str) -> None:

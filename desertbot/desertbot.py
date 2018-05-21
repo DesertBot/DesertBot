@@ -11,12 +11,15 @@ from desertbot.modulehandler import ModuleHandler
 from desertbot.output import OutputHandler
 from desertbot.support import ISupport
 from desertbot.utils.string import isNumber
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, TYPE_CHECKING
 from weakref import WeakValueDictionary
+
+if TYPE_CHECKING:
+    from desertbot.factory import DesertBotFactory
 
 
 class DesertBot(IRCBase, object):
-    def __init__(self, factory: 'DesertBotFactory', config: Config):
+    def __init__(self, factory: DesertBotFactory, config: Config):
         self.logger = logging.getLogger('desertbot.core')
         self.factory = factory
         self.config = config

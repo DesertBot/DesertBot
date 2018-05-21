@@ -4,11 +4,14 @@ from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse
 from desertbot.user import IRCUser
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from desertbot.desertbot import DesertBot
 
 
 class InputHandler(object):
-    def __init__(self, bot: 'DesertBot'):
+    def __init__(self, bot: DesertBot):
         self.bot = bot
 
     def handleCommand(self, command: str, prefix: str, params: List[str]) -> None:

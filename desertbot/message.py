@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
-from typing import Dict, Optional
+from typing import Dict, Optional, TYPE_CHECKING
 import re
 
 from desertbot.user import IRCUser
 from desertbot.channel import IRCChannel
+
+if TYPE_CHECKING:
+    from desertbot.desertbot import DesertBot
 
 
 class TargetTypes(Enum):
@@ -13,7 +16,7 @@ class TargetTypes(Enum):
             
 
 class IRCMessage(object):
-    def __init__(self, msgType: str, user: IRCUser, channel: Optional[IRCChannel], message: str, bot: 'DesertBot', metadata: Dict=None):
+    def __init__(self, msgType: str, user: IRCUser, channel: Optional[IRCChannel], message: str, bot: DesertBot, metadata: Dict=None):
         if metadata is None:
             metadata = {}
         self.metadata = metadata
