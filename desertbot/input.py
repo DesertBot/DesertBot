@@ -29,6 +29,20 @@ class InputHandler(object):
         if method:
             method(prefix, params)
 
+    def _handleACCOUNT(self, nick, ident, host, params):
+        if 'account-notify' not in self.bot.capabilities['finished']:
+            return
+
+        if nick not in self.bot.users:
+            self.bot.logger.warning('Received ACCOUNT message for unknown user {}.'.format(nick))
+            return
+
+        user = self.bot.users[nick]
+        if params[0] == '*':
+            user.account = None
+        else:
+            user.account = params[0]
+
     def _handleCAP(self, nick, ident, host, params):
         subCommand = params[1]
         if subCommand == 'LS':
