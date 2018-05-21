@@ -90,6 +90,9 @@ class Log(BotCommand):
             log(os.path.join(self.bot.logPath, self.bot.server), message.replyTo, logString)
 
     def output(self, response: IRCResponse):
+        if 'echo-message' in self.bot.capabilities['finished']:
+            return response
+
         if response.type in logSelfFuncs:
             logString = logSelfFuncs[response.type](self.bot.nick, response)
             log(os.path.join(self.bot.logPath, self.bot.server),
