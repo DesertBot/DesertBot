@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class IRCChannel(object):
-    def __init__(self, name: str, bot: DesertBot):
+    def __init__(self, name: str, bot: 'DesertBot'):
         self.logger = logging.getLogger('desertbot.core.{}'.format(name))
         self.name = name
         self.bot = bot
@@ -112,7 +112,7 @@ class IRCChannel(object):
             "removedParams": paramsRemoved
         }
 
-    def getHighestStatusOfUser(self, user: IRCUser) -> str:
+    def getHighestStatusOfUser(self, user: 'IRCUser') -> str:
         if user.nick not in self.ranks:
             return ""
 
@@ -121,7 +121,7 @@ class IRCChannel(object):
                 return self.bot.supportHelper.statusModes[status]
         return ""
 
-    def userIsChanOp(self, user: IRCUser) -> bool:
+    def userIsChanOp(self, user: 'IRCUser') -> bool:
         if user.nick not in self.ranks:
             return False
 

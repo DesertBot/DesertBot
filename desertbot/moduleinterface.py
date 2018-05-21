@@ -29,7 +29,7 @@ class IModule(Interface):
         Called when the module is loaded. Typically loading data, API keys, etc.
         """
 
-    def hookBot(bot: DesertBot) -> None:
+    def hookBot(bot: 'DesertBot') -> None:
         """
         Called when the bot is loaded to pass a reference to the bot for later use.
         """
@@ -71,7 +71,7 @@ class BotModule(object):
     def onLoad(self) -> None:
         pass
 
-    def hookBot(self, bot: DesertBot) -> None:
+    def hookBot(self, bot: 'DesertBot') -> None:
         self.bot = bot
 
     def displayHelp(self, query: str) -> str:

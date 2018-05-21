@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class InputHandler(object):
-    def __init__(self, bot: DesertBot):
+    def __init__(self, bot: 'DesertBot'):
         self.bot = bot
 
     def handleCommand(self, command: str, prefix: str, params: List[str]) -> None:

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class DesertBot(IRCBase, object):
-    def __init__(self, factory: DesertBotFactory, config: Config):
+    def __init__(self, factory: 'DesertBotFactory', config: Config):
         self.logger = logging.getLogger('desertbot.core')
         self.factory = factory
         self.config = config

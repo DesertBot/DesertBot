@@ -5,7 +5,7 @@ if TYPE_CHECKING:
 
 
 class OutputHandler(object):
-    def __init__(self, bot: DesertBot):
+    def __init__(self, bot: 'DesertBot'):
         self.bot = bot
 
     def cmdINVITE(self, user: str, channel: str) -> None:

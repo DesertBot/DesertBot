@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class ModuleHandler(object):
-    def __init__(self, bot: DesertBot):
+    def __init__(self, bot: 'DesertBot'):
         self.bot = bot
         self.logger = logging.getLogger('desertbot.modulehandler')
 
