@@ -29,6 +29,34 @@ class InputHandler(object):
         if method:
             method(prefix, params)
 
+    def _handleCAP(self, nick, ident, host, params):
+        subCommand = params[1]
+        if subCommand == 'LS':
+            self.bot.logger.info('Received CAP LS reply, supported caps: {}'.format(params[2]))
+            serverCaps = _parseCapReply(params[2])
+            for reqCap in [x for x in self.bot.capabilities['available'] if x in serverCaps]:
+                self.bot.capabilities['requested'].append(reqCap)
+            self.checkCAPNegotiationFinished()
+            if self.bot.capabilities['init']:
+                toRequest = ' '.join(self.bot.capabilities['requested'])
+                self.bot.logger.info('Requesting capabilities: {}...'.format(toRequest))
+                self.bot.output.cmdCAP_REQ(toRequest)
+        elif subCommand == 'ACK' or subCommand == 'NAK':
+            capList = _parseCapReply(params[2])
+            self.bot.capabilities['requested'] = [x for x in self.bot.capabilities['requested'] if x not in capList]
+            if params[1] == 'ACK':
+                for capName in capList:
+                    if capName not in self.bot.capabilities['enabled']:
+                        self.bot.capabilities['enabled'].append(capName)
+                    # TODO Special handling for capabilities that need more work after being acknowledged
+                    if capName not in self.bot.capabilities['finished']:
+                        self.bot.capabilities['finished'].append(capName)
+
+                self.bot.logger.info('Acknowledged capability changes: {}.'.format(params[2]))
+            else:
+                self.bot.logger.info('Rejected capability changes: {}.'.format(params[2]))
+            self.checkCAPNegotiationFinished()
+
     def _handleERROR(self, nick, ident, host, params):
         self.bot.logger.info('Connection terminated ({})'.format(params[0]))
 
@@ -388,6 +416,12 @@ class InputHandler(object):
         channel = self.bot.channels[params[1]]
         channel.userlistComplete = True
 
+    def _handleNumeric401(self, prefix, params):
+        # This is assuming the numeric is even sent to begin with, which some unsupported IRCds don't even seem to do.
+        if params[0] == 'CAP':
+            self.bot.logger.info('Server does not support capability negotiation.')
+            self.bot.capabilities['init'] = False
+
     def _handleNumeric433(self, prefix, params):
         # 433: ERR_NICKNAMEINUSE
         newNick = '{}_'.format(self.bot.nick)
@@ -400,6 +434,15 @@ class InputHandler(object):
 
     def sendResponse(self, response: IRCResponse):
         self.bot.moduleHandler.sendResponse(response)
+
+    def checkCAPNegotiationFinished(self):
+        if not self.bot.capabilities['init'] or len(self.bot.capabilities['requested']) != 0:
+            return
+
+        if set(self.bot.capabilities['enabled']) == set(self.bot.capabilities['finished']):
+            self.bot.output.cmdCAP_END()
+            self.bot.logger.info('Capability negotiation completed.')
+            self.bot.capabilities['init'] = False
 
 
 def parseUserPrefix(prefix: str) -> Tuple[str, Optional[str], Optional[str]]:
@@ -425,3 +468,15 @@ def now():
 def timestamp(time):
     unixEpoch = datetime.utcfromtimestamp(0)
     return int((time - unixEpoch).total_seconds())
+
+
+def _parseCapReply(reply):
+    parsedReply = {}
+    for serverCap in reply.split():
+        if '=' in serverCap:
+            key, value = serverCap.split('=')
+        else:
+            key = serverCap
+            value = None
+        parsedReply[key] = value
+    return parsedReply

@@ -37,6 +37,15 @@ class DesertBot(IRCBase, object):
         self.ident = None
         self.server = self.config['server']
         self.commandChar = self.config.getWithDefault('commandChar', '!')
+        self.availableCapabilities = ['multi-prefix']
+        self.initializingCapabilities = True
+        self.capabilities = {
+            'init': True,
+            'available': ['multi-prefix', 'userhost-in-names'],
+            'requested': [],
+            'enabled': [],
+            'finished': []
+        }
 
         self.rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
         self.dataPath = os.path.join(self.rootDir, 'data', self.server)
@@ -65,6 +74,10 @@ class DesertBot(IRCBase, object):
 
         self.supportHelper.network = self.server
         self.logger.info('Connection established.')
+
+        # Try to enable IRCv3 support.
+        self.logger.info('Requesting supported capabilities...')
+        self.output.cmdCAP_LS()
 
         # Initialize login data from the config.
         self.nick = self.config.getWithDefault('nickname', 'DesertBot')
