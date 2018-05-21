@@ -114,9 +114,14 @@ class InputHandler(object):
     def _handleJOIN(self, nick, ident, host, params):
         if nick not in self.bot.users:
             user = IRCUser(nick, ident, host)
+            if 'extended-join' in self.bot.capabilities['finished'] and len(params) > 1:
+                if params[1] != '*':
+                    user.account = params[1]
+                user.gecos = params[2]
             self.bot.users[nick] = user
         else:
             user = self.bot.users[nick]
+
         if params[0] not in self.bot.channels:
             channel = IRCChannel(params[0], self.bot)
             self.bot.output.cmdWHO(params[0])
