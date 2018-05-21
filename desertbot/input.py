@@ -218,7 +218,7 @@ class InputHandler(object):
                 source = self.bot.channels[params[0]]
             else:
                 # We got a notice for an unknown channel. Create a temporary IRCChannel object for it.
-                source = IRCChannel(params[0], self)
+                source = IRCChannel(params[0], self.bot)
             if nick in self.bot.users:
                 user = self.bot.users[nick]
             else:
