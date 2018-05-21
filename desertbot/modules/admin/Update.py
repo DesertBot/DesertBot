@@ -86,8 +86,8 @@ class Update(BotCommand):
             for filepath in addedPyFiles:
                 filename = filepath.split(os.path.sep)[-1]  # list contains full filepaths, split on os.path.sep and get last for filename
                 if "modules" in filepath:
-                    if filename in self.bot.moduleHandler.fileMap:
-                        modulesToLoad.append(self.bot.moduleHandler.fileMap[filename])
+                    # TODO a better way to do this, module name might not match file name.
+                    modulesToLoad.append(filename.split(".py")[0])
                 else:
                     modulesToReload = []
                     modulesToLoad = []
