@@ -7,7 +7,7 @@ ply==3.11
 enum34==1.1.6
 twitter==1.18.0
 requests==2.18.4
-pytimeparse==1.1.7
+pytimeparse==1.1.8
 pymysql==0.8.1
 pycryptodome==3.6.1
 pyasn1==0.4.2
