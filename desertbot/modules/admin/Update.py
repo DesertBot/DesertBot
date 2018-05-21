@@ -39,9 +39,14 @@ class Update(BotCommand):
 
         changes = list(reversed(changes))
         response = u'New commits: {}'.format(u' | '.join(changes))
-        
-        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '..origin/master'])
+
+        # Get modified files
+        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '--diff-filter=M', '..origin/master'])
         changedFiles = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
+
+        # Get added files
+        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '--diff-filter=A', '..origin/master'])
+        addedFiles = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         returnCode = subprocess.check_call(['git', 'merge', 'origin/master'])
 
@@ -60,15 +65,34 @@ class Update(BotCommand):
             finally:
                 response += " | No auto-reload due to requirements change, please restart bot."
         else:
+            changedPyFiles = [path for path in changedFiles if path.endswith(".py")]
+            addedPyFiles = [path for path in addedFiles if path.endswith(".py")]
+
             modulesToReload = []
-            for filepath in changedFiles:
-                filename = filepath.split(os.path.sep)[-1]  # changedFiles contains full filepaths, split on os.path.sep and get last for filename
-                if filename in self.bot.moduleHandler.fileMap:
-                    modulesToReload.append(self.bot.moduleHandler.fileMap[filename])
+            modulesToLoad = []
+
+            for filepath in changedPyFiles:
+                filename = filepath.split(os.path.sep)[-1]  # list contains full filepaths, split on os.path.sep and get last for filename
+                if "modules" in filepath:
+                    if filename in self.bot.moduleHandler.fileMap:
+                        modulesToReload.append(self.bot.moduleHandler.fileMap[filename])
                 else:
                     modulesToReload = []
+                    modulesToLoad = []
                     response += " | No auto-reload due to change(s) in bot core, please restart bot."
                     self.logger.info("No auto-reload due to change in file {!r}".format(filename))
+                    break
+
+            for filepath in addedPyFiles:
+                filename = filepath.split(os.path.sep)[-1]  # list contains full filepaths, split on os.path.sep and get last for filename
+                if "modules" in filepath:
+                    if filename in self.bot.moduleHandler.fileMap:
+                        modulesToLoad.append(self.bot.moduleHandler.fileMap[filename])
+                else:
+                    modulesToReload = []
+                    modulesToLoad = []
+                    response += " | No auto-load due to change(s) in bot core, please restart bot."
+                    self.logger.info("No auto-load due to change in file {!r}".format(filename))
                     break
 
             reloadedModules = []
@@ -87,6 +111,23 @@ class Update(BotCommand):
                 response += " | Reloaded modules: {}".format(", ".join(reloadedModules))
             if len(failures) > 0:
                 response += " | Failed to reload modules: {}".format(", ".join(failures))
+
+            loadedModules = []
+            failures = []
+            for moduleName in modulesToLoad:
+                if moduleName == "Update":
+                    failures.append(moduleName)
+                try:
+                    self.bot.moduleHandler.reloadModule(moduleName)
+                except Exception:
+                    failures.append(moduleName)
+                    self.logger.exception("Exception when auto-reloading module {!r}".format(moduleName))
+                else:
+                    loadedModules.append(moduleName)
+            if len(loadedModules) > 0:
+                response += " | Loaded new modules: {}".format(", ".join(loadedModules))
+            if len(failures) > 0:
+                response += " | Failed to load new modules: {}".format(", ".join(failures))
 
         return IRCResponse(ResponseType.Say,
                            response,
