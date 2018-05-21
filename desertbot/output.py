@@ -8,6 +8,15 @@ class OutputHandler(object):
     def __init__(self, bot: 'DesertBot'):
         self.bot = bot
 
+    def cmdCAP_END(self):
+        self.bot.sendMessage('CAP', 'END')
+
+    def cmdCAP_LS(self):
+        self.bot.sendMessage('CAP', 'LS')
+
+    def cmdCAP_REQ(self, toRequest: str):
+        self.bot.sendMessage('CAP', 'REQ', toRequest)
+
     def cmdINVITE(self, user: str, channel: str) -> None:
         self.bot.sendMessage("INVITE", user, channel)
 
