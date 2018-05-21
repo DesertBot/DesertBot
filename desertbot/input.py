@@ -43,6 +43,22 @@ class InputHandler(object):
         else:
             user.account = params[0]
 
+    def _handleAWAY(self, nick, ident, host, params):
+        if 'away-notify' not in self.bot.capabilities['finished']:
+            return
+
+        if nick not in self.bot.users:
+            self.bot.logger.warning('Received AWAY message for unknown user {}.'.format(nick))
+            return
+
+        user = self.bot.users[nick]
+        if len(params) == 1:
+            user.isAway = True
+            user.awayMessage = params[0]
+        else:
+            user.isAway = False
+            user.awayMessage = None
+
     def _handleCAP(self, nick, ident, host, params):
         subCommand = params[1]
         if subCommand == 'LS':
