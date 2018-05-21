@@ -87,6 +87,18 @@ class InputHandler(object):
                 self.bot.logger.info('Rejected capability changes: {}.'.format(params[2]))
             self.checkCAPNegotiationFinished()
 
+    def _handleCHGHOST(self, nick, ident, host, params):
+        if 'chghost' not in self.bot.capabilities['finished']:
+            return
+
+        if nick not in self.bot.users:
+            self.bot.logger.warning('Received CHGHOST message for unknown user {}.'.format(nick))
+            return
+
+        user = self.bot.users[nick]
+        user.ident = params[0]
+        user.host = params[1]
+
     def _handleERROR(self, nick, ident, host, params):
         self.bot.logger.info('Connection terminated ({})'.format(params[0]))
 
