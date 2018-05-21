@@ -22,7 +22,9 @@ class Source(BotCommand):
         return "source - returns a link to {0}'s source".format(self.bot.nick)
 
     def execute(self, message: IRCMessage):
-        return IRCResponse(ResponseType.Say, self.bot.sourceURL, message.replyTo)
+        return IRCResponse(ResponseType.Say,
+                           self.bot.config.getWithDefault('source', 'https://github.com/DesertBot/DesertBot/'),
+                           message.replyTo)
 
 
 source = Source()
