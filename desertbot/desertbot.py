@@ -41,8 +41,8 @@ class DesertBot(IRCBase, object):
         self.initializingCapabilities = True
         self.capabilities = {
             'init': True,
-            'available': ['account-notify', 'away-notify', 'chghost', 'extended-join', 'invite-notify', 'multi-prefix',
-                          'userhost-in-names'],
+            'available': ['account-notify', 'away-notify', 'echo-message', 'chghost', 'extended-join', 'invite-notify',
+                          'multi-prefix', 'userhost-in-names'],
             'requested': [],
             'enabled': [],
             'finished': []
