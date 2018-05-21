@@ -107,8 +107,24 @@ class InputHandler(object):
             inviter = self.bot.users[nick]
         else:
             inviter = IRCUser(nick, ident, host)
-        self.bot.output.cmdJOIN(params[1])
-        message = IRCMessage('INVITE', inviter, None, '', self.bot)
+
+        invitee = None
+        if 'invite-notify' in self.bot.capabilities['finished'] and len(params) > 1:
+            if params[0] not in self.bot.users:
+                invitee = IRCUser(params[0])
+            else:
+                invitee = self.bot.users[nick]
+            chanName = params[1]
+        else:
+            chanName = params[0]
+
+        if chanName not in self.bot.channels:
+            channel = IRCChannel(params[0], self.bot)
+        else:
+            channel = self.bot.channels[chanName]
+        if not invitee or invitee.nick == self.bot.nick:
+            self.bot.output.cmdJOIN(chanName)
+        message = IRCMessage('INVITE', inviter, channel, '', self.bot, {'invitee': invitee})
         self.handleMessage(message)
 
     def _handleJOIN(self, nick, ident, host, params):
