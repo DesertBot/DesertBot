@@ -60,14 +60,17 @@ class DesertBot(IRCBase, object):
 
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
 
+        # Create and bind database engine, allowing for queries against ORM storage to be made
+        # This means modules can use session.query() during load to retrieve objects from the database
+        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite://'))
+        Session.configure(bind=self.database_engine)
+
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
 
-        # Initialize ORM after modules have loaded, and registered their Object classes against the Base
-        # This means that database queries can't happen on module load, but must be delayed until the database is ready
-        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite://'))
+        # After all modules have loaded, tell ORM Base to create all non-existant tables
+        # Database system is now fully ready, and session.add() will work
         Base.metadata.create_all(self.database_engine)
-        Session.configure(bind=self.database_engine)
 
         # set start time after modules have loaded, some take a while
         self.startTime = datetime.utcnow()
