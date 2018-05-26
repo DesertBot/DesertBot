@@ -62,7 +62,7 @@ class DesertBot(IRCBase, object):
 
         # Create and bind database engine, allowing for queries against ORM storage to be made
         # This means modules can use session.query() during load to retrieve objects from the database
-        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite://'))
+        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite:///data/{}.db'.format(self.server)))
         Session.configure(bind=self.database_engine)
 
         self.moduleHandler = ModuleHandler(self)
