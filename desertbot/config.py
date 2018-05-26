@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import copy
+import copy, os
 from ruamel.yaml import YAML
 from six import iteritems
 from typing import Any, Dict
@@ -37,7 +37,7 @@ class Config(object):
             return configData
 
         for fname in configData['import']:
-            includeConfig = self._readConfig('configs/{}.yaml'.format(fname))
+            includeConfig = self._readConfig('{}/{}.yaml'.format(os.path.dirname(os.path.abspath(fileName)), fname))
             for key, val in iteritems(includeConfig):
                 # not present in base config, just assign it
                 if key not in configData:
