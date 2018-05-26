@@ -5,12 +5,14 @@ from twisted.internet.interfaces import ISSLTransport
 from twisted.internet import reactor
 from datetime import datetime
 from desertbot.config import Config
+from desertbot.datastore import Session
 from desertbot.input import InputHandler
 from desertbot.ircbase import IRCBase
 from desertbot.modulehandler import ModuleHandler
 from desertbot.output import OutputHandler
 from desertbot.support import ISupport
 from desertbot.utils.string import isNumber
+from sqlalchemy import create_engine
 from typing import Dict, Optional, List, TYPE_CHECKING
 from weakref import WeakValueDictionary
 
@@ -57,6 +59,11 @@ class DesertBot(IRCBase, object):
         self.logPath = os.path.join(self.rootDir, 'logs')
 
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
+
+        # Create and bind database engine, allowing for queries against ORM storage to be made
+        # This means modules can use session.query() during load to retrieve objects from the database
+        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite:///data/{}.db'.format(self.server)))
+        Session.configure(bind=self.database_engine)
 
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
