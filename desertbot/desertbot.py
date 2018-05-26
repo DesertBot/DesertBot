@@ -5,7 +5,7 @@ from twisted.internet.interfaces import ISSLTransport
 from twisted.internet import reactor
 from datetime import datetime
 from desertbot.config import Config
-from desertbot.datastore import Base, Session
+from desertbot.datastore import Session
 from desertbot.input import InputHandler
 from desertbot.ircbase import IRCBase
 from desertbot.modulehandler import ModuleHandler

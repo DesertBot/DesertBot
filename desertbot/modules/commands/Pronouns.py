@@ -20,7 +20,7 @@ class Pronoun(Base):
 
 
 @implementer(IPlugin, IModule)
-class PronounCommand(BotCommand):
+class Pronouns(BotCommand):
     def triggers(self):
         return ["pronouns", "setpron", "rmpron"]
 
@@ -31,10 +31,10 @@ class PronounCommand(BotCommand):
     def onLoad(self):
         Base.metadata.create_all(self.bot.database_engine)
 
-    def execute(self, message: IRCMessage):
-        if not message.parameterList:
-            return IRCResponse(ResponseType.Say, self.help(message.command), message.replyTo)
+    def onUnload(self):
+        Base.metadata.remove(Pronoun.__table__)
 
+    def execute(self, message: IRCMessage):
         session = Session()
 
         if message.command == "setpron":
@@ -61,13 +61,13 @@ class PronounCommand(BotCommand):
             else:
                 lookup = message.parameterList[0]
 
-            user_pronouns = session.query(Pronoun.pronouns).filter(Pronoun.nick == lookup).first()
-            if user_pronouns is None:
+            user = session.query(Pronoun).filter(Pronoun.nick == lookup).first()
+            if user is None:
                 session.close()
                 return IRCResponse(ResponseType.Say, "User's pronouns have not been specified.", message.replyTo)
             else:
                 session.close()
-                return IRCResponse(ResponseType.Say, "{} uses <{}> pronouns.".format(lookup, user_pronouns), message.replyTo)
+                return IRCResponse(ResponseType.Say, "{} uses <{}> pronouns.".format(lookup, str(user.pronouns)), message.replyTo)
 
 
-pronoun = PronounCommand()
+pronouns = Pronouns()
