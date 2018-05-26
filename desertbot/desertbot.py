@@ -68,10 +68,6 @@ class DesertBot(IRCBase, object):
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
 
-        # After all modules have loaded, tell ORM Base to create all non-existant tables
-        # Database system is now fully ready, and session.add() will work
-        Base.metadata.create_all(self.database_engine)
-
         # set start time after modules have loaded, some take a while
         self.startTime = datetime.utcnow()
 

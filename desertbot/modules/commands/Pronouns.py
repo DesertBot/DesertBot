@@ -28,6 +28,9 @@ class PronounCommand(BotCommand):
         return "Commands: pronouns <user>, setpron <pronouns>, rmpron | "\
                "Query the user's pronouns, specify your own pronouns, or remove your pronouns from the database."
 
+    def onLoad(self):
+        Base.metadata.create_all(self.bot.database_engine)
+
     def execute(self, message: IRCMessage):
         if not message.parameterList:
             return IRCResponse(ResponseType.Say, self.help(message.command), message.replyTo)
