@@ -11,6 +11,7 @@ from desertbot.modulehandler import ModuleHandler
 from desertbot.output import OutputHandler
 from desertbot.support import ISupport
 from desertbot.utils.string import isNumber
+from sqlalchemy import create_engine
 from typing import Dict, Optional, List, TYPE_CHECKING
 from weakref import WeakValueDictionary
 
@@ -57,6 +58,8 @@ class DesertBot(IRCBase, object):
         self.logPath = os.path.join(self.rootDir, 'logs')
 
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
+
+        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite://'))
 
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
