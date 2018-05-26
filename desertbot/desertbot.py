@@ -5,6 +5,7 @@ from twisted.internet.interfaces import ISSLTransport
 from twisted.internet import reactor
 from datetime import datetime
 from desertbot.config import Config
+from desertbot.datastore import Base, Session
 from desertbot.input import InputHandler
 from desertbot.ircbase import IRCBase
 from desertbot.modulehandler import ModuleHandler
@@ -59,10 +60,14 @@ class DesertBot(IRCBase, object):
 
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
 
-        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite://'))
-
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
+
+        # Initialize ORM after modules have loaded, and registered their Object classes against the Base
+        # This means that database queries can't happen on module load, but must be delayed until the database is ready
+        self.database_engine = create_engine(self.config.getWithDefault('database_engine', 'sqlite://'))
+        Base.metadata.create_all(self.database_engine)
+        Session.configure(bind=self.database_engine)
 
         # set start time after modules have loaded, some take a while
         self.startTime = datetime.utcnow()
