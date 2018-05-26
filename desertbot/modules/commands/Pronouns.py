@@ -40,13 +40,17 @@ class PronounCommand(BotCommand):
             user_pronouns = Pronoun(nick=message.user.nick, pronouns=message.parameterList[0])
             session.add(user_pronouns)
             session.commit()
+            session.close()
+            return IRCResponse(ResponseType.Say, "Your pronouns have been set as <{}>.".format(message.parameterList[0]), message.replyTo)
         elif message.command == "rmpron":
             user_pronouns = session.query(Pronoun).filter(Pronoun.nick == message.user.nick).first()
             if user_pronouns is None:
+                session.close()
                 return IRCResponse(ResponseType.Say, "I don't even know your pronouns!", message.replyTo)
             else:
                 session.delete(user_pronouns)
                 session.commit()
+                session.close()
                 return IRCResponse(ResponseType.Say, "Your pronouns have been deleted.", message.replyTo)
         elif message.command == "pronouns":
             if len(message.parameterList) < 1:
@@ -56,8 +60,11 @@ class PronounCommand(BotCommand):
 
             user_pronouns = session.query(Pronoun.pronouns).filter(Pronoun.nick == lookup).first()
             if user_pronouns is None:
+                session.close()
                 return IRCResponse(ResponseType.Say, "User's pronouns have not been specified.", message.replyTo)
-            return IRCResponse(ResponseType.Say, "{} uses <{}> pronouns.".format(lookup, user_pronouns), message.replyTo)
+            else:
+                session.close()
+                return IRCResponse(ResponseType.Say, "{} uses <{}> pronouns.".format(lookup, user_pronouns), message.replyTo)
 
 
 pronoun = PronounCommand()
