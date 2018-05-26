@@ -21,4 +21,4 @@ admins:
 #- -Responses
 
 # database engine to use for data storage http://docs.sqlalchemy.org/en/latest/core/engines.html
-database_engine: 'sqlite://'
+database_engine: 'sqlite:///data/server.org/data.db'
