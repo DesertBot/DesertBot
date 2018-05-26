@@ -17,12 +17,21 @@ from collections import OrderedDict
 from twisted.internet import reactor
 
 from desertbot.message import IRCMessage
+from desertbot.response import IRCResponse, ResponseType
 
 
 @implementer(IPlugin, IModule)
 class BotControl(BotCommand):
     def triggers(self):
-        return ['restart', 'shutdown']
+        return ['nick', 'restart', 'shutdown']
+
+    @admin
+    def _nick(self, message):
+        """nick - changes the bot's nickname"""
+        if len(message.parameterList) > 0:
+            return IRCResponse(ResponseType.Raw, 'NICK {}'.format(message.parameterList[0]), '')
+        else:
+            return IRCResponse(ResponseType.Say, 'Change my nickname to what?', message.replyTo)
 
     @admin
     def _restart(self, message):
@@ -50,8 +59,9 @@ class BotControl(BotCommand):
             reactor.callLater(2.0, reactor.stop)
 
     _commands = OrderedDict([
-        (u'restart', _restart),
-        (u'shutdown', _shutdown),
+        ('nick', _nick),
+        ('restart', _restart),
+        ('shutdown', _shutdown),
     ])
 
     def help(self, query: str) -> str:
@@ -59,7 +69,7 @@ class BotControl(BotCommand):
         if command in self._commands:
             return self._commands[command].__doc__
         else:
-            return u'{} - pretty obvious'.format(u', '.join(self._commands.keys()))
+            return '{} - pretty obvious'.format(u', '.join(self._commands.keys()))
 
     def execute(self, message: IRCMessage):
         return self._commands[message.command.lower()](self, message)
