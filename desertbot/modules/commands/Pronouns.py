@@ -29,7 +29,7 @@ class Pronouns(BotCommand):
                "Query the user's pronouns, specify your own pronouns, or remove your pronouns from the database."
 
     def onLoad(self):
-        Base.metadata.create_all(self.bot.database_engine)
+        Base.metadata.create_all(self.bot.databaseEngine)
 
     def onUnload(self):
         Base.metadata.remove(Pronoun.__table__)
