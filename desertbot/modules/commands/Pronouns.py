@@ -57,11 +57,11 @@ class Pronouns(BotCommand):
                 return IRCResponse(ResponseType.Say, "Your pronouns have been deleted.", message.replyTo)
         elif message.command == "pronouns":
             if len(message.parameterList) < 1:
-                lookup = message.user.nick.lower()
+                lookup = message.user.nick
             else:
-                lookup = message.parameterList[0].lower()
+                lookup = message.parameterList[0]
 
-            user = session.query(Pronoun).filter(Pronoun.nick == lookup).first()
+            user = session.query(Pronoun).filter(Pronoun.nick == lookup.lower()).first()
             if user is None:
                 session.close()
                 return IRCResponse(ResponseType.Say, "User's pronouns have not been specified.", message.replyTo)
