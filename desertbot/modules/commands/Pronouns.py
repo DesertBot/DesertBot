@@ -40,13 +40,13 @@ class Pronouns(BotCommand):
         if message.command == "setpron":
             if len(message.parameterList) < 1:
                 return IRCResponse(ResponseType.Say, "Your pronouns are... blank?", message.replyTo)
-            user_pronouns = Pronoun(nick=message.user.nick, pronouns=message.parameterList[0])
+            user_pronouns = Pronoun(nick=message.user.nick.lower(), pronouns=message.parameters)
             session.add(user_pronouns)
             session.commit()
             session.close()
-            return IRCResponse(ResponseType.Say, "Your pronouns have been set as <{}>.".format(message.parameterList[0]), message.replyTo)
+            return IRCResponse(ResponseType.Say, "Your pronouns have been set as <{}>.".format(message.parameters), message.replyTo)
         elif message.command == "rmpron":
-            user_pronouns = session.query(Pronoun).filter(Pronoun.nick == message.user.nick).first()
+            user_pronouns = session.query(Pronoun).filter(Pronoun.nick == message.user.nick.lower()).first()
             if user_pronouns is None:
                 session.close()
                 return IRCResponse(ResponseType.Say, "I don't even know your pronouns!", message.replyTo)
@@ -57,9 +57,9 @@ class Pronouns(BotCommand):
                 return IRCResponse(ResponseType.Say, "Your pronouns have been deleted.", message.replyTo)
         elif message.command == "pronouns":
             if len(message.parameterList) < 1:
-                lookup = message.user.nick
+                lookup = message.user.nick.lower()
             else:
-                lookup = message.parameterList[0]
+                lookup = message.parameterList[0].lower()
 
             user = session.query(Pronoun).filter(Pronoun.nick == lookup).first()
             if user is None:
