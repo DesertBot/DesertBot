@@ -40,18 +40,19 @@ class Pronouns(BotCommand):
         if message.command == "setpron":
             if len(message.parameterList) < 1:
                 return IRCResponse(ResponseType.Say, "Your pronouns are... blank?", message.replyTo)
-            user_pronouns = Pronoun(nick=message.user.nick.lower(), pronouns=message.parameters)
-            session.add(user_pronouns)
+            userPronouns = Pronoun(nick=message.user.nick.lower(), pronouns=message.parameters)
+            session.add(userPronouns)
             session.commit()
             session.close()
-            return IRCResponse(ResponseType.Say, "Your pronouns have been set as <{}>.".format(message.parameters), message.replyTo)
+            return IRCResponse(ResponseType.Say, "Your pronouns have been set as <{}>.".format(message.parameters),
+                               message.replyTo)
         elif message.command == "rmpron":
-            user_pronouns = session.query(Pronoun).filter(Pronoun.nick == message.user.nick.lower()).first()
-            if user_pronouns is None:
+            userPronouns = session.query(Pronoun).filter(Pronoun.nick == message.user.nick.lower()).first()
+            if userPronouns is None:
                 session.close()
                 return IRCResponse(ResponseType.Say, "I don't even know your pronouns!", message.replyTo)
             else:
-                session.delete(user_pronouns)
+                session.delete(userPronouns)
                 session.commit()
                 session.close()
                 return IRCResponse(ResponseType.Say, "Your pronouns have been deleted.", message.replyTo)
@@ -67,7 +68,8 @@ class Pronouns(BotCommand):
                 return IRCResponse(ResponseType.Say, "User's pronouns have not been specified.", message.replyTo)
             else:
                 session.close()
-                return IRCResponse(ResponseType.Say, "{} uses <{}> pronouns.".format(lookup, str(user.pronouns)), message.replyTo)
+                return IRCResponse(ResponseType.Say, "{} uses <{}> pronouns.".format(lookup, str(user.pronouns)),
+                                   message.replyTo)
 
 
 pronouns = Pronouns()
