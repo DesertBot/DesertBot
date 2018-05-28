@@ -39,7 +39,11 @@ class Pronouns(BotCommand):
             if message.command == "setpron":
                 if len(message.parameterList) < 1:
                     return IRCResponse(ResponseType.Say, "Your pronouns are... blank?", message.replyTo)
-                userPronouns = Pronoun(nick=message.user.nick.lower(), pronouns=message.parameters)
+                userPronouns = session.query(Pronoun).filter(Pronoun.nick == message.user.nick.lower()).first()
+                if userPronouns is not None:
+                    userPronouns.pronouns = message.parameters
+                else:
+                    userPronouns = Pronoun(nick=message.user.nick.lower(), pronouns=message.parameters)
                 session.add(userPronouns)
                 return IRCResponse(ResponseType.Say, "Your pronouns have been set as <{}>.".format(message.parameters),
                                    message.replyTo)
