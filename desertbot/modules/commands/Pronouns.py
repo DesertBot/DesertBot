@@ -44,7 +44,7 @@ class Pronouns(BotCommand):
                     userPronouns.pronouns = message.parameters
                 else:
                     userPronouns = Pronoun(nick=message.user.nick.lower(), pronouns=message.parameters)
-                session.add(userPronouns)
+                    session.add(userPronouns)
                 return IRCResponse(ResponseType.Say, "Your pronouns have been set as <{}>.".format(message.parameters),
                                    message.replyTo)
             elif message.command == "rmpron":
