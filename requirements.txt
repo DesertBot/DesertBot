@@ -10,7 +10,7 @@ requests==2.18.4
 pytimeparse==1.1.8
 pymysql==0.8.1
 pycryptodome==3.6.1
-pyasn1==0.4.2
+pyasn1==0.4.3
 isodate==0.6.0
 google-api-python-client==1.6.7
 pyxDamerauLevenshtein==1.5
