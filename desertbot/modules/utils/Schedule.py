@@ -46,7 +46,7 @@ class Task(object):
         """
         self.type = type
         self.timeStr = timeStr
-        self.commandStr = command
+        self.command = command
         self.params = params
         self.user = user
         self.channel = channel
@@ -54,7 +54,6 @@ class Task(object):
 
         # these will be set by self.reInit()
         self.bot = None
-        self.command = None
         self.cron = None
         self.nextTime = None
         self.cronStr = None
@@ -63,8 +62,6 @@ class Task(object):
 
     def reInit(self, bot):
         self.bot = bot
-        triggers = bot.moduleHandler.mappedTriggers
-        self.command = triggers[self.commandStr].execute
 
         self.cronStr = {
             'cron': self.timeStr
@@ -80,13 +77,15 @@ class Task(object):
         self.task.addCallback(self.cycle)
 
     def activate(self):
-        commandStr = u'{}{} {}'.format(self.bot.commandChar, self.commandStr,
+        commandStr = u'{}{} {}'.format(self.bot.commandChar, self.command,
                                        u' '.join(self.params))
         message = IRCMessage('PRIVMSG', self.user, IRCChannel(self.channel),
                              commandStr,
                              self.bot)
+        
+        trigger = self.bot.moduleHandler.mappedTriggers[self.command].execute
 
-        return self.command(message)
+        return trigger(message)
 
     def cycle(self, response):
         if not isinstance(response, list):
@@ -178,7 +177,7 @@ class Schedule(BotCommand):
         t = self.schedule[taskName]
         return IRCResponse(ResponseType.Say,
                            u'{} {} {} {} | {}'
-                           .format(t.type, t.timeStr, t.commandStr,
+                           .format(t.type, t.timeStr, t.command,
                                    u' '.join(t.params), t.nextTime),
                            message.replyTo)
 
