@@ -14,7 +14,7 @@ pyasn1==0.4.3
 isodate==0.6.0
 google-api-python-client==1.7.3
 pyxDamerauLevenshtein==1.5
-numpy==1.14.3
+numpy==1.14.4
 Cython==0.28.3
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
 parsedatetime==2.4
