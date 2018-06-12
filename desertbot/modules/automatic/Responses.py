@@ -181,7 +181,7 @@ class Responses(BotCommand):
                     r'baa+': 'sheep',
                     r'(blub(\s+)?)+': 'deep one',
                     r'bu*zz+': 'bee',
-                    r'(boo+|oooo+)': 'ghost',
+                    r'(boo+|oooo+)': 'spoopy goast',
                     r'(noo+t ?)+': 'penguin',
                     r'too+t': 'mastodon',
                 }
