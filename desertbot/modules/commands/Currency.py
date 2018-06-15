@@ -44,7 +44,7 @@ class Currency(BotCommand):
         ccTo   = ",".join(ccTo)
         ccTo   = ccTo.upper()
 
-        url = "https://api.fixer.io/latest?base={}&symbols={}"
+        url = "https://exchangeratesapi.io/api/latest?base={}&symbols={}"
         url = url.format(ccFrom, ccTo)
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         jsonResponse = json.loads(response.body)
