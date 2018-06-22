@@ -35,7 +35,7 @@ class Ignore(BotCommand):
             if message.replyTo in self.bot.channels:
                 if ignore in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[ignore]
-                    ignore = u'*!{}@{}'.format(user.user, user.host)
+                    ignore = u'*!{}@{}'.format(user.nick, user.host)
 
             ignores = self.bot.config.getWithDefault('ignored', [])
             ignores.append(ignore)
@@ -62,7 +62,7 @@ class Ignore(BotCommand):
             if message.replyTo in self.bot.channels:
                 if unignore in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[unignore]
-                    unignore = u'*!{}@{}'.format(user.user, user.host)
+                    unignore = u'*!{}@{}'.format(user.nick, user.host)
 
             if unignore not in ignores:
                 skipped.append(unignore)
