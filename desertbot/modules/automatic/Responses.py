@@ -160,6 +160,7 @@ class Responses(BotCommand):
             def animalMatch(message):
                 matchDict = {
                     r'(woo+f|r+u+ff+|arf|ba+r+k)': 'puppeh',
+                    r'(bo+r+k)': 'pupper',
                     r'nya+n?~?': 'neko ₍˄·͈༝·͈˄₎◞',
                     r'squeak': 'mouse',
                     r'moo+': 'cow',
@@ -251,10 +252,6 @@ class Responses(BotCommand):
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
                                             '{} is the droid you are looking for.'.format(message.user.nick),
-                                            message.replyTo)]
-                    elif self.animal == 'puppeh':
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is such doge. wow.'.format(message.user.nick),
                                             message.replyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
