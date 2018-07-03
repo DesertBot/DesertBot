@@ -15,13 +15,14 @@ import zlib
 from collections import OrderedDict
 import re
 
+from twisted.internet import threads
 import requests
 
 from desertbot.response import IRCResponse, ResponseType
 
 
 @implementer(IPlugin, IModule)
-class LangPlayground(BotCommand):
+class Lang(BotCommand):
     def triggers(self):
         return self.commands.keys()
 
@@ -33,6 +34,8 @@ class LangPlayground(BotCommand):
 
     def onLoad(self):
         self.languages = None
+        d = threads.deferToThread(self._fetchLanguages)
+        d.addCallback(self._setLanguages)
         self.templates = {
             'rust':
 """fn main() {{
@@ -96,11 +99,19 @@ int main() {{
     def execute(self, message: IRCMessage):
         return self.commands[message.command.lower()](self, message)
 
+    def _fetchLanguages(self):
+        self.logger.info("Loading language list from TryItOnline...")
+        langUrl = "https://raw.githubusercontent.com/TryItOnline/tryitonline/master/usr/share/tio.run/languages.json"
+        response = requests.get(langUrl)
+        return response.json().keys()
+
+    def _setLanguages(self, langs: List[str]):
+        self.languages = langs
+        self.logger.info("Language list loaded")
+
     def _tio(self, lang: str, code: str, userInput: str="") -> str:
         if self.languages == None:
-            langUrl = "https://raw.githubusercontent.com/TryItOnline/tryitonline/master/usr/share/tio.run/languages.json"
-            response = requests.get(langUrl)
-            self.languages = response.json().keys()
+            self._setLanguages(self._fetchLanguages())
 
         if lang not in self.languages:
             langList = self.bot.moduleHandler.runActionUntilValue('closest-matches',
@@ -161,4 +172,4 @@ int main() {{
 
         return u' | '.join(r.decode('utf-8', 'ignore') for r in returned)
 
-langPlayground = LangPlayground()
+lang = Lang()
