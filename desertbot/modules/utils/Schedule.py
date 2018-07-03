@@ -117,7 +117,6 @@ class Task(object):
         return representer.represent_mapping(cls.yaml_tag, cleanedTask)
 
     def _deferredError(self, error):
-        import traceback
         self.logger.exception("Python Execution Error in deferred call {!r}".format(error))
         self.logger.exception(error)
 
