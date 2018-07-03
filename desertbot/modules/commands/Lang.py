@@ -13,6 +13,7 @@ from typing import List
 
 import zlib
 from collections import OrderedDict
+import re
 
 import requests
 
@@ -25,7 +26,10 @@ class LangPlayground(BotCommand):
         return self.commands.keys()
 
     def help(self, query: List[str]) -> str:
-        return self._helpText()
+        command = query[0].lower()
+        helpText = re.sub(r"\s+", u" ", self.commands[command].__doc__)
+        return u"{cmdChar}{help}".format(cmdChar=self.bot.commandChar,
+                                         help=helpText)
 
     def onLoad(self):
         self.languages = None
@@ -48,8 +52,49 @@ int main() {{
 }}"""
         }
 
-    def _helpText(self):
-        return u"{}lang <lang> <code> - evaluates the given code using https://tio.run".format(self.bot.commandChar)
+    def _lang(self, message: IRCMessage):
+        """lang <lang> <code> - evaluates the given <code> as <lang>, using
+        https://tio.run"""
+
+        if len(message.parameterList) > 0:
+            lang = message.parameterList[0].lower()
+            code = u' '.join(message.parameterList[1:])
+            if lang in self.templates:
+                code = self.templates[lang].format(code=code)
+            result = self._tio(lang, code)
+            return IRCResponse(ResponseType.Say,
+                               result.replace("\n", " "),
+                               message.replyTo)
+        else:
+            return IRCResponse(ResponseType.Say,
+                               self.help(message.command),
+                               message.replyTo)
+
+    def _langurl(self, message: IRCMessage):
+        """langurl <lang> <url> <input> - evaluates the <code> at <url>
+        as <lang> with <input> as stdin, using https://tio.run"""
+
+        if len(message.parameterList) > 1:
+            lang = message.parameterList[0].lower()
+            url = message.parameterList[1]
+            userInput = " ".join(message.parameterList[2:])
+            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+            code = page.body
+            result = self._tio(lang, code, userInput)
+            return IRCResponse(ResponseType.Say,
+                               result.replace("\n", " "),
+                               message.replyTo)
+        else:
+            return IRCResponse(ResponseType.Say,
+                               self.help(message.command),
+                               message.replyTo)
+
+    commands = OrderedDict([
+        (u'lang', _lang),
+        (u'langurl', _langurl)])
+
+    def execute(self, message: IRCMessage):
+        return self.commands[message.command.lower()](self, message)
 
     def _tio(self, lang: str, code: str, userInput: str="") -> str:
         if self.languages == None:
@@ -115,44 +160,5 @@ int main() {{
             return error
 
         return u' | '.join(r.decode('utf-8', 'ignore') for r in returned)
-
-    def _lang(self, message: IRCMessage):
-        if len(message.parameterList) > 0:
-            lang = message.parameterList[0].lower()
-            code = u' '.join(message.parameterList[1:])
-            if lang in self.templates:
-                code = self.templates[lang].format(code=code)
-            result = self._tio(lang, code)
-            return IRCResponse(ResponseType.Say,
-                               result.replace("\n", " "),
-                               message.replyTo)
-        else:
-            return IRCResponse(ResponseType.Say,
-                               self._helpText(),
-                               message.replyTo)
-
-    def _langurl(self, message: IRCMessage):
-        if len(message.parameterList) > 1:
-            lang = message.parameterList[0].lower()
-            url = message.parameterList[1]
-            userInput = " ".join(message.parameterList[2:])
-            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-            code = page.body
-            result = self._tio(lang, code, userInput)
-            return IRCResponse(ResponseType.Say,
-                               result.replace("\n", " "),
-                               message.replyTo)
-        else:
-            return IRCResponse(ResponseType.Say,
-                               self._helpText(),
-                               message.replyTo)
-
-    commands = OrderedDict([
-        (u'lang', _lang),
-        (u'langurl', _langurl)])
-
-    def execute(self, message: IRCMessage):
-        return self.commands[message.command.lower()](self, message)
-
 
 langPlayground = LangPlayground()
