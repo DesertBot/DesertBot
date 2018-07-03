@@ -46,7 +46,7 @@ class Delay(BotCommand):
         moduleHandler = self.bot.moduleHandler
         if command in moduleHandler.mappedTriggers:
             d = task.deferLater(reactor, delay, moduleHandler.mappedTriggers[command].execute, newMessage)
-            d.addCallback(self.bot.sendResponse)
+            d.addCallback(self.bot.moduleHandler.sendResponses)
             return IRCResponse(ResponseType.Say,
                                "OK, I'll execute that in {}".format(delayString),
                                message.replyTo,
@@ -63,7 +63,7 @@ class Delay(BotCommand):
                                    message.replyTo)
 
             d = task.deferLater(reactor, delay, moduleHandler.commands['Alias'].execute, newMessage)
-            d.addCallback(self.bot.sendResponse)
+            d.addCallback(self.bot.moduleHandler.sendResponses)
             return IRCResponse(ResponseType.Say,
                                "OK, I'll execute that in {}".format(delayString),
                                message.replyTo)

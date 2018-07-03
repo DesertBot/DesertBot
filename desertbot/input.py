@@ -495,9 +495,6 @@ class InputHandler(object):
     def handleMessage(self, message: IRCMessage):
         self.bot.moduleHandler.handleMessage(message)
 
-    def sendResponse(self, response: IRCResponse):
-        self.bot.moduleHandler.sendResponse(response)
-
     def checkCAPNegotiationFinished(self):
         if not self.bot.capabilities['init'] or len(self.bot.capabilities['requested']) != 0:
             return

@@ -174,7 +174,7 @@ class ModuleHandler(object):
                 self.logger.exception("Python Execution Error sending responses {!r}".format(responses))
 
     def _deferredError(self, error):
-        pass
+        self.logger.exception("Python Execution Error in deferred call {!r}".format(error))
 
     def loadAll(self) -> None:
         configModulesToLoad = self.bot.config.getWithDefault('modules', ['all'])

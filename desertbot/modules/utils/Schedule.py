@@ -14,6 +14,7 @@ import datetime
 import re
 import os
 from collections import OrderedDict
+import logging
 
 from croniter import croniter
 from twisted.internet import task
@@ -25,6 +26,7 @@ from six import iteritems
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 from desertbot.channel import IRCChannel
+from desertbot.user import IRCUser
 # from desertbot.utils import string
 
 yaml = YAML()
@@ -54,6 +56,7 @@ class Task(object):
 
         # these will be set by self.reInit()
         self.bot = None
+        self.logger = None
         self.cron = None
         self.nextTime = None
         self.cronStr = None
@@ -62,6 +65,7 @@ class Task(object):
 
     def reInit(self, bot):
         self.bot = bot
+        self.logger = logging.getLogger('desertbot.{}'.format(Schedule.__name__))
 
         self.cronStr = {
             'cron': self.timeStr
@@ -75,11 +79,15 @@ class Task(object):
         seconds = delta.total_seconds()
         self.task = task.deferLater(reactor, seconds, self.activate)
         self.task.addCallback(self.cycle)
+        self.task.addErrback(self._deferredError)
 
     def activate(self):
         commandStr = u'{}{} {}'.format(self.bot.commandChar, self.command,
                                        u' '.join(self.params))
-        message = IRCMessage('PRIVMSG', self.user, IRCChannel(self.channel),
+        self.logger.info("Activated {!r}".format(commandStr))
+        message = IRCMessage('PRIVMSG',
+                             IRCUser(self.user),
+                             IRCChannel(self.channel, self.bot),
                              commandStr,
                              self.bot)
         
@@ -102,11 +110,16 @@ class Task(object):
     @classmethod
     def to_yaml(cls, representer, node):
         # trim out complex objects and things we can recreate
-        skip = ['bot', 'task', 'command', 'cron', 'nextTime']
+        skip = ['bot', 'task', 'command', 'cron', 'nextTime', 'logger']
         cleanedTask = dict((k, v)
                            for (k, v) in node.__dict__.items()
                            if k not in skip)
         return representer.represent_mapping(cls.yaml_tag, cleanedTask)
+
+    def _deferredError(self, error):
+        import traceback
+        self.logger.exception("Python Execution Error in deferred call {!r}".format(error))
+        self.logger.exception(error)
 
 
 @implementer(IPlugin, IModule)
