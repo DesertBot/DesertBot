@@ -101,7 +101,7 @@ class IRCChannel(object):
                     self.modes[mode] = None
                     modesAdded.append(mode)
                     paramsAdded.append(None)
-                elif not adding and modes in self.modes:
+                elif not adding and mode in self.modes:
                     del self.modes[mode]
                     modesRemoved.append(mode)
                     paramsRemoved.append(None)

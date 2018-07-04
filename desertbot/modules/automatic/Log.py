@@ -25,9 +25,9 @@ logFuncs = {
     'NICK': lambda m: u'{0} is now known as {1}'.format(m.user.nick, m.messageString),
     'PART': lambda m: u' << {0} ({1}@{2}) left {3}{4}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo, m.messageString),
     'QUIT': lambda m: u' << {0} ({1}@{2}) quit{3}'.format(m.user.nick, m.user.ident, m.user.host, m.messageString),
-    'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.kickee, m.user.nick, m.messageString),
+    'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.metadata['kicked'], m.user.nick, m.messageString),
     'TOPIC': lambda m: u'# {0} set the topic to: {1}'.format(m.user.nick, m.messageString),
-    'MODE': lambda m: u'# {0} sets mode: {1}{2} {3}'.format(m.user.nick, m.modeOperator, m.modes, ' '.join(m.modeArgs)),
+    'MODE': lambda m: formatMode(m),
 }
 
 logSelfFuncs = {
@@ -36,6 +36,23 @@ logSelfFuncs = {
     ResponseType.Notice: lambda nick, r: u'[{0}] {1}'.format(nick, r.response),
 }
 
+
+def formatMode(msg: IRCMessage):
+    added = msg.metadata['added']
+    removed = msg.metadata['removed']
+    addedParams = [p for p in msg.metadata['addedParams'] if p is not None]
+    removedParams = [p for p in msg.metadata['removedParams'] if p is not None]
+
+    if len(added) > 0:
+        modeStr = '+{}'.format(''.join(added))
+        if len(addedParams) > 0:
+            modeStr += ' {}'.format(' '.join(addedParams))
+    else:
+        modeStr = '-{}'.format(''.join(removed))
+        if len(removedParams) > 0:
+            modeStr += ' {}'.format(' '.join(removedParams))
+
+    return '# {} sets mode: {}'.format(msg.user.nick, modeStr)
 
 def log(path, target, text):
     now = datetime.datetime.utcnow()
