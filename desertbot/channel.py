@@ -83,7 +83,7 @@ class IRCChannel(object):
                     del self.modes[mode]
                     modesRemoved.append(mode)
                     paramsRemoved.append(None)
-            elif supportedChanModes == ModeType.PARAM_UNSET:
+            elif supportedChanModes == ModeType.PARAM_SET_UNSET:
                 if len(params) < 1:
                     self.logger.warning('Received a broken MODE string for channel {}!'.format(self.name))
                     return {}
