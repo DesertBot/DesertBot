@@ -52,6 +52,8 @@ class Task(object):
         self.params = params
         self.user = user
         self.channel = channel
+
+        # this will be set by start()
         self.task = None
 
         # these will be set by self.reInit()
@@ -110,7 +112,7 @@ class Task(object):
     @classmethod
     def to_yaml(cls, representer, node):
         # trim out complex objects and things we can recreate
-        skip = ['bot', 'task', 'command', 'cron', 'nextTime', 'logger']
+        skip = ['bot', 'task', 'cron', 'nextTime', 'logger']
         cleanedTask = dict((k, v)
                            for (k, v) in node.__dict__.items()
                            if k not in skip)
