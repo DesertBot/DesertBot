@@ -82,6 +82,10 @@ int main() {{
             url = message.parameterList[1]
             userInput = " ".join(message.parameterList[2:])
             page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+            if not page:
+                return IRCResponse(ResponseType.Say,
+                                   "Page not found at {!r}".format(url),
+                                   message.replyTo)
             code = page.body
             result = self._tio(lang, code, userInput)
             return IRCResponse(ResponseType.Say,
