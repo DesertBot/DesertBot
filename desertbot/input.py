@@ -1,7 +1,6 @@
 from desertbot.channel import IRCChannel
 from desertbot.ircbase import ModeType
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse
 from desertbot.user import IRCUser
 from datetime import datetime
 from typing import List, Optional, Tuple, TYPE_CHECKING
