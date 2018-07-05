@@ -389,6 +389,7 @@ class Responses(BotCommand):
                     "https://giant.gfycat.com/ElasticAdventurousCottontail.webm", # parrot gets booped from off-screen
                     "https://i.imgur.com/8mMGnA1.gifv", # cat boops dog, then escapes under a couch
                     "https://i.imgur.com/v13xyjM.gifv", # cat runs in, tentatively boops dog, then flees. dog is confused
+                    "https://i.imgur.com/byR8SQY.gifv", # cat gently boops sleepy human's nose with their paw
                     ]
                 return [IRCResponse(ResponseType.Say,
                                     'Boop! {}'.format(random.choice(boops)),
