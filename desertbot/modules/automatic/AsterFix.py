@@ -47,7 +47,7 @@ class AsterFix(BotModule):
             return
 
         likelyChanges = self._getCloseMatches(change, lastmessageList, 5, 0.5)
-        likelyChanges = filter((lambda word: word != change), likelyChanges)
+        likelyChanges = list(filter((lambda word: word != change), likelyChanges))
 
         if likelyChanges:
             target = likelyChanges[0]
