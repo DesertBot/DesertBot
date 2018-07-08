@@ -24,7 +24,7 @@ class ModuleLoader(BotCommand):
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say,
-                               "You didn't specify a module name! Usage: {0}".format(self.help),
+                               "You didn't specify a module name! Usage: {0}".format(self.help(None)),
                                message.replyTo)
 
         command = {'load': self.load, 'reload': self.reload, 'unload': self.unload}[message.command.lower()]
