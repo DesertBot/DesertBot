@@ -185,6 +185,7 @@ class Responses(BotCommand):
                     r'(boo+|oooo+)': 'spoopy goast',
                     r'(noo+t ?)+': 'penguin',
                     r'too+t': 'mastodon',
+                    r'whee+k': 'guinea pig'
                 }
 
                 self.animal = None
