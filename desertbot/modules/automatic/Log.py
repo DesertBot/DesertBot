@@ -40,8 +40,14 @@ logSelfFuncs = {
 def formatMode(msg: IRCMessage):
     added = msg.metadata['added']
     removed = msg.metadata['removed']
-    addedParams = [p for p in msg.metadata['addedParams'] if p is not None]
-    removedParams = [p for p in msg.metadata['removedParams'] if p is not None]
+    if 'addedParams' in msg.metadata:
+        addedParams = [p for p in msg.metadata['addedParams'] if p is not None]
+    else:
+        addedParams = []
+    if 'removedParams' in msg.metadata:
+        removedParams = [p for p in msg.metadata['removedParams'] if p is not None]
+    else:
+        removeParams = []
 
     if len(added) > 0:
         modeStr = '+{}'.format(''.join(added))
