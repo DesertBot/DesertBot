@@ -47,7 +47,7 @@ def formatMode(msg: IRCMessage):
     if 'removedParams' in msg.metadata:
         removedParams = [p for p in msg.metadata['removedParams'] if p is not None]
     else:
-        removeParams = []
+        removedParams = []
 
     if len(added) > 0:
         modeStr = '+{}'.format(''.join(added))
