@@ -2,14 +2,13 @@
 """
 Created on Dec 06, 2016
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import json
 from six import iteritems
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
@@ -47,8 +46,8 @@ class Currency(BotCommand):
         url = "https://exchangeratesapi.io/api/latest?base={}&symbols={}"
         url = url.format(ccFrom, ccTo)
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-        jsonResponse = json.loads(response.body)
-        rates = jsonResponse['rates']
+        j = response.json()
+        rates = j['rates']
 
         if not rates:
             return IRCResponse(ResponseType.Say,

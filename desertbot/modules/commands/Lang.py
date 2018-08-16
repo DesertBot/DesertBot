@@ -2,7 +2,7 @@
 """
 Created on Mar 27, 2018
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.message import IRCMessage
@@ -81,12 +81,12 @@ int main() {{
             lang = message.parameterList[0].lower()
             url = message.parameterList[1]
             userInput = " ".join(message.parameterList[2:])
-            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-            if not page:
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+            if not response:
                 return IRCResponse(ResponseType.Say,
                                    "Page not found at {!r}".format(url),
                                    message.replyTo)
-            code = page.body
+            code = response.content
             result = self._tio(lang, code, userInput)
             return IRCResponse(ResponseType.Say,
                                result.replace("\n", " "),

@@ -2,7 +2,7 @@
 """
 Created on Mar 03, 2015
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -63,13 +63,13 @@ class RedditImage(BotCommand):
         url = url.format(subreddit, random.randint(0, topRange))
         try:
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=self.headers)
-            jsonResponse = json.loads(response.body)
+            j = response.json()
         except json.JSONDecodeError:
             return IRCResponse(ResponseType.Say,
                                "[The imgur API doesn't appear to be responding correctly]",
                                message.replyTo)
 
-        images = jsonResponse['data']
+        images = j['data']
 
         if not images:
             return IRCResponse(ResponseType.Say,

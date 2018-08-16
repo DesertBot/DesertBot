@@ -2,14 +2,13 @@
 """
 Created on Oct 09, 2013
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import json
 import urllib
 
 from desertbot.message import IRCMessage
@@ -37,17 +36,17 @@ class GPSLookup(BotCommand):
 
             url = "http://dev.virtualearth.net/REST/v1/Locations?q={0}&key={1}".format(urllib.quote_plus(message.parameters), self.api_key)
 
-            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-            result = json.loads(page.body)
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+            j = response.json()
 
-            if result['resourceSets'][0]['estimatedTotal'] == 0:
+            if j['resourceSets'][0]['estimatedTotal'] == 0:
                 self.logger.warning("Could not find GPS record for {}".format(message.parameters))
-                self.logger.debug(result)
+                self.logger.debug(j)
                 return IRCResponse(ResponseType.Say,
                                    "Couldn't find GPS coords for '{0}', sorry!".format(message.parameters),
                                    message.replyTo)
 
-            coords = result['resourceSets'][0]['resources'][0]['point']['coordinates']
+            coords = j['resourceSets'][0]['resources'][0]['point']['coordinates']
 
             return IRCResponse(ResponseType.Say,
                                "GPS coords for '{0}' are: {1},{2}".format(message.parameters, coords[0], coords[1]),

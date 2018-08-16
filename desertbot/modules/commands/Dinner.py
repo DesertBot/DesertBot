@@ -2,7 +2,7 @@
 """
 Created on Jul 31, 2013
 
-@author: Tyranic-Moron, Emily
+@author: StarlitGhost, Emily
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -34,9 +34,9 @@ class Dinner(BotCommand):
             option = message.parameterList[0]
 
         if option in options:
-            webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', wtfsimfd.format(options[option]))
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', wtfsimfd.format(options[option]))
 
-            soup = BeautifulSoup(webPage.body, 'lxml')
+            soup = BeautifulSoup(response.content, 'lxml')
 
             phrase = soup.find('dl').text
             item = soup.find('a')

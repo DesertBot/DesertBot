@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Jan 27, 2013
+
+@author: StarlitGhost
+"""
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 from html.parser import HTMLParser
-import json
+from urllib.parse import urlparse
 import math
 import re
 import time
@@ -123,8 +128,8 @@ class URLFollow(BotCommand):
         parts = 'snippet,contentDetails,statistics,liveStreamingDetails'
         url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(videoID, fields, parts, self.youtubeKey)
         
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-        j = json.loads(webPage.body)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        j = response.json()
 
         if 'items' not in j:
             return None
@@ -194,30 +199,30 @@ class URLFollow(BotCommand):
 
         headers = {'Authorization': 'Client-ID {0}'.format(self.imgurClientID)}
         
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
         
-        if webPage is None:
+        if not response:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
 
-        if webPage is None:
+        if not response:
             return
         
-        response = json.loads(webPage.body)
+        j = response.json()
         
-        imageData = response['data']
+        imageData = j['data']
 
         if imageData['title'] is None:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
-            if webPage is not None:
-                response = json.loads(webPage.body)
-                if response['success']:
-                    imageData = response['data']
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
+            if response:
+                j = response.json()
+                if j['success']:
+                    imageData = j['data']
 
             if imageData['title'] is None:
-                webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', 'http://imgur.com/{0}'.format(imgurID))
-                imageData['title'] = self.GetTitle(webPage.body).replace(' - Imgur', '')
+                response = self.bot.moduleHandler.runActionUntilValue('fetch-url', 'http://imgur.com/{0}'.format(imgurID))
+                imageData['title'] = self.GetTitle(response.content).replace(' - Imgur', '')
                 if imageData['title'] == 'imgur: the simple image sharer':
                     imageData['title'] = None
         
@@ -244,9 +249,9 @@ class URLFollow(BotCommand):
 
     def FollowTwitter(self, tweeter, tweetID):
         url = 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
-        soup = BeautifulSoup(webPage.body, 'lxml')
+        soup = BeautifulSoup(response.content, 'lxml')
 
         tweet = soup.find(class_='permalink-tweet')
         
@@ -279,13 +284,13 @@ class URLFollow(BotCommand):
     def FollowSteam(self, steamType, steamId):
         steamType = {'app': 'app', 'sub': 'package'}[steamType]
         url = 'http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc=US&l=english&v=1'.format(steamType, steamId)
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
-        response = json.loads(webPage.body)
-        if not response[steamId]['success']:
+        j = response.json()
+        if not j[steamId]['success']:
             return  # failure
 
-        appData = response[steamId]['data']
+        appData = j[steamId]['data']
 
         data = []
 
@@ -382,22 +387,22 @@ class URLFollow(BotCommand):
 
     def getSteamPrice(self, appType, appId, region):
         url = 'http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc={2}&l=english&v=1'.format(appType, appId, region)
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         priceField = {'app': 'price_overview', 'package': 'price'}[appType]
-        response = json.loads(webPage.body)
+        j = response.json()
         
-        if 'data' not in response[appId]:
+        if 'data' not in j[appId]:
             return
         
         if region == 'AU':
-            response[appId]['data'][priceField]['currency'] = 'AUD'
-        return response[appId]['data'][priceField]
+            j[appId]['data'][priceField]['currency'] = 'AUD'
+        return j[appId]['data'][priceField]
 
     def FollowKickstarter(self, ksID):
         url = 'https://www.kickstarter.com/projects/{}/description'.format(ksID)
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
-        soup = BeautifulSoup(webPage.body, 'lxml')
+        soup = BeautifulSoup(response.content, 'lxml')
 
         data = []
 
@@ -513,17 +518,17 @@ class URLFollow(BotCommand):
         twitchHeaders = {'Accept': 'application/vnd.twitchtv.v3+json',
                          'Client-ID': self.twitchClientID}
         url = u'https://api.twitch.tv/kraken/streams/{}'.format(channel)
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=twitchHeaders)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=twitchHeaders)
 
-        streamData = json.loads(webPage.body)
+        streamData = response.json()
 
         if 'stream' in streamData and streamData['stream'] is not None:
             chanData = streamData['stream']['channel']
             channelOnline = True
         elif 'error' not in streamData:
             url = u'https://api.twitch.tv/kraken/channels/{}'.format(channel)
-            webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=twitchHeaders)
-            chanData = json.loads(webPage.body)
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=twitchHeaders)
+            chanData = response.json()
 
         if len(chanData) > 0:
             if channelOnline:
@@ -543,17 +548,18 @@ class URLFollow(BotCommand):
             return channelInfo, 'https://twitch.tv/{}'.format(channel)
     
     def FollowStandard(self, url):
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         
-        if webPage is None:
+        if not response:
             return
 
-        if webPage.responseUrl != url:
-            return self.dispatchToFollows(None, webPage.responseUrl)
+        if response.url != url:
+            return self.dispatchToFollows(None, response.url)
         
-        title = self.GetTitle(webPage.body)
+        title = self.GetTitle(response.content)
         if title is not None:
-            return u'{0} (at {1})'.format(title, webPage.domain), url
+            domain = urlparse(response.url).netloc
+            return u'{} (at {})'.format(title, domain), url
         
         return
 

@@ -2,7 +2,7 @@
 """
 Created on Dec 05, 2013
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -45,9 +45,9 @@ class Gif(BotCommand):
 
         url = baseURL.format(year)
 
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
-        link = webPage.body
+        link = response.content
 
         return IRCResponse(ResponseType.Say,
                            u"Random DB{} gif: {}".format(year, link),

@@ -2,7 +2,7 @@
 """
 Created on Jan 24, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -10,7 +10,6 @@ from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 from future.moves.urllib.parse import quote
-import json
 from builtins import str
 
 from desertbot.message import IRCMessage
@@ -37,18 +36,18 @@ class Urban(BotCommand):
 
         url = 'http://api.urbandictionary.com/v0/define?term={0}'.format(search)
         
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
-        response = json.loads(webPage.body)
+        j = response.json()
 
-        if len(response['list']) == 0:
+        if len(j['list']) == 0:
             return IRCResponse(ResponseType.Say,
                                "No entry found for '{0}'".format(message.parameters),
                                message.replyTo)
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
-        defn = response['list'][0]
+        defn = j['list'][0]
 
         word = defn['word']
         
