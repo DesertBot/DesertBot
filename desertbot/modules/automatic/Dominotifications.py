@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on May 27, 2014
+
+@author: StarlitGhost
+"""
 from twisted.plugin import IPlugin
 from desertbot.channel import IRCChannel
 from desertbot.moduleinterface import IModule, BotModule
@@ -6,7 +11,6 @@ from zope.interface import implementer
 from typing import Dict
 
 import re
-import json
 
 from twisted.internet import task, threads
 
@@ -63,9 +67,9 @@ class Dominotifications(BotModule):
         trackingDetails = self.trackers[orderID]
 
         trackURL = u'https://www.dominos.co.uk/pizzaTracker/getOrderDetails?id={}'.format(orderID)
-        page = self.bot.moduleHandler.runActionUntilValue('fetch-url', trackURL)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', trackURL)
 
-        if page is None:
+        if not response:
             # tracking API didn't respond
             self._stopPizzaTracker(orderID)
             self.bot.sendResponse(IRCResponse(ResponseType.Say,
@@ -74,7 +78,7 @@ class Dominotifications(BotModule):
                                   trackingDetails.channel.name))
             return
 
-        j = json.loads(page.body)
+        j = response.json()
 
         if j['customerName'] is None:
             self._stopPizzaTracker(orderID)

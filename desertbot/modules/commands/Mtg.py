@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Jan 21, 2013
+
+@author: StarlitGhost
+"""
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
@@ -27,9 +32,9 @@ class Mtg(BotCommand):
         for param in message.parameterList:
             searchTerm += '+[%s]' % param
 
-        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', searchTerm)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', searchTerm)
 
-        soup = BeautifulSoup(webPage.body, 'lxml')
+        soup = BeautifulSoup(response.content, 'lxml')
 
         name = soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_nameRow'})
         if name is None:

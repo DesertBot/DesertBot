@@ -2,7 +2,7 @@
 """
 Created on May 21, 2014
 
-@author: HubbeKing, Tyranic-Moron
+@author: HubbeKing, StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -216,17 +216,17 @@ class Alias(BotCommand):
 
         url = message.parameterList[1]
         try:
-            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         except ValueError:
             return IRCResponse(ResponseType.Say,
                                u"'{}' is not a valid URL".format(url),
                                message.replyTo)
-        if page is None:
+        if not response:
             return IRCResponse(ResponseType.Say,
                                u"Failed to open page at {}".format(url),
                                message.replyTo)
 
-        text = page.body
+        text = response.content
         text = UnicodeDammit(text).unicode_markup
         lines = text.splitlines()
         numAliases = 0

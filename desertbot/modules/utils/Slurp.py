@@ -2,7 +2,7 @@
 """
 Created on Aug 31, 2015
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -42,10 +42,10 @@ class Slurp(BotCommand):
         if 'slurp' in message.metadata and url in message.metadata['slurp']:
             soup = message.metadata['slurp'][url]
         else:
-            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-            if page is None:
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+            if not response:
                 return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.replyTo)
-            soup = BeautifulSoup(page.body, 'lxml')
+            soup = BeautifulSoup(response.content, 'lxml')
 
         tag = soup.select_one(selector)
 

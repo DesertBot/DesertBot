@@ -2,14 +2,13 @@
 """
 Created on Sep 01, 2017
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import json
 import time
 import datetime
 
@@ -67,15 +66,15 @@ class Splatoon(BotCommand):
     def execute(self, message: IRCMessage):
         url = "https://splatoon2.ink/data/schedules.json"
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-        jsonResponse = json.loads(response.body)
+        j = response.json()
 
         if len(message.parameterList) < 1:
             # do everything
             data = []
-            data += filter(None, [self._regular(jsonResponse, short=True)])
-            data += filter(None, [self._ranked(jsonResponse, short=True)])
-            data += filter(None, [self._league(jsonResponse, short=True)])
-            data += filter(None, [self._fest(jsonResponse, short=True)])
+            data += filter(None, [self._regular(j, short=True)])
+            data += filter(None, [self._ranked(j, short=True)])
+            data += filter(None, [self._league(j, short=True)])
+            data += filter(None, [self._fest(j, short=True)])
             return IRCResponse(ResponseType.Say,
                                self.graySplitter.join(data),
                                message.replyTo)
@@ -89,7 +88,7 @@ class Splatoon(BotCommand):
             subCommand = message.parameterList[0].lower()
             if subCommand in subCommands:
                 return IRCResponse(ResponseType.Say,
-                                   subCommands[subCommand](jsonResponse, short=False),
+                                   subCommands[subCommand](j, short=False),
                                    message.replyTo)
             else:
                 return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)

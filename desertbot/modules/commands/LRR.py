@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Jan 29, 2013
+
+@author: StarlitGhost
+"""
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
@@ -60,13 +65,13 @@ class LRR(BotCommand):
 
             DataStore[feedName]['lastCheck'] = datetime.datetime.utcnow()
 
-            feedPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', feedDeets['url'])
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', feedDeets['url'])
 
-            if feedPage is None:
+            if not response:
                 #TODO: log an error here that the feed likely no longer exists!
                 continue
 
-            root = ET.fromstring(feedPage.body)
+            root = ET.fromstring(response.content)
             item = root.find('channel/item')
 
             if item is None:

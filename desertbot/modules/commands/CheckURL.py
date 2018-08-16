@@ -14,8 +14,6 @@ from desertbot.response import IRCResponse, ResponseType
 
 from desertbot.utils.api_keys import load_key
 
-import json
-
 @implementer(IPlugin, IModule)
 class CheckURL(BotCommand):
     def triggers(self):
@@ -33,14 +31,14 @@ class CheckURL(BotCommand):
         urlF = "https://api.webcargo.io/availability?key={}&domain={}"
         url = urlF.format(apiKey, urlToCheck)
 
-        page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
-        if page.body is None:
+        if not response:
             return IRCResponse(ResponseType.Say,
                                "[WebCargo domain checker failed to respond]",
                                message.replyTo)
 
-        j = json.loads(page.body)
+        j = response.json()
 
         if "message" in j:
             return IRCResponse(ResponseType.Say,
