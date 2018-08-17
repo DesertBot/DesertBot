@@ -27,6 +27,10 @@ class Mastodon(BotModule):
 
     def followURL(self, _: IRCMessage, url: str) -> [str, None]:
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        
+        if not response:
+            return
+        
         # we'd check Server: Mastodon here but it seems that not every server
         # sets that correctly
         if not 'Set-Cookie' in response.headers:
