@@ -11,8 +11,8 @@ from zope.interface import implementer
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
-from desertbot.utils import dice
 
+import pyhedrals as dice
 
 @implementer(IPlugin, IModule)
 class Roll(BotCommand):
