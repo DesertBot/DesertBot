@@ -23,5 +23,5 @@ future==0.16.0
 six==1.11.0
 ruamel.yaml==0.15.61
 croniter==0.3.25
-SQLAlchemy==1.2.10
+SQLAlchemy==1.2.11
 pyhedrals==0.0.1
