@@ -20,6 +20,10 @@ owners:
 - "*!hubbe@hubbe.club"
 - "*!hubbe@dbchat-d1d5c6a1.bb.dnainternet.fi"
 
+# shelve storage settings
+storage_path: desertbot.db
+storage_sync_interval: 5
+
 # modules to load
 modules:
 - all

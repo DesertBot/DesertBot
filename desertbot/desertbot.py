@@ -1,18 +1,18 @@
 import logging
 import os
+import shelve
 
 from twisted.internet.interfaces import ISSLTransport
 from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
 from datetime import datetime
 from desertbot.config import Config
-from desertbot.datastore import Session
 from desertbot.input import InputHandler
 from desertbot.ircbase import IRCBase
 from desertbot.modulehandler import ModuleHandler
 from desertbot.output import OutputHandler
 from desertbot.support import ISupport
 from desertbot.utils.string import isNumber
-from sqlalchemy import create_engine
 from typing import Dict, Optional, List, TYPE_CHECKING
 from weakref import WeakValueDictionary
 
@@ -60,10 +60,11 @@ class DesertBot(IRCBase, object):
 
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
 
-        # Create and bind database engine, allowing for queries against ORM storage to be made
-        # This means modules can use session.query() during load to retrieve objects from the database
-        self.databaseEngine = create_engine(self.config.getWithDefault('databaseEngine', 'sqlite:///data/{}.db'.format(self.server)))
-        Session.configure(bind=self.databaseEngine)
+        # load in the shelve object from the datastore and tell twisted to keep it synced to file
+        self.logger.info("Loading storage file...")
+        self.storage = shelve.open(self.config.getWithDefault("storage_path", "desertbot.db"))
+        self.storageSync = LoopingCall(self.storage.sync())
+        self.storageSync.start(self.config.getWithDefault("storage_sync_interval", 5), now=False)
 
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
@@ -72,6 +73,7 @@ class DesertBot(IRCBase, object):
         self.startTime = datetime.utcnow()
 
     def cleanup(self) -> None:
+        self.storage.close()
         self.config.writeConfig()
         self.logger.info('Saved config and data.')
 
