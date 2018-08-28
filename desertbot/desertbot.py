@@ -61,10 +61,10 @@ class DesertBot(IRCBase, object):
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
 
         # load in the shelve object from the datastore and tell twisted to keep it synced to file
-        self.logger.info("Loading storage file...")
-        self.storage = shelve.open(self.config.getWithDefault("storage_path", "desertbot.db"))
+        self.logger.info('Loading storage file...')
+        self.storage = shelve.open(os.path.join(self.dataPath, 'desertbot.db'))
         self.storageSync = LoopingCall(self.storage.sync())
-        self.storageSync.start(self.config.getWithDefault("storage_sync_interval", 5), now=False)
+        self.storageSync.start(self.config.getWithDefault('storage_sync_interval', 5), now=False)
 
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
