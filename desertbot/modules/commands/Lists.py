@@ -18,6 +18,17 @@ class Lists(BotCommand):
         return ["list"]
 
     def help(self, query):
+        """
+        List module basic command syntax:
+        .list <list_name> [subcommand] [params]
+
+        Valid subcommands:
+        <None> - get random entry from list
+        <Integer> - get specific entry from list
+        add - add new entry         (entry text as params)
+        list - list entries         (optional regex as params)
+        search - search for entry   (regex as params, last in params list optionally match ID integer)
+        """
         return "TBD"
 
     def onLoad(self):
@@ -26,7 +37,30 @@ class Lists(BotCommand):
         self.lists= self.bot.storage["lists"]
 
     def execute(self, message: IRCMessage):
-        pass
+        if len(message.parameterList) == 0:
+            return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
+        elif len(message.parameterList) == 1 and message.parameterList[0].lower in self.lists:
+            return IRCResponse(ResponseType.Say,
+                               self._get_random_entry(message.parameterList[0].lower()),
+                               message.replyTo)
+        elif len(message.parameterList) >= 2:
+            listName = message.parameterList[0].lower()
+            subcommand = message.parameterList[1].lower()
+            paramsList = [param for param in message.parameterList[2:]]
+
+            if subcommand == "add":
+                self._add_entry(listName, " ".join(paramsList))
+            elif subcommand == "list":
+                return self._get_multiple_entries(listName, " ".join(paramsList))
+            elif subcommand == "search":
+                try:
+                    desiredNumber = int(paramsList[-1])
+                    paramsList.pop(-1)
+                except Exception:
+                    desiredNumber = None
+                return self._search(listName, " ".join(paramsList), desiredNumber)
+            else:
+                return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
 
     def _get_random_entry(self, listName):
         listLength = len(self.lists[listName])
