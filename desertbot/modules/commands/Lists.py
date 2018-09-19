@@ -47,7 +47,10 @@ class Lists(BotCommand):
             return "{} <nothing>/<number>/add/list/search/remove/removebyid - manages named lists. " \
                    "Use {}help list <subcommand> for help with the subcommands".format(prefix, self.bot.commandChar)
         else:
-            return "{} {}".format(prefix, helpDict[query[1]])
+            if query[1].lower() in helpDict:
+                return "{} {}".format(prefix, helpDict[query[1].lower()])
+            else:
+                return "{!r} is not a valid subcommand, use {}help list for a list of subcommands".format(query[1], self.bot.commandChar)
 
     def onLoad(self):
         if "lists" not in self.bot.storage:
