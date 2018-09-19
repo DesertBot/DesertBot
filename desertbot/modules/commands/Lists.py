@@ -25,9 +25,11 @@ class Lists(BotCommand):
         Valid subcommands:
         <None> - get random entry from list
         <Integer> - get specific entry from list
-        add - add new entry         (entry text as params)
-        list - list entries         (optional regex as params)
-        search - search for entry   (regex as params, last in params list optionally match ID integer)
+        add - add new entry             (entry text as params)
+        list - list entries             (optional regex as params)
+        search - search for entry       (regex as params, last in params list optionally match ID integer)
+        remove - remove an entry        (regex as params, only remove if matches only single entry)
+        removebyid - remove an entry    (ID as param)
         """
         return "TBD"
 
@@ -41,7 +43,7 @@ class Lists(BotCommand):
             return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
         elif len(message.parameterList) == 1 and message.parameterList[0].lower in self.lists:
             return IRCResponse(ResponseType.Say,
-                               self._get_random_entry(message.parameterList[0].lower()),
+                               self._getRandomEntry(message.parameterList[0].lower()),
                                message.replyTo)
         elif len(message.parameterList) >= 2:
             listName = message.parameterList[0].lower()
@@ -49,25 +51,43 @@ class Lists(BotCommand):
             paramsList = [param for param in message.parameterList[2:]]
 
             if subcommand == "add":
-                self._add_entry(listName, " ".join(paramsList))
+                text = self._addEntry(listName, " ".join(paramsList))
+            elif listName not in self.lists:
+                text = "I don't have a list named {!r}, maybe add some entries to it to create it?"
             elif subcommand == "list":
-                return self._get_multiple_entries(listName, " ".join(paramsList))
+                text = self._getMultipleEntries(listName, " ".join(paramsList))
             elif subcommand == "search":
                 try:
                     desiredNumber = int(paramsList[-1])
                     paramsList.pop(-1)
                 except Exception:
                     desiredNumber = None
-                return self._search(listName, " ".join(paramsList), desiredNumber)
+                text = self._search(listName, " ".join(paramsList), desiredNumber)
+            elif subcommand == "remove":
+                if len(paramsList) == 0:
+                    text = "You didn't give me anything to match against!"
+                else:
+                    text = self._removeEntry(listName, " ".join(paramsList))
+            elif subcommand == "removebyid":
+                if len(paramsList) != 1:
+                    text = "Please give me one and ONLY one ID to remove."
+                else:
+                    text = self._removeEntryByID(listName, int(paramsList[0]))
             else:
-                return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
+                try:
+                    desiredNumber = int(subcommand)
+                    text = self._getNumberedEntry(listName, desiredNumber)
+                except Exception:
+                    text = self.help("")
 
-    def _get_random_entry(self, listName):
+            return IRCResponse(ResponseType.Say, text, message.replyTo)
+
+    def _getRandomEntry(self, listName):
         listLength = len(self.lists[listName])
         chosen = random.choice(self.lists[listName])
         return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
 
-    def _get_numbered_entry(self, listName, number):
+    def _getNumberedEntry(self, listName, number):
         listLength = len(self.lists[listName])
         try:
             choice = int(number)
@@ -80,7 +100,7 @@ class Lists(BotCommand):
             chosen = self.lists[listName][choice + 1]
         return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
 
-    def _get_multiple_entries(self, listName, regexPattern=None):
+    def _getMultipleEntries(self, listName, regexPattern=None):
         listLength = len(self.lists[listName])
         if listLength == 0:
             return "That list is empty!"
@@ -109,7 +129,7 @@ class Lists(BotCommand):
 
         return "Link posted! (Expires in 10 minutes) {}".format(pasteEElink)
 
-    def _add_entry(self, listName, entryText):
+    def _addEntry(self, listName, entryText):
         if listName not in self.lists:
             self.lists[listName] = []
         entryObject = {
@@ -119,6 +139,7 @@ class Lists(BotCommand):
         }
         self.lists[listName].append(entryObject)
         self.bot.storage["lists"] = self.lists
+        return "Entry #{} - {} - {} added to list {}".format(entryObject["id"], entryObject["timestamp"], entryObject["text"], listName)
 
     def _search(self, listName, regexPattern, desiredNumber=None):
         listLength = len(self.lists[listName])
@@ -144,7 +165,7 @@ class Lists(BotCommand):
             chosen = random.choice(entries)
             return "Match #{}/{} - {} - {}".format(entries.index(chosen), len(entries), chosen["timestamp"], chosen["text"])
 
-    def _remove_entry(self, listName, regexPattern):
+    def _removeEntry(self, listName, regexPattern):
         listLength = len(self.lists[listName])
         if listLength == 0:
             return "That list is empty!"
@@ -167,7 +188,7 @@ class Lists(BotCommand):
             self.bot.storage["lists"] = self.lists
             return "Entry #{} - {} from list {} was removed".format(entryCopy["id"], entryCopy["text"], listName)
 
-    def _remove_entry_by_id(self, listName, idNumber):
+    def _removeEntryByID(self, listName, idNumber):
         listLength = len(self.lists[listName])
         if listLength == 0:
             return "That list is empty!"
