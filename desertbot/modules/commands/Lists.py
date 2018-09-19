@@ -31,7 +31,23 @@ class Lists(BotCommand):
         remove - remove an entry        (regex as params, only remove if matches only single entry)
         removebyid - remove an entry    (ID as param)
         """
-        return "TBD"
+        prefix = "{}list <list_name>".format(self.bot.commandChar)
+        helpDict = {
+            "<nothing>": "returns a random entry from the named list",
+            "<number>": "returns a specific entry from the named list",
+            "add": "add <list entry> - adds the given text to the named list",
+            "list": "list <regex search> - uploads the named list to paste.ee and gives you a link. "
+                    "If a regex search is given, only matching entries are uploaded",
+            "search": "search <regex> <number> - regex search entries, returning a random matching one. "
+                      "If a number is given, return the nth matching entry",
+            "remove": "remove <regex> - remove the matching entry, only if there is only one match",
+            "removebyid": "removebyid <id> - remove an entry by id"
+        }
+        if len(query) == 1:
+            return "{} <nothing>/<number>/add/list/search/remove/removebyid - manages named lists. " \
+                   "Use {}help list <subcommand> for help with the subcommands".format(prefix, self.bot.commandChar)
+        else:
+            return "{} {}".format(prefix, helpDict[query[1]])
 
     def onLoad(self):
         if "lists" not in self.bot.storage:
