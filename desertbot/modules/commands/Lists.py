@@ -57,7 +57,7 @@ class Lists(BotCommand):
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
-        elif len(message.parameterList) == 1 and message.parameterList[0].lower in self.lists:
+        elif len(message.parameterList) == 1 and message.parameterList[0].lower() in self.lists:
             return IRCResponse(ResponseType.Say,
                                self._getRandomEntry(message.parameterList[0].lower()),
                                message.replyTo)
@@ -69,14 +69,14 @@ class Lists(BotCommand):
             if subcommand == "add":
                 text = self._addEntry(listName, " ".join(paramsList))
             elif listName not in self.lists:
-                text = "I don't have a list named {!r}, maybe add some entries to it to create it?"
+                text = "I don't have a list named {!r}, maybe add some entries to it to create it?".format(listName)
             elif subcommand == "list":
                 text = self._getMultipleEntries(listName, " ".join(paramsList))
             elif subcommand == "search":
                 try:
                     desiredNumber = int(paramsList[-1])
                     paramsList.pop(-1)
-                except Exception:
+                except ValueError:
                     desiredNumber = None
                 text = self._search(listName, " ".join(paramsList), desiredNumber)
             elif subcommand == "remove":
@@ -93,7 +93,7 @@ class Lists(BotCommand):
                 try:
                     desiredNumber = int(subcommand)
                     text = self._getNumberedEntry(listName, desiredNumber)
-                except Exception:
+                except ValueError:
                     text = self.help("")
 
             return IRCResponse(ResponseType.Say, text, message.replyTo)
@@ -107,7 +107,7 @@ class Lists(BotCommand):
         listLength = len(self.lists[listName])
         try:
             choice = int(number)
-        except Exception:
+        except ValueError:
             return "I don't know what you mean by {!r}".format(number)
 
         if choice >= listLength:
@@ -150,12 +150,13 @@ class Lists(BotCommand):
             self.lists[listName] = []
         entryObject = {
             "id": len(self.lists[listName]) + 1,
-            "timestamp": datetime.datetime.utcnow().strftime("[%Y-%m-%d] [%H:%M"),
+            "timestamp": datetime.datetime.utcnow().strftime("[%Y-%m-%d] [%H:%M]"),
             "text": entryText
         }
         self.lists[listName].append(entryObject)
         self.bot.storage["lists"] = self.lists
-        return "Entry #{} - {} - {} added to list {}".format(entryObject["id"], entryObject["timestamp"], entryObject["text"], listName)
+        return "Entry #{} - {} - {} added to list {}".format(entryObject["id"], entryObject["timestamp"],
+                                                             entryObject["text"], listName)
 
     def _search(self, listName, regexPattern, desiredNumber=None):
         listLength = len(self.lists[listName])
@@ -176,10 +177,12 @@ class Lists(BotCommand):
                 chosen = entries[-1]
             else:
                 chosen = entries[desiredNumber + 1]
-            return "Match #{}/{} - {} - {}".format(entries.index(chosen), len(entries), chosen["timestamp"], chosen["text"])
+            return "Match #{}/{} - {} - {}".format(entries.index(chosen) + 1, len(entries),
+                                                   chosen["timestamp"], chosen["text"])
         else:
             chosen = random.choice(entries)
-            return "Match #{}/{} - {} - {}".format(entries.index(chosen), len(entries), chosen["timestamp"], chosen["text"])
+            return "Match #{}/{} - {} - {}".format(entries.index(chosen) + 1, len(entries),
+                                                   chosen["timestamp"], chosen["text"])
 
     def _removeEntry(self, listName, regexPattern):
         listLength = len(self.lists[listName])
