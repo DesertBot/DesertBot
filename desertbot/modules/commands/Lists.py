@@ -105,16 +105,14 @@ class Lists(BotCommand):
         """
         Get a random entry from the list with the given name
         """
-        listLength = len(self.lists[listName])
         chosen = random.choice(self.lists[listName])
-        return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
+        return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
     def _getEntryByID(self, listName, number):
         """
         Get a specific entry from the list with the given name.
         If that number entry doesn't exist in the given list, return an error.
         """
-        listLength = len(self.lists[listName])
         try:
             choice = int(number)
         except ValueError:
@@ -127,15 +125,14 @@ class Lists(BotCommand):
         
         if chosen is None:
             return "There is no entry with the id {} in the {!r} list!".format(number, listName)
-        return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
+        return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
     def _getMultipleEntries(self, listName, regexPattern=None):
         """
         Get multiple entries from the list with the given name as a paste.ee link
         If regexPattern is None, just use the whole list, otherwise make a list of all entries matching the regexPattern.
         """
-        listLength = len(self.lists[listName])
-        if listLength == 0:
+        if len(self.lists[listName]) == 0:
             return "That list is empty!"
         entries = [entry for entry in self.lists[listName]]
 
@@ -196,8 +193,7 @@ class Lists(BotCommand):
         Search the list with the given name using the given regex pattern.
         If desiredNumber is not none, try to return a specific match from the list of entries matching the regex.
         """
-        listLength = len(self.lists[listName])
-        if listLength == 0:
+        if len(self.lists[listName]) == 0:
             return "That list is empty!"
         entries = [entry for entry in self.lists[listName]]
 
@@ -226,8 +222,7 @@ class Lists(BotCommand):
         Try to remove an entry from the list of the given name using the given regexPattern.
         Only removes an entry if there is only one entry matching the given regexPattern.
         """
-        listLength = len(self.lists[listName])
-        if listLength == 0:
+        if len(self.lists[listName]) == 0:
             return "That list is empty!"
         entries = [entry for entry in self.lists[listName]]
 
@@ -252,8 +247,7 @@ class Lists(BotCommand):
         """
         Remove an entry by its ID from the list with the given name.
         """
-        listLength = len(self.lists[listName])
-        if listLength == 0:
+        if len(self.lists[listName]) == 0:
             return "That list is empty!"
         entries = [entry for entry in self.lists[listName]]
 
