@@ -95,7 +95,7 @@ class Lists(BotCommand):
             else:
                 try:
                     desiredNumber = int(subcommand)
-                    text = self._getNumberedEntry(listName, desiredNumber)
+                    text = self._getEntryByID(listName, desiredNumber)
                 except ValueError:
                     text = self.help("")
 
@@ -109,21 +109,24 @@ class Lists(BotCommand):
         chosen = random.choice(self.lists[listName])
         return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
 
-    def _getNumberedEntry(self, listName, number):
+    def _getEntryByID(self, listName, number):
         """
         Get a specific entry from the list with the given name.
-        If that number entry doesn't exist in the given list, just return the last one in that list.
+        If that number entry doesn't exist in the given list, return an error.
         """
         listLength = len(self.lists[listName])
         try:
             choice = int(number)
         except ValueError:
             return "I don't know what you mean by {!r}".format(number)
-
-        if choice >= listLength:
-            chosen = self.lists[listName][-1]
-        else:
-            chosen = self.lists[listName][choice + 1]
+        
+        chosen = None
+        for entry in self.lists[listName]:
+            if entry["id"] == number:
+                chosen = entry
+        
+        if chosen is None:
+            return "There is no entry with the id {} in the {!r} list!".format(number, listName)
         return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
 
     def _getMultipleEntries(self, listName, regexPattern=None):
