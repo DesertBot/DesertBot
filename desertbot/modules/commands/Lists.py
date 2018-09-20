@@ -61,7 +61,7 @@ class Lists(BotCommand):
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
         elif len(message.parameterList) == 1:
-            if message.parameterList[0].lower() in self.lists():
+            if message.parameterList[0].lower() in self.lists:
                 return IRCResponse(ResponseType.Say,
                                    self._getRandomEntry(message.parameterList[0].lower()),
                                    message.replyTo)
