@@ -102,11 +102,18 @@ class Lists(BotCommand):
             return IRCResponse(ResponseType.Say, text, message.replyTo)
 
     def _getRandomEntry(self, listName):
+        """
+        Get a random entry from the list with the given name
+        """
         listLength = len(self.lists[listName])
         chosen = random.choice(self.lists[listName])
         return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
 
     def _getNumberedEntry(self, listName, number):
+        """
+        Get a specific entry from the list with the given name.
+        If that number entry doesn't exist in the given list, just return the last one in that list.
+        """
         listLength = len(self.lists[listName])
         try:
             choice = int(number)
@@ -120,6 +127,10 @@ class Lists(BotCommand):
         return "Entry #{}/{} - {} - {}".format(chosen["id"], listLength, chosen["timestamp"], chosen["text"])
 
     def _getMultipleEntries(self, listName, regexPattern=None):
+        """
+        Get multiple entries from the list with the given name as a paste.ee link
+        If regexPattern is None, just use the whole list, otherwise make a list of all entries matching the regexPattern.
+        """
         listLength = len(self.lists[listName])
         if listLength == 0:
             return "That list is empty!"
@@ -148,11 +159,27 @@ class Lists(BotCommand):
 
         return "Link posted! (Expires in 10 minutes) {}".format(pasteEElink)
 
+    def _getNextAvailableID(self, listName):
+        """
+        Get the next available ID for the given list
+        """
+        if len(self.lists[listName]) == 0:
+            # List is empty, return 1. New entry will be first entry.
+            return 1
+        else:
+            # Get the ID for the last entry in the list and give the new ID as 1 larger than that
+            lastEntry = self.lists[listName][-1]
+            return int(lastEntry["id"]) + 1
+    
     def _addEntry(self, listName, entryText):
+        """
+        Add a new entry to the given list with the given text.
+        If there is no list with the given name, create it first.
+        """
         if listName not in self.lists:
             self.lists[listName] = []
         entryObject = {
-            "id": len(self.lists[listName]) + 1,
+            "id": self._getNextAvailableID(listName),
             "timestamp": datetime.datetime.utcnow().strftime("[%Y-%m-%d] [%H:%M]"),
             "text": entryText
         }
@@ -162,6 +189,10 @@ class Lists(BotCommand):
                                                              entryObject["text"], listName)
 
     def _search(self, listName, regexPattern, desiredNumber=None):
+        """
+        Search the list with the given name using the given regex pattern.
+        If desiredNumber is not none, try to return a specific match from the list of entries matching the regex.
+        """
         listLength = len(self.lists[listName])
         if listLength == 0:
             return "That list is empty!"
@@ -188,6 +219,10 @@ class Lists(BotCommand):
                                                    chosen["timestamp"], chosen["text"])
 
     def _removeEntry(self, listName, regexPattern):
+        """
+        Try to remove an entry from the list of the given name using the given regexPattern.
+        Only removes an entry if there is only one entry matching the given regexPattern.
+        """
         listLength = len(self.lists[listName])
         if listLength == 0:
             return "That list is empty!"
@@ -211,6 +246,9 @@ class Lists(BotCommand):
             return "Entry #{} - {} from list {} was removed".format(entryCopy["id"], entryCopy["text"], listName)
 
     def _removeEntryByID(self, listName, idNumber):
+        """
+        Remove an entry by its ID from the list with the given name.
+        """
         listLength = len(self.lists[listName])
         if listLength == 0:
             return "That list is empty!"
