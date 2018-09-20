@@ -60,10 +60,15 @@ class Lists(BotCommand):
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
-        elif len(message.parameterList) == 1 and message.parameterList[0].lower() in self.lists:
-            return IRCResponse(ResponseType.Say,
-                               self._getRandomEntry(message.parameterList[0].lower()),
-                               message.replyTo)
+        elif len(message.parameterList) == 1:
+            if message.parameterList[0].lower() in self.lists():
+                return IRCResponse(ResponseType.Say,
+                                   self._getRandomEntry(message.parameterList[0].lower()),
+                                   message.replyTo)
+            else:
+                return IRCResponse(ResponseType.Say,
+                                   "I don't have a list named {!r}".format(message.parameterList[0]),
+                                   message.replyTo)
         elif len(message.parameterList) >= 2:
             listName = message.parameterList[0].lower()
             subcommand = message.parameterList[1].lower()
@@ -100,6 +105,8 @@ class Lists(BotCommand):
                     text = self.help("")
 
             return IRCResponse(ResponseType.Say, text, message.replyTo)
+        else:
+            return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
 
     def _getRandomEntry(self, listName):
         """
