@@ -26,6 +26,7 @@ class Lists(BotCommand):
         <None> - get random entry from list
         <Integer> - get specific entry from list
         add - add new entry             (entry text as params)
+        last - get last entry
         list - list entries             (optional regex as params)
         search - search for entry       (regex as params, last in params list optionally match ID integer)
         remove - remove an entry        (regex as params, only remove if matches only single entry)
@@ -36,6 +37,7 @@ class Lists(BotCommand):
             "<nothing>": "returns a random entry from the named list",
             "<number>": "returns a specific entry from the named list",
             "add": "add <list entry> - adds the given text to the named list",
+            "last": "last - returns the last entry from the named list",
             "list": "list <regex search> - uploads the named list to paste.ee and gives you a link. "
                     "If a regex search is given, only matching entries are uploaded",
             "search": "search <regex> <number> - regex search entries, returning a random matching one. "
@@ -78,6 +80,8 @@ class Lists(BotCommand):
                 text = self._addEntry(listName, " ".join(paramsList))
             elif listName not in self.lists:
                 text = "I don't have a list named {!r}, maybe add some entries to it to create it?".format(listName)
+            elif subcommand == "last":
+                text = self._getLastEntry(listName)
             elif subcommand == "list":
                 text = self._getMultipleEntries(listName, " ".join(paramsList))
             elif subcommand == "search":
@@ -132,6 +136,13 @@ class Lists(BotCommand):
         
         if chosen is None:
             return "There is no entry with the id {} in the {!r} list!".format(number, listName)
+        return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
+
+    def _getLastEntry(self, listName):
+        """
+        Return the last entry from the given list
+        """
+        chosen = self.lists[listName][-1]
         return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
     def _getMultipleEntries(self, listName, regexPattern=None):
