@@ -120,7 +120,7 @@ class Lists(BotCommand):
         
         chosen = None
         for entry in self.lists[listName]:
-            if entry["id"] == number:
+            if entry["id"] == choice:
                 chosen = entry
         
         if chosen is None:
