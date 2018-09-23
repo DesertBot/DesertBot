@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  desertbot-server:
+    container_name: desertbot-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        config: configs/server.yaml
+    volumes:
+      - ./configs:/app/configs
+      - ./data:/app/data
+      - ./logs:/app/logs
+
+# vim: tabstop=2 shiftwidth=2 expandtab
