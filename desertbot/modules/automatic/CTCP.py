@@ -28,7 +28,7 @@ class CTCP(BotModule):
             return self._getResponse(target, 'PING', msg[5:])
         elif ctcpCommand == 'VERSION':
             try:
-                versionNum = subprocess.check_output(['git', 'describe', '--always']).strip()
+                versionNum = subprocess.check_output(['git', 'describe', '--always']).decode('utf-8').strip()
             except FileNotFoundError:
                 versionNum = '1.0'
             return self._getResponse(target, 'VERSION', '{} v{} / {}'.format(self.bot.nick, versionNum, platform()))
