@@ -21,6 +21,6 @@ parsedatetime==2.4
 cryptography==2.3.1
 future==0.16.0
 six==1.11.0
-ruamel.yaml==0.15.66
+ruamel.yaml==0.15.70
 croniter==0.3.25
 pyhedrals==0.0.1
