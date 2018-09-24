@@ -2,6 +2,7 @@ version: '3'
 
 services:
   desertbot-server:
+    restart: unless-stopped
     container_name: desertbot-server
     build:
       context: .
