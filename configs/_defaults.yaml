@@ -18,10 +18,9 @@ owners:
 - "*!SG@starlitghost.xyz"
 - "*!Heufy@netadmin.dbcommunity.org"
 - "*!hubbe@hubbe.club"
-- "*!hubbe@dbchat-d1d5c6a1.bb.dnainternet.fi"
 
 # shelve storage settings
-storage_sync_interval: 5
+storage_save_interval: 60
 
 # modules to load
 modules:
