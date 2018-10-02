@@ -15,6 +15,8 @@ import math
 import re
 import time
 import datetime
+from datetime import timezone
+import json
 
 from builtins import str
 from six import iteritems
@@ -300,7 +302,7 @@ class URLFollow(BotCommand):
         else:
             name = appData['name']
         data.append(name)
-        
+
         # package contents (might need to trim this...)
         if 'apps' in appData:
             appNames = [app['name'] for app in appData['apps']]
@@ -346,7 +348,7 @@ class URLFollow(BotCommand):
 
             if not prices['AUD'] or prices['AUD']['final'] == prices['USD']['final']:
                 del prices['AUD']
-            
+
             # filter out any missing prices
             prices = {key: val for key, val in iteritems(prices) if val}
 
@@ -373,7 +375,7 @@ class URLFollow(BotCommand):
             else:
                 platformArray.append(u'---')
             data.append(u'/'.join(platformArray))
-        
+
         # description
         if 'about_the_game' in appData and appData['about_the_game'] is not None:
             limit = 100
@@ -390,10 +392,10 @@ class URLFollow(BotCommand):
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         priceField = {'app': 'price_overview', 'package': 'price'}[appType]
         j = response.json()
-        
+
         if 'data' not in j[appId]:
             return
-        
+
         if region == 'AU':
             j[appId]['data'][priceField]['currency'] = 'AUD'
         return j[appId]['data'][priceField]
@@ -404,107 +406,141 @@ class URLFollow(BotCommand):
 
         soup = BeautifulSoup(response.content, 'lxml')
 
-        data = []
+        output = []
 
-        shorturl = soup.find(rel='shorturl')['href']
-        if shorturl is None:
-            shorturl = 'https://www.kickstarter.com/projects/{}/'.format(ksID)
+        state = soup.find(id='main_content')
+        if 'Campaign-state-canceled' in state['class']:
+            state = 'cancelled'
+            campaignState = assembleFormattedText(A.normal[A.fg.red['Cancelled']])
 
-        title = soup.find(property='og:title')
-        if title is not None:
-            # live projects
-            creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
-            # completed projects
-            if creator is None or not creator.text:
-                creator = soup.find(class_='green-dark', attrs={'data-modal-class': 'modal_project_by'})
-            if creator is not None:
-                data.append(str(assembleFormattedText(A.normal['{0}',
-                                                                   A.fg.gray[' by '],
-                                                                   '{1}'])).format(title['content'].strip(),
-                                                                                   creator.text.strip()))
+        elif 'Campaign-state-suspended' in state['class']:
+            state = 'suspended'
+            campaignState = assembleFormattedText(A.normal[A.fg.blue['Suspended']])
+
+        elif 'Campaign-state-failed' in state['class']:
+            state = 'failed'
+            campaignState = assembleFormattedText(A.normal[A.fg.red['Failed']])
+
+        elif 'Campaign-state-successful' in state['class']:
+            state = 'successful'
+            campaignState = assembleFormattedText(A.normal[A.fg.green['Successful']])
+
+        elif 'Campaign-state-live' in state['class']:
+            state = 'live'
+
+        if state == 'live':
+            data = soup.find(attrs={'data-initial': True})
+            if data is not None:
+                data = json.loads(data['data-initial'])
+                data = data['project']
+
+                shorturl = data['projectShortLink']
+
+                title = data['name']
+                creator = data['creator']['name']
+
+                backerCount = int(data['backersCount'])
+
+                pledged = float(data['pledged']['amount'])
+                goal = float(data['goal']['amount'])
+                percentage = float(data['percentFunded'])
+
+                deadline = int(data['deadlineAt'])
+                deadline = datetime.datetime.fromtimestamp(deadline, timezone.utc)
+                now = datetime.datetime.now(timezone.utc)
+                remaining = deadline - now
+                remaining = remaining.total_seconds()
+                remaining = remaining / 3600
+
+                days = math.floor(remaining/24)
+                hours = remaining % 24
+
+                campaignState = 'Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours)
             else:
-                data.append(title['content'].strip())
-
-        stats = soup.find(id='stats')
-        # projects in progress
-        if stats is not None:
-            backerCount = soup.find(id='backers_count')
-            if backerCount is not None:
-                backerCount = int(backerCount['data-backers-count'])
-        # completed projects
+                return '[Kickstarter changed their page structure again :S]'
         else:
-            backerCount = soup.find(class_='NS_campaigns__spotlight_stats')
-            if backerCount is not None:
-                backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
+            shorturl = soup.find(rel='shorturl')['href']
+            if shorturl is None:
+                shorturl = 'https://www.kickstarter.com/projects/{}/'.format(ksID)
 
-        data.append('Backers: {:,d}'.format(backerCount))
+            title = soup.find(property='og:title')
+            if title is not None:
+                title = title['content'].strip()
+                # live projects
+                creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
+                # completed projects
+                if creator is None or not creator.text:
+                    creator = soup.find(class_='green-dark',
+                                        attrs={'data-modal-class': 'modal_project_by'})
+                if creator is not None:
+                    creator = creator.text.strip()
 
-        if stats is not None:
-            pledgeData = soup.find(id='pledged')
-            if pledgeData is not None:
-                pledged = float(pledgeData['data-pledged'])
-                goal = float(pledgeData['data-goal'])
-                percentage = float(pledgeData['data-percent-raised'])
-                if backerCount > 0:
-                    pledgePerBacker = pledged / backerCount
-                else:
-                    pledgePerBacker = 0
+            stats = soup.find(id='stats')
+            # projects in progress
+            if stats is not None:
+                backerCount = soup.find(id='backers_count')
+                if backerCount is not None:
+                    backerCount = int(backerCount['data-backers-count'])
+            # completed projects
+            else:
+                backerCount = soup.find(class_='NS_campaigns__spotlight_stats')
+                if backerCount is not None:
+                    backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
+
+            if stats is not None:
+                pledgeData = soup.find(id='pledged')
+                if pledgeData is not None:
+                    pledged = float(pledgeData['data-pledged'])
+                    goal = float(pledgeData['data-goal'])
+                    percentage = float(pledgeData['data-percent-raised'])
+                    percentage = int(percentage * 100)
+            else:
+                money = soup.select('span.money')
+                if money:
+                    pledgedString = money[1].text.strip()
+                    goalString = money[2].text.strip()
+                    pledged = float(re.sub(r'[^0-9.]', u'', pledgedString))
+                    goal = float(re.sub(r'[^0-9.]', u'', goalString))
+                    percentage = (pledged / goal)
+
+        if creator is not None:
+            name = str(assembleFormattedText(A.normal['{}',
+                                                      A.fg.gray[' by '],
+                                                      '{}'])).format(title,
+                                                                     creator)
         else:
-            money = soup.select('span.money')
-            if money:
-                pledgedString = money[1].text.strip()
-                goalString = money[2].text.strip()
-                pledged = float(re.sub(r'[^0-9.]', u'', pledgedString))
-                goal = float(re.sub(r'[^0-9.]', u'', goalString))
-                percentage = (pledged / goal)
-                if backerCount > 0:
-                    pledgePerBacker = pledged / backerCount
-                else:
-                    pledgePerBacker = 0
+            name = title
+        output.append(name)
 
-        # no longer any way to get this?
-        #currency = soup.select('span.money.no-code')[-1]['class']
-        #currency.remove('money')
-        #currency.remove('no-code')
-        #currency = currency[0].upper()
+        if backerCount is not None:
+            output.append('Backers: {:,d}'.format(backerCount))
 
-        if percentage >= 1.0:
+        if backerCount > 0:
+            pledgePerBacker = pledged / backerCount
+        else:
+            pledgePerBacker = 0
+
+        if percentage >= 100:
             percentageString = A.fg.green['({2:,.0f}% funded)']
         else:
             percentageString = A.fg.red['({2:,.0f}% funded)']
 
         pledgePerBackerString = A.fg.gray['{3:,.0f}/backer']
 
-        pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} ', percentageString, ' ', pledgePerBackerString])
-        data.append(pledgedString.format(pledged,
-                                         goal,
-                                         percentage * 100,
-                                         pledgePerBacker))
+        pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}',
+                                                       A.fg.gray['/'],
+                                                       '{1:,.0f} ',
+                                                       percentageString,
+                                                       ' ',
+                                                       pledgePerBackerString])
+        output.append(pledgedString.format(pledged,
+                                           goal,
+                                           percentage,
+                                           pledgePerBacker))
 
-        findState = soup.find(id='main_content')
-        if 'Campaign-state-canceled' in findState['class']:
-            data.append(assembleFormattedText(A.normal[A.fg.red['Cancelled']]))
-        
-        elif 'Campaign-state-suspended' in findState['class']:
-            data.append(assembleFormattedText(A.normal[A.fg.blue['Suspended']]))
-            
-        elif 'Campaign-state-failed' in findState['class']:
-            data.append(assembleFormattedText(A.normal[A.fg.red['Failed']]))
+        output.append(campaignState)
 
-        elif 'Campaign-state-successful' in findState['class']:
-            data.append(assembleFormattedText(A.normal[A.fg.green['Successful']]))
-
-        elif 'Campaign-state-live' in findState['class']:
-            duration = soup.find(id='project_duration_data')
-
-            if duration is not None:
-                remaining = float(duration['data-hours-remaining'])
-                days = math.floor(remaining/24)
-                hours = remaining % 24
-
-                data.append('Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours))
-
-        return self.graySplitter.join(data), shorturl
+        return self.graySplitter.join(output), shorturl
 
     def FollowTwitch(self, channel):
         # Heavily based on Didero's DideRobot code for the same
