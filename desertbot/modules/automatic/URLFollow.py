@@ -443,6 +443,7 @@ class URLFollow(BotCommand):
 
                 pledged = float(data['pledged']['amount'])
                 goal = float(data['goal']['amount'])
+                currency = data['goal']['currency']
                 percentage = float(data['percentFunded'])
 
                 deadline = int(data['deadlineAt'])
@@ -502,6 +503,7 @@ class URLFollow(BotCommand):
                     pledged = float(re.sub(r'[^0-9.]', u'', pledgedString))
                     goal = float(re.sub(r'[^0-9.]', u'', goalString))
                     percentage = (pledged / goal)
+            currency = ""
 
         if creator is not None:
             name = str(assembleFormattedText(A.normal['{}',
@@ -529,14 +531,15 @@ class URLFollow(BotCommand):
 
         pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}',
                                                        A.fg.gray['/'],
-                                                       '{1:,.0f} ',
+                                                       '{1:,.0f} {4} ',
                                                        percentageString,
                                                        ' ',
                                                        pledgePerBackerString])
         output.append(pledgedString.format(pledged,
                                            goal,
                                            percentage,
-                                           pledgePerBacker))
+                                           pledgePerBacker,
+                                           currency))
 
         output.append(campaignState)
 
