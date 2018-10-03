@@ -13,7 +13,6 @@ from html.parser import HTMLParser
 from urllib.parse import urlparse
 import re
 import time
-import datetime
 
 from builtins import str
 from six import iteritems
@@ -25,9 +24,6 @@ from desertbot.utils.api_keys import load_key
 from desertbot.utils import string
 
 from bs4 import BeautifulSoup
-from isodate import parse_duration
-import dateutil.parser
-import dateutil.tz
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
@@ -51,7 +47,6 @@ class URLFollow(BotCommand):
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
     def onLoad(self):
-        self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
         self.twitchClientID = load_key(u'Twitch Client ID')
         
@@ -97,15 +92,12 @@ class URLFollow(BotCommand):
         return IRCResponse(ResponseType.Say, text, message.replyTo, {'urlfollowURL': url})
 
     def dispatchToFollows(self, _: IRCMessage, url: str):
-        youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
         twitterMatch = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
         steamMatch   = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
         twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)/?(\s|$)', url)
-        
-        if youtubeMatch:
-            return self.FollowYouTube(youtubeMatch.group('videoID'))
-        elif imgurMatch:
+
+        if imgurMatch:
             return self.FollowImgur(imgurMatch.group('imgurID'))
         elif twitterMatch:
             return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'))
@@ -115,69 +107,7 @@ class URLFollow(BotCommand):
             return self.FollowTwitch(twitchMatch.group('twitchChannel'))
         elif not re.search('\.(jpe?g|gif|png|bmp)$', url):
             return self.FollowStandard(url)
-        
-    def FollowYouTube(self, videoID):
-        if self.youtubeKey is None:
-            return '[YouTube API key not found]'
 
-        fields = 'items(id,snippet(title,description,channelTitle,liveBroadcastContent),contentDetails(duration),statistics(viewCount),liveStreamingDetails(scheduledStartTime))'
-        parts = 'snippet,contentDetails,statistics,liveStreamingDetails'
-        url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(videoID, fields, parts, self.youtubeKey)
-        
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-        j = response.json()
-
-        if 'items' not in j:
-            return None
-
-        data = []
-
-        vid = j['items'][0]
-
-        title = vid['snippet']['title']
-        data.append(title)
-        channel = vid['snippet']['channelTitle']
-        data.append(channel)
-        if vid['snippet']['liveBroadcastContent'] == 'none':
-            length = parse_duration(vid['contentDetails']['duration']).total_seconds()
-            m, s = divmod(int(length), 60)
-            h, m = divmod(m, 60)
-            if h > 0:
-                length = u'{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
-            else:
-                length = u'{0:02d}:{1:02d}'.format(m, s)
-
-            data.append(length)
-        elif vid['snippet']['liveBroadcastContent'] == 'upcoming':
-            startTime = vid['liveStreamingDetails']['scheduledStartTime']
-            startDateTime = dateutil.parser.parse(startTime)
-            now = datetime.datetime.now(dateutil.tz.tzutc())
-            delta = startDateTime - now
-            timespan = string.deltaTimeToString(delta, 'm')
-            timeString = assembleFormattedText(A.normal['Live in ', A.fg.cyan[A.bold[timespan]]])
-            data.append(timeString)
-            pass # time till stream starts, indicate it's upcoming
-        elif vid['snippet']['liveBroadcastContent'] == 'live':
-            status = str(assembleFormattedText(A.normal[A.fg.red[A.bold['{} Live']]]))
-            status = status.format(u'●')
-            data.append(status)
-        else:
-            pass # if we're here, wat
-
-        views = int(vid['statistics']['viewCount'])
-        data.append('{:,}'.format(views))
-
-        description = vid['snippet']['description']
-        if not description:
-            description = u'<no description available>'
-        description = re.sub('(\n|\s)+', ' ', description)
-        limit = 150
-        if len(description) > limit:
-            description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
-        data.append(description)
-
-        return self.graySplitter.join(data), 'http://youtu.be/{}'.format(videoID)
-    
     def FollowImgur(self, imgurID):
         if self.imgurClientID is None:
             return '[imgur Client ID not found]'
