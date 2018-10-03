@@ -12,7 +12,6 @@ from zope.interface import implementer
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 import re
-import time
 
 from builtins import str
 from six import iteritems
@@ -21,7 +20,6 @@ from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
 from desertbot.utils.api_keys import load_key
-from desertbot.utils import string
 
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
@@ -93,53 +91,15 @@ class URLFollow(BotCommand):
         return IRCResponse(ResponseType.Say, text, message.replyTo, {'urlfollowURL': url})
 
     def dispatchToFollows(self, _: IRCMessage, url: str):
-        twitterMatch = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
         steamMatch   = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
         twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)/?(\s|$)', url)
 
-        if twitterMatch:
-            return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'))
-        elif steamMatch:
+        if steamMatch:
             return self.FollowSteam(steamMatch.group('steamType'), steamMatch.group('steamID'))
         elif twitchMatch:
             return self.FollowTwitch(twitchMatch.group('twitchChannel'))
         elif not re.search('\.(jpe?g|gif|png|bmp)$', url):
             return self.FollowStandard(url)
-
-    def FollowTwitter(self, tweeter, tweetID):
-        url = 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-
-        soup = BeautifulSoup(response.content, 'lxml')
-
-        tweet = soup.find(class_='permalink-tweet')
-
-        user = tweet.find(class_='username').text
-
-        tweetText = tweet.find(class_='tweet-text')
-
-        tweetTimeText = tweet.find(class_='client-and-actions').text.strip()
-        try:
-            tweetTimeText = time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y')
-            tweetTimeText = time.strftime('%Y/%m/%d %H:%M', tweetTimeText)
-        except ValueError:
-            pass
-        tweetTimeText = re.sub(r'[\r\n\s]+', u' ', tweetTimeText)
-
-        links = tweetText.find_all('a', {'data-expanded-url': True})
-        for link in links:
-            link.string = ' ' + link['data-expanded-url']
-
-        embeddedLinks = tweetText.find_all('a', {'data-pre-embedded': 'true'})
-        for link in embeddedLinks:
-            link.string = ' ' + link['href']
-
-        text = string.unescapeXHTML(tweetText.text)
-        text = re.sub('[\r\n]+', self.graySplitter, text)
-
-        formatString = str(colour(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
-
-        return formatString.format(tweetTimeText, user, text), url
 
     def FollowSteam(self, steamType, steamId):
         steamType = {'app': 'app', 'sub': 'package'}[steamType]
