@@ -29,6 +29,9 @@ class Twitter(BotCommand):
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
+        if not match:
+            return
+
         tweeter = match.group('tweeter')
         tweetID = match.group('tweetID')
         url = 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)
