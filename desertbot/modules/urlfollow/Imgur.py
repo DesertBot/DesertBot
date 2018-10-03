@@ -10,6 +10,7 @@ from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
+from desertbot.utils.api_keys import load_key
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
@@ -23,6 +24,9 @@ class Imgur(BotCommand):
 
     def help(self, query):
         return 'Automatic module that follows Imgur URLs'
+
+    def onLoad(self):
+        self.imgurClientID = load_key(u'imgur Client ID')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)

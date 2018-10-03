@@ -47,7 +47,6 @@ class URLFollow(BotCommand):
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
     def onLoad(self):
-        self.imgurClientID = load_key(u'imgur Client ID')
         self.twitchClientID = load_key(u'Twitch Client ID')
         
         self.autoFollow = True
