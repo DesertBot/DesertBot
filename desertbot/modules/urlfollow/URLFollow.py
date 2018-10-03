@@ -9,7 +9,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-from html.parser import HTMLParser
+import html
 from urllib.parse import urlparse
 import re
 
@@ -19,7 +19,6 @@ from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
 from bs4 import BeautifulSoup
-from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 
 @implementer(IPlugin, IModule)
@@ -38,10 +37,6 @@ class URLFollow(BotCommand):
         return ('Automatic module that follows urls '
                 'and grabs information about the resultant webpage')
 
-    htmlParser = HTMLParser()
-
-    graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
-
     def onLoad(self):
         self.autoFollow = True
 
@@ -55,7 +50,7 @@ class URLFollow(BotCommand):
 
         return self.handleURL(message, auto=False)
 
-    def handleURL(self, message, auto=True):
+    def handleURL(self, message: IRCMessage, auto: bool=True):
         if auto and message.command:
             return
         if auto and not self.autoFollow:
@@ -85,18 +80,18 @@ class URLFollow(BotCommand):
 
         return IRCResponse(ResponseType.Say, text, message.replyTo, {'urlfollowURL': url})
 
-    def dispatchToFollows(self, _: IRCMessage, url: str):
+    def dispatchToFollows(self, message: IRCMessage, url: str):
         if not re.search('\.(jpe?g|gif|png|bmp)$', url):
-            return self.FollowStandard(url)
+            return self.FollowStandard(message, url)
 
-    def FollowStandard(self, url):
+    def FollowStandard(self, message: IRCMessage, url: str):
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
         if not response:
             return
 
         if response.url != url:
-            return self.dispatchToFollows(None, response.url)
+            return self.bot.moduleHandler.runActionUntilValue('urlfollow', message, url)(None, response.url)
 
         title = self.GetTitle(response.content)
         if title is not None:
@@ -113,7 +108,7 @@ class URLFollow(BotCommand):
             title = re.sub(u'[\r\n]+', u'', title)  # strip any newlines
             title = title.strip()  # strip all whitespace either side
             title = u' '.join(title.split())  # replace multiple whitespace with single space
-            title = self.htmlParser.unescape(title)  # unescape html entities
+            title = html.unescape(title)  # unescape html entities
 
             # Split on the first space before 300 characters, and replace the rest with '...'
             if len(title) > 300:
@@ -121,7 +116,7 @@ class URLFollow(BotCommand):
 
             return title
 
-        return None
+        return
 
 
 urlfollow = URLFollow()
