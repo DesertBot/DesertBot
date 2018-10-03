@@ -14,7 +14,6 @@ from urllib.parse import urlparse
 import re
 
 from builtins import str
-from six import iteritems
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -91,140 +90,12 @@ class URLFollow(BotCommand):
         return IRCResponse(ResponseType.Say, text, message.replyTo, {'urlfollowURL': url})
 
     def dispatchToFollows(self, _: IRCMessage, url: str):
-        steamMatch   = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
         twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)/?(\s|$)', url)
 
-        if steamMatch:
-            return self.FollowSteam(steamMatch.group('steamType'), steamMatch.group('steamID'))
-        elif twitchMatch:
+        if twitchMatch:
             return self.FollowTwitch(twitchMatch.group('twitchChannel'))
         elif not re.search('\.(jpe?g|gif|png|bmp)$', url):
             return self.FollowStandard(url)
-
-    def FollowSteam(self, steamType, steamId):
-        steamType = {'app': 'app', 'sub': 'package'}[steamType]
-        params = '{0}details/?{0}ids={1}&cc=US&l=english&v=1'.format(steamType, steamId)
-        url = 'http://store.steampowered.com/api/{}'.format(params)
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-
-        j = response.json()
-        if not j[steamId]['success']:
-            return  # failure
-
-        appData = j[steamId]['data']
-
-        data = []
-
-        # name
-        if 'developers' in appData:
-            developers = u', '.join(appData['developers'])
-            name = colour(A.normal[appData['name'], A.fg.gray[' by '], developers])
-        else:
-            name = appData['name']
-        data.append(name)
-
-        # package contents (might need to trim this...)
-        if 'apps' in appData:
-            appNames = [app['name'] for app in appData['apps']]
-            apps = u'Package containing: {}'.format(u', '.join(appNames))
-            data.append(apps)
-
-        # genres
-        if 'genres' in appData:
-            genres = ', '.join([genre['description'] for genre in appData['genres']])
-            data.append(u'Genres: ' + genres)
-
-        # release date
-        releaseDate = appData['release_date']
-        if not releaseDate['coming_soon']:
-            if releaseDate['date']:
-                data.append(u'Released: ' + releaseDate['date'])
-        else:
-            upcomingDate = A.fg.cyan[A.bold[str(releaseDate['date'])]]
-            data.append(colour(A.normal['To Be Released: ', upcomingDate]))
-
-        # metacritic
-        # http://www.metacritic.com/faq#item32
-        # (Why is the breakdown of green, yellow, and red scores different for games?)
-        if 'metacritic' in appData:
-            metaScore = appData['metacritic']['score']
-            if metaScore < 50:
-                metacritic = colour(A.normal[A.fg.red[str(metaScore)]])
-            elif metaScore < 75:
-                metacritic = colour(A.normal[A.fg.orange[str(metaScore)]])
-            else:
-                metacritic = colour(A.normal[A.fg.green[str(metaScore)]])
-            data.append(u'Metacritic: {0}'.format(metacritic))
-
-        # prices
-        priceField = {'app': 'price_overview', 'package': 'price'}[steamType]
-        if priceField in appData:
-            prices = {'USD': appData[priceField],
-                      'GBP': self.getSteamPrice(steamType, steamId, 'GB'),
-                      'EUR': self.getSteamPrice(steamType, steamId, 'FR'),
-                      'AUD': self.getSteamPrice(steamType, steamId, 'AU')}
-
-            currencies = {'USD': u'$',
-                          'GBP': u'\u00A3',
-                          'EUR': u'\u20AC',
-                          'AUD': u'AU$'}
-
-            # filter out AUD if same as USD (most are)
-            if not prices['AUD'] or prices['AUD']['final'] == prices['USD']['final']:
-                del prices['AUD']
-
-            # filter out any missing prices
-            prices = {key: val for key, val in iteritems(prices) if val}
-            priceList = [currencies[val['currency']] + str(val['final'] / 100.0)
-                         for val in prices.values()]
-            priceString = u'/'.join(priceList)
-            if prices['USD']['discount_percent'] > 0:
-                discount = ' ({0}% sale!)'.format(prices['USD']['discount_percent'])
-                priceString += colour(A.normal[A.fg.green[A.bold[discount]]])
-
-            data.append(priceString)
-
-        # platforms
-        if 'platforms' in appData:
-            platforms = appData['platforms']
-            platformArray = []
-            if platforms['windows']:
-                platformArray.append(u'Win')
-            else:
-                platformArray.append(u'---')
-            if platforms['mac']:
-                platformArray.append(u'Mac')
-            else:
-                platformArray.append(u'---')
-            if platforms['linux']:
-                platformArray.append(u'Lin')
-            else:
-                platformArray.append(u'---')
-            data.append(u'/'.join(platformArray))
-
-        # description
-        if 'about_the_game' in appData and appData['about_the_game'] is not None:
-            limit = 100
-            description = re.sub(r'(<[^>]+>|[\r\n\t])+', colour(A.normal[' ', A.fg.gray['>'], ' ']), appData['about_the_game'])
-            if len(description) > limit:
-                description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
-            data.append(description)
-
-        url = 'http://store.steampowered.com/{}/{}'.format({'app': 'app', 'package': 'sub'}[steamType], steamId)
-        return self.graySplitter.join(data), url
-
-    def getSteamPrice(self, appType, appId, region):
-        url = 'http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc={2}&l=english&v=1'.format(appType, appId, region)
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-        priceField = {'app': 'price_overview', 'package': 'price'}[appType]
-        j = response.json()
-
-        if 'data' not in j[appId]:
-            return
-
-        if region == 'AU':
-            j[appId]['data'][priceField]['currency'] = 'AUD'
-        return j[appId]['data'][priceField]
 
     def FollowTwitch(self, channel):
         # Heavily based on Didero's DideRobot code for the same
