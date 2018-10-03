@@ -24,7 +24,7 @@ from desertbot.utils.api_keys import load_key
 from desertbot.utils import string
 
 from bs4 import BeautifulSoup
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 
 @implementer(IPlugin, IModule)
@@ -40,17 +40,18 @@ class URLFollow(BotCommand):
         return ['urlfollow', 'follow']
 
     def help(self, query):
-        return 'Automatic module that follows urls and grabs information about the resultant webpage'
+        return ('Automatic module that follows urls '
+                'and grabs information about the resultant webpage')
 
     htmlParser = HTMLParser()
-    
-    graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
+
+    graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
 
     def onLoad(self):
         self.twitchClientID = load_key(u'Twitch Client ID')
-        
+
         self.autoFollow = True
-    
+
     def execute(self, message: IRCMessage):
         if message.parameterList[0].lower() == 'on':
             self.autoFollow = True
@@ -78,11 +79,12 @@ class URLFollow(BotCommand):
                                    {'urlfollowURL': u'[no url recognized]'})
             return
 
-        follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', message, match.group('url'))
+        url = match.group('url')
+        follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', message, url)
         if not follows:
             if not auto:
                 return IRCResponse(ResponseType.Say,
-                                   u'[no follows worked for {}]'.format(match.group('url')),
+                                   u'[no follows worked for {}]'.format(url),
                                    message.replyTo,
                                    {'urlfollowURL': u'[no follows worked for {}]'})
             return
@@ -111,14 +113,15 @@ class URLFollow(BotCommand):
         soup = BeautifulSoup(response.content, 'lxml')
 
         tweet = soup.find(class_='permalink-tweet')
-        
+
         user = tweet.find(class_='username').text
 
         tweetText = tweet.find(class_='tweet-text')
-        
+
         tweetTimeText = tweet.find(class_='client-and-actions').text.strip()
         try:
-            tweetTimeText = time.strftime('%Y/%m/%d %H:%M', time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y'))
+            tweetTimeText = time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y')
+            tweetTimeText = time.strftime('%Y/%m/%d %H:%M', tweetTimeText)
         except ValueError:
             pass
         tweetTimeText = re.sub(r'[\r\n\s]+', u' ', tweetTimeText)
@@ -134,13 +137,14 @@ class URLFollow(BotCommand):
         text = string.unescapeXHTML(tweetText.text)
         text = re.sub('[\r\n]+', self.graySplitter, text)
 
-        formatString = str(assembleFormattedText(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
+        formatString = str(colour(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
 
         return formatString.format(tweetTimeText, user, text), url
 
     def FollowSteam(self, steamType, steamId):
         steamType = {'app': 'app', 'sub': 'package'}[steamType]
-        url = 'http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc=US&l=english&v=1'.format(steamType, steamId)
+        params = '{0}details/?{0}ids={1}&cc=US&l=english&v=1'.format(steamType, steamId)
+        url = 'http://store.steampowered.com/api/{}'.format(params)
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
         j = response.json()
@@ -153,7 +157,8 @@ class URLFollow(BotCommand):
 
         # name
         if 'developers' in appData:
-            name = assembleFormattedText(A.normal[appData['name'], A.fg.gray[' by '], u', '.join(appData['developers'])])
+            developers = u', '.join(appData['developers'])
+            name = colour(A.normal[appData['name'], A.fg.gray[' by '], developers])
         else:
             name = appData['name']
         data.append(name)
@@ -166,7 +171,8 @@ class URLFollow(BotCommand):
 
         # genres
         if 'genres' in appData:
-            data.append(u'Genres: ' + ', '.join([genre['description'] for genre in appData['genres']]))
+            genres = ', '.join([genre['description'] for genre in appData['genres']])
+            data.append(u'Genres: ' + genres)
 
         # release date
         releaseDate = appData['release_date']
@@ -174,18 +180,20 @@ class URLFollow(BotCommand):
             if releaseDate['date']:
                 data.append(u'Released: ' + releaseDate['date'])
         else:
-            data.append(assembleFormattedText(A.normal['To Be Released: ', A.fg.cyan[A.bold[str(releaseDate['date'])]]]))
+            upcomingDate = A.fg.cyan[A.bold[str(releaseDate['date'])]]
+            data.append(colour(A.normal['To Be Released: ', upcomingDate]))
 
         # metacritic
-        # http://www.metacritic.com/faq#item32 (Why is the breakdown of green, yellow, and red scores different for games?)
+        # http://www.metacritic.com/faq#item32
+        # (Why is the breakdown of green, yellow, and red scores different for games?)
         if 'metacritic' in appData:
             metaScore = appData['metacritic']['score']
             if metaScore < 50:
-                metacritic = assembleFormattedText(A.normal[A.fg.red[str(metaScore)]])
+                metacritic = colour(A.normal[A.fg.red[str(metaScore)]])
             elif metaScore < 75:
-                metacritic = assembleFormattedText(A.normal[A.fg.orange[str(metaScore)]])
+                metacritic = colour(A.normal[A.fg.orange[str(metaScore)]])
             else:
-                metacritic = assembleFormattedText(A.normal[A.fg.green[str(metaScore)]])
+                metacritic = colour(A.normal[A.fg.green[str(metaScore)]])
             data.append(u'Metacritic: {0}'.format(metacritic))
 
         # prices
@@ -201,15 +209,18 @@ class URLFollow(BotCommand):
                           'EUR': u'\u20AC',
                           'AUD': u'AU$'}
 
+            # filter out AUD if same as USD (most are)
             if not prices['AUD'] or prices['AUD']['final'] == prices['USD']['final']:
                 del prices['AUD']
 
             # filter out any missing prices
             prices = {key: val for key, val in iteritems(prices) if val}
-
-            priceString = u'/'.join([currencies[val['currency']] + str(val['final'] / 100.0) for val in prices.values()])
+            priceList = [currencies[val['currency']] + str(val['final'] / 100.0)
+                         for val in prices.values()]
+            priceString = u'/'.join(priceList)
             if prices['USD']['discount_percent'] > 0:
-                priceString += assembleFormattedText(A.normal[A.fg.green[A.bold[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]]])
+                discount = ' ({0}% sale!)'.format(prices['USD']['discount_percent'])
+                priceString += colour(A.normal[A.fg.green[A.bold[discount]]])
 
             data.append(priceString)
 
@@ -234,7 +245,7 @@ class URLFollow(BotCommand):
         # description
         if 'about_the_game' in appData and appData['about_the_game'] is not None:
             limit = 100
-            description = re.sub(r'(<[^>]+>|[\r\n\t])+', assembleFormattedText(A.normal[' ', A.fg.gray['>'], ' ']), appData['about_the_game'])
+            description = re.sub(r'(<[^>]+>|[\r\n\t])+', colour(A.normal[' ', A.fg.gray['>'], ' ']), appData['about_the_game'])
             if len(description) > limit:
                 description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
@@ -261,13 +272,14 @@ class URLFollow(BotCommand):
         # TODO: other stats?
         if self.twitchClientID is None:
             return '[Twitch Client ID not found]'
-        
+
         chanData = {}
         channelOnline = False
         twitchHeaders = {'Accept': 'application/vnd.twitchtv.v3+json',
                          'Client-ID': self.twitchClientID}
         url = u'https://api.twitch.tv/kraken/streams/{}'.format(channel)
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=twitchHeaders)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
+                                                              extraHeaders=twitchHeaders)
 
         streamData = response.json()
 
@@ -276,40 +288,50 @@ class URLFollow(BotCommand):
             channelOnline = True
         elif 'error' not in streamData:
             url = u'https://api.twitch.tv/kraken/channels/{}'.format(channel)
-            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=twitchHeaders)
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
+                                                                  extraHeaders=twitchHeaders)
             chanData = response.json()
 
-        if len(chanData) > 0:
-            if channelOnline:
-                channelInfo = assembleFormattedText(A.fg.green['']) + u'{}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
-            else:
-                channelInfo = assembleFormattedText(A.fg.red['']) + u'{}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
-            channelInfo += u' "{}"'.format(re.sub(r'[\r\n]+', self.graySplitter, chanData['status'].strip()))
-            if chanData['game'] is not None:
-                channelInfo += assembleFormattedText(A.normal[A.fg.gray[', playing '], u'{}'.format(chanData['game'])])
-            if chanData['mature']:
-                channelInfo += assembleFormattedText(A.normal[A.fg.lightRed[' [Mature]']])
-            if channelOnline:
-                channelInfo += assembleFormattedText(A.normal[A.fg.green[' (Live with {0:,d} viewers)'.format(streamData['stream']['viewers'])]])
-            else:
-                channelInfo += assembleFormattedText(A.normal[A.fg.red[' (Offline)']])
+        if len(chanData) == 0:
+            return
 
-            return channelInfo, 'https://twitch.tv/{}'.format(channel)
-    
+        output = []
+        if channelOnline:
+            name = colour(A.normal[A.fg.green['{}'.format(chanData['display_name'])]])
+        else:
+            name = colour(A.normal[A.fg.red['{}'.format(chanData['display_name'])]])
+        output.append(name)
+        title = ' "{}"'.format(re.sub(r'[\r\n]+', self.graySplitter, chanData['status'].strip()))
+        output.append(title)
+        if chanData['game'] is not None:
+            game = colour(A.normal[A.fg.gray[', playing '], '{}'.format(chanData['game'])])
+            output.append(game)
+        if chanData['mature']:
+            mature = colour(A.normal[A.fg.lightRed[' [Mature]']])
+            output.append(mature)
+        if channelOnline:
+            viewers = streamData['stream']['viewers']
+            status = colour(A.normal[A.fg.green[' (Live with {0:,d} viewers)'.format(viewers)]])
+        else:
+            status = colour(A.normal[A.fg.red[' (Offline)']])
+        output.append(status)
+
+        return ''.join(output), 'https://twitch.tv/{}'.format(channel)
+
     def FollowStandard(self, url):
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-        
+
         if not response:
             return
 
         if response.url != url:
             return self.dispatchToFollows(None, response.url)
-        
+
         title = self.GetTitle(response.content)
         if title is not None:
             domain = urlparse(response.url).netloc
             return u'{} (at {})'.format(title, domain), url
-        
+
         return
 
     def GetTitle(self, webpage):
@@ -318,16 +340,16 @@ class URLFollow(BotCommand):
         if title:
             title = title.text
             title = re.sub(u'[\r\n]+', u'', title)  # strip any newlines
-            title = title.strip()   # strip all whitespace either side
-            title = re.sub(u'\s+', u' ', title)     # replace multiple whitespace chars with a single space
-            title = self.htmlParser.unescape(title)     # unescape html entities
+            title = title.strip()  # strip all whitespace either side
+            title = u' '.join(title.split())  # replace multiple whitespace with single space
+            title = self.htmlParser.unescape(title)  # unescape html entities
 
             # Split on the first space before 300 characters, and replace the rest with '...'
             if len(title) > 300:
                 title = title[:300].rsplit(u' ', 1)[0] + u" ..."
 
             return title
-        
+
         return None
 
 
