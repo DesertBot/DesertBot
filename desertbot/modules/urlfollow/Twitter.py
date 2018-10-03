@@ -25,7 +25,7 @@ class Twitter(BotCommand):
         return super(Twitter, self).actions() + [('urlfollow', 2, self.follow)]
 
     def help(self, query):
-        return 'Automatic module that follows Kickstarter URLs'
+        return 'Automatic module that follows Twitch URLs'
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
