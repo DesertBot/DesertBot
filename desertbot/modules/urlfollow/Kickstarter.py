@@ -100,43 +100,22 @@ class Kickstarter(BotCommand):
             title = soup.find(property='og:title')
             if title is not None:
                 title = title['content'].strip()
-                # live projects
                 creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
-                # completed projects
-                if creator is None or not creator.text:
-                    creator = soup.find(class_='green-dark',
-                                        attrs={'data-modal-class': 'modal_project_by'})
                 if creator is not None:
                     creator = creator.text.strip()
 
-            stats = soup.find(id='stats')
-            # projects in progress
-            if stats is not None:
-                backerCount = soup.find(id='backers_count')
-                if backerCount is not None:
-                    backerCount = int(backerCount['data-backers-count'])
-            # completed projects
-            else:
-                backerCount = soup.find(class_='NS_campaigns__spotlight_stats')
-                if backerCount is not None:
-                    backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
+            backerCount = soup.find(class_='NS_campaigns__spotlight_stats')
+            if backerCount is not None:
+                backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
 
-            if stats is not None:
-                pledgeData = soup.find(id='pledged')
-                if pledgeData is not None:
-                    pledged = float(pledgeData['data-pledged'])
-                    goal = float(pledgeData['data-goal'])
-                    percentage = float(pledgeData['data-percent-raised'])
-                    percentage = int(percentage * 100)
-            else:
-                money = soup.select('span.money')
-                if money:
-                    pledgedString = money[1].text.strip()
-                    goalString = money[2].text.strip()
-                    pledged = float(re.sub(r'[^0-9.]', u'', pledgedString))
-                    goal = float(re.sub(r'[^0-9.]', u'', goalString))
-                    percentage = (pledged / goal)
-            currency = ""
+            money = soup.select('span.money')
+            if money:
+                pledgedString = money[1].text.strip()
+                goalString = money[2].text.strip()
+                pledged = float(re.sub(r'[^0-9.]', u'', pledgedString))
+                goal = float(re.sub(r'[^0-9.]', u'', goalString))
+                percentage = (pledged / goal)
+                currency = ""
 
         if creator is not None:
             name = str(assembleFormattedText(A.normal['{}',
