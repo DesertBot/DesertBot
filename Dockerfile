@@ -11,5 +11,5 @@ RUN apt-get update && \
     pip install Cython && \
     pip install -r requirements.txt
 ARG config
-ENV config=$config
+ENV config=$config PYTHONUNBUFFERED=1
 ENTRYPOINT python -u start.py -c $config
