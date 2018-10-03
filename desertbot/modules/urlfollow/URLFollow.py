@@ -92,14 +92,11 @@ class URLFollow(BotCommand):
         return IRCResponse(ResponseType.Say, text, message.replyTo, {'urlfollowURL': url})
 
     def dispatchToFollows(self, _: IRCMessage, url: str):
-        imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
         twitterMatch = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
         steamMatch   = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
         twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)/?(\s|$)', url)
 
-        if imgurMatch:
-            return self.FollowImgur(imgurMatch.group('imgurID'))
-        elif twitterMatch:
+        if twitterMatch:
             return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'))
         elif steamMatch:
             return self.FollowSteam(steamMatch.group('steamType'), steamMatch.group('steamID'))
@@ -107,71 +104,6 @@ class URLFollow(BotCommand):
             return self.FollowTwitch(twitchMatch.group('twitchChannel'))
         elif not re.search('\.(jpe?g|gif|png|bmp)$', url):
             return self.FollowStandard(url)
-
-    def FollowImgur(self, imgurID):
-        if self.imgurClientID is None:
-            return '[imgur Client ID not found]'
-
-        if imgurID.startswith('gallery/'):
-            imgurID = imgurID.replace('gallery/', '')
-
-        albumLink = False
-        if imgurID.startswith('a/'):
-            imgurID = imgurID.replace('a/', '')
-            url = 'https://api.imgur.com/3/album/{0}'.format(imgurID)
-            albumLink = True
-        else:
-            url = 'https://api.imgur.com/3/image/{0}'.format(imgurID)
-
-        headers = {'Authorization': 'Client-ID {0}'.format(self.imgurClientID)}
-        
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
-        
-        if not response:
-            url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
-
-        if not response:
-            return
-        
-        j = response.json()
-        
-        imageData = j['data']
-
-        if imageData['title'] is None:
-            url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=headers)
-            if response:
-                j = response.json()
-                if j['success']:
-                    imageData = j['data']
-
-            if imageData['title'] is None:
-                response = self.bot.moduleHandler.runActionUntilValue('fetch-url', 'http://imgur.com/{0}'.format(imgurID))
-                imageData['title'] = self.GetTitle(response.content).replace(' - Imgur', '')
-                if imageData['title'] == 'imgur: the simple image sharer':
-                    imageData['title'] = None
-        
-        data = []
-        if imageData['title'] is not None:
-            data.append(imageData['title'])
-        else:
-            data.append(u'<No Title>')
-        if imageData['nsfw']:
-            data.append(u'\x034\x02NSFW!\x0F')
-        if albumLink:
-            data.append(u'Album: {0} Images'.format(imageData['images_count']))
-        else:
-            if 'is_album' in imageData and imageData['is_album']:
-                data.append(u'Album: {0:,d} Images'.format(len(imageData['images'])))
-            else:
-                if imageData[u'animated']:
-                    data.append(u'\x032\x02Animated!\x0F')
-                data.append(u'{0:,d}x{1:,d}'.format(imageData['width'], imageData['height']))
-                data.append(u'Size: {0:,d}kb'.format(int(imageData['size']/1024)))
-        data.append(u'Views: {0:,d}'.format(imageData['views']))
-        
-        return self.graySplitter.join(data), '[no imgur url]'
 
     def FollowTwitter(self, tweeter, tweetID):
         url = 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)
