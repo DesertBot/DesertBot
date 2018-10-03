@@ -158,7 +158,6 @@ class Kickstarter(BotCommand):
         graySplitter = assembleFormattedText(A.normal[' ',
                                                       A.fg.gray['|'],
                                                       ' '])
-
         return graySplitter.join(output), shorturl
 
 
