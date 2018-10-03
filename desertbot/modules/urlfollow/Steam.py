@@ -144,7 +144,8 @@ class Steam(BotCommand):
             data.append(description)
 
         url = 'http://store.steampowered.com/{}/{}'.format({'app': 'app', 'package': 'sub'}[steamType], steamId)
-        return self.graySplitter.join(data), url
+        graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
+        return graySplitter.join(data), url
 
     def getSteamPrice(self, appType, appId, region):
         url = 'http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc={2}&l=english&v=1'.format(appType, appId,
