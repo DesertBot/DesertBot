@@ -2,7 +2,7 @@
 """
 Created on May 10, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -20,8 +20,9 @@ class Roll(BotCommand):
         return ['roll', 'rollv']
 
     def help(self, query):
-        return 'roll(v) - dice roller, \'rollv\' outputs every roll. supported operators are #d#(kh#/kl#/dh#/dl#/!/r/ro/s/sa/sd), + - * / % ^ ( ) #comments | ' \
-           'see https://git.io/PyMoBo-Roll for example usage and a detailed explanation of the dice modifiers'
+        return 'roll(v) - dice roller, \'rollv\' outputs every roll. ' \
+            'supported operators are #d#(kh#/kl#/dh#/dl#/!/r/ro/s/sa/sd), + - * / % ^ ( ) #comments | ' \
+            'see https://git.io/PyMoBo-Roll for example usage and a detailed explanation of the dice modifiers'
 
     def onLoad(self):
         self.roller = dice.DiceParser()
