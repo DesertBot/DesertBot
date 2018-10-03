@@ -24,7 +24,7 @@ class Steam(BotCommand):
         return super(Steam, self).actions() + [('urlfollow', 2, self.follow)]
 
     def help(self, query):
-        return 'Automatic module that follows Kickstarter URLs'
+        return 'Automatic module that follows Steam URLs'
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
