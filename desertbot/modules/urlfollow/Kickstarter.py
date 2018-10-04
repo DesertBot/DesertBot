@@ -16,6 +16,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 import datetime
 from datetime import timezone
+import html
 import json
 import math
 import re
@@ -42,80 +43,80 @@ class Kickstarter(BotCommand):
         output = []
 
         state = soup.find(id='main_content')
+
+        pageStructureChanged = '[Kickstarter changed their page structure again :S ({})]'
+        if not state:
+            return pageStructureChanged.format('#main_content'), None
+
         if 'Campaign-state-canceled' in state['class']:
             state = 'cancelled'
             campaignState = assembleFormattedText(A.normal[A.fg.red['Cancelled']])
-
         elif 'Campaign-state-suspended' in state['class']:
             state = 'suspended'
             campaignState = assembleFormattedText(A.normal[A.fg.blue['Suspended']])
-
         elif 'Campaign-state-failed' in state['class']:
             state = 'failed'
             campaignState = assembleFormattedText(A.normal[A.fg.red['Failed']])
-
         elif 'Campaign-state-successful' in state['class']:
             state = 'successful'
             campaignState = assembleFormattedText(A.normal[A.fg.green['Successful']])
-
         elif 'Campaign-state-live' in state['class']:
             state = 'live'
+        else:
+            return '[Kickstarter state {!r} not recognised]'.format(state['class']), None
 
         if state == 'live':
             data = soup.find(attrs={'data-initial': True})
-            if data is not None:
-                data = json.loads(data['data-initial'])
-                data = data['project']
+            if not data:
+                return pageStructureChanged.format('live data-initial'), None
 
-                shorturl = data['projectShortLink']
+            data = json.loads(data['data-initial'])
+            data = data['project']
 
-                title = data['name']
-                creator = data['creator']['name']
+            shorturl = data['projectShortLink']
 
-                backerCount = int(data['backersCount'])
+            title = data['name']
+            creator = data['creator']['name']
 
-                pledged = float(data['pledged']['amount'])
-                goal = float(data['goal']['amount'])
-                currency = data['goal']['currency']
-                percentage = float(data['percentFunded'])
+            backerCount = int(data['backersCount'])
 
-                deadline = int(data['deadlineAt'])
-                deadline = datetime.datetime.fromtimestamp(deadline, timezone.utc)
-                now = datetime.datetime.now(timezone.utc)
-                remaining = deadline - now
-                remaining = remaining.total_seconds()
-                remaining = remaining / 3600
+            pledged = float(data['pledged']['amount'])
+            goal = float(data['goal']['amount'])
+            currency = data['goal']['currency']
+            percentage = float(data['percentFunded'])
 
-                days = math.floor(remaining/24)
-                hours = remaining % 24
+            deadline = int(data['deadlineAt'])
+            deadline = datetime.datetime.fromtimestamp(deadline, timezone.utc)
+            now = datetime.datetime.now(timezone.utc)
+            remaining = deadline - now
+            remaining = remaining.total_seconds()
+            remaining = remaining / 3600
 
-                campaignState = 'Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours)
-            else:
-                return '[Kickstarter changed their page structure again :S]'
+            days = math.floor(remaining/24)
+            hours = remaining % 24
+
+            campaignState = 'Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours)
         else:
-            shorturl = soup.find(rel='shorturl')['href']
-            if shorturl is None:
-                shorturl = 'https://www.kickstarter.com/projects/{}/'.format(ksID)
+            pattern = re.compile(r'\n\s*window\.current_project\s*=\s*"(?P<data>\{.*?\})";\n')
+            script = soup.find("script", text=pattern)
+            if not script:
+                return pageStructureChanged.format('non-live script pattern'), None
 
-            title = soup.find(property='og:title')
-            if title is not None:
-                title = title['content'].strip()
-                creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
-                if creator is not None:
-                    creator = creator.text.strip()
+            data = pattern.search(script.text).group('data')
+            data = html.unescape(data)
+            data = json.loads(data)
 
-            backerCount = soup.find(class_='NS_campaigns__spotlight_stats')
-            if backerCount is not None:
-                backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
+            shorturl = data['urls']['web']['project_short']
 
-            money = soup.select('span.money')
-            if money:
-                pledgedString = money[1].text.strip()
-                goalString = money[2].text.strip()
-                pledged = float(re.sub(r'[^0-9.]', u'', pledgedString))
-                goal = float(re.sub(r'[^0-9.]', u'', goalString))
-                percentage = (pledged / goal)
-                currency = ""
+            title = data['name']
+            creator = data['creator']['name']
+
+            backerCount = int(data['backers_count'])
+
+            pledged = float(data['pledged'])
+            goal = float(data['goal'])
+            currency = data['currency']
+            percentage = (pledged / goal)
 
         if creator is not None:
             name = str(assembleFormattedText(A.normal['{}',

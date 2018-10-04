@@ -91,7 +91,7 @@ class URLFollow(BotCommand):
             return
 
         if response.url != url:
-            return self.bot.moduleHandler.runActionUntilValue('urlfollow', message, url)(None, response.url)
+            return self.bot.moduleHandler.runActionUntilValue('urlfollow', message, response.url)
 
         title = self.GetTitle(response.content)
         if title is not None:
