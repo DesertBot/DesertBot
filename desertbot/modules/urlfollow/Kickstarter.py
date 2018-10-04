@@ -65,10 +65,10 @@ class Kickstarter(BotCommand):
         else:
             return '[Kickstarter state {!r} not recognised]'.format(state['class']), None
 
-        if state == 'live':
+        if state in ['live', 'cancelled', 'suspended']:
             data = soup.find(attrs={'data-initial': True})
             if not data:
-                return pageStructureChanged.format('live data-initial'), None
+                return pageStructureChanged.format('{} data-initial'.format(state)), None
 
             data = json.loads(data['data-initial'])
             data = data['project']
@@ -76,7 +76,10 @@ class Kickstarter(BotCommand):
             shorturl = data['projectShortLink']
 
             title = data['name']
-            creator = data['creator']['name']
+            if data['creator']:
+                creator = data['creator']['name']
+            else:
+                creator = None
 
             backerCount = int(data['backersCount'])
 
@@ -85,18 +88,20 @@ class Kickstarter(BotCommand):
             currency = data['goal']['currency']
             percentage = float(data['percentFunded'])
 
-            deadline = int(data['deadlineAt'])
-            deadline = datetime.datetime.fromtimestamp(deadline, timezone.utc)
-            now = datetime.datetime.now(timezone.utc)
-            remaining = deadline - now
-            remaining = remaining.total_seconds()
-            remaining = remaining / 3600
+            if state == 'live':
+                deadline = int(data['deadlineAt'])
+                deadline = datetime.datetime.fromtimestamp(deadline, timezone.utc)
+                now = datetime.datetime.now(timezone.utc)
+                remaining = deadline - now
+                remaining = remaining.total_seconds()
+                remaining = remaining / 3600
 
-            days = math.floor(remaining/24)
-            hours = remaining % 24
+                days = math.floor(remaining/24)
+                hours = remaining % 24
 
-            campaignState = 'Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours)
+                campaignState = 'Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours)
         else:
+            # Successful
             pattern = re.compile(r'\n\s*window\.current_project\s*=\s*"(?P<data>\{.*?\})";\n')
             script = soup.find("script", text=pattern)
             if not script:
