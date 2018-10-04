@@ -68,17 +68,17 @@ class Update(BotCommand):
             changedPyFiles = [path for path in changedFiles if path.endswith(".py")]
             addedPyFiles = [path for path in addedFiles if path.endswith(".py")]
 
-            modulesToReload = []
-            modulesToLoad = []
+            modulesToReload = set()
+            modulesToLoad = set()
 
             for filepath in changedPyFiles:
                 filename = filepath.split(os.path.sep)[-1]  # list contains full filepaths, split on os.path.sep and get last for filename
                 if "modules" in filepath:
                     if filename in self.bot.moduleHandler.fileMap:
-                        modulesToReload.append(self.bot.moduleHandler.fileMap[filename])
+                        modulesToReload.add(self.bot.moduleHandler.fileMap[filename])
                 else:
-                    modulesToReload = []
-                    modulesToLoad = []
+                    modulesToReload = set()
+                    modulesToLoad = set()
                     response += " | No auto-reload due to change(s) in bot core, please restart bot."
                     self.logger.info("No auto-reload due to change in file {!r}".format(filename))
                     break
@@ -87,10 +87,10 @@ class Update(BotCommand):
                 filename = filepath.split(os.path.sep)[-1]  # list contains full filepaths, split on os.path.sep and get last for filename
                 if "modules" in filepath:
                     # TODO a better way to do this, module name might not match file name.
-                    modulesToLoad.append(filename.split(".py")[0])
+                    modulesToLoad.add(filename.split(".py")[0])
                 else:
-                    modulesToReload = []
-                    modulesToLoad = []
+                    modulesToReload = set()
+                    modulesToLoad = set()
                     response += " | No auto-load due to change(s) in bot core, please restart bot."
                     self.logger.info("No auto-load due to change in file {!r}".format(filename))
                     break
