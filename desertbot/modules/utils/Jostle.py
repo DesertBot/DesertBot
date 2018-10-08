@@ -9,6 +9,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
+from json import JSONDecodeError
 import jsonpath_ng
 import re
 
@@ -55,7 +56,12 @@ class Jostle(BotCommand):
                 return IRCResponse(ResponseType.Say,
                                    '[Jostle Error: problem fetching {}]'.format(url),
                                    message.replyTo)
-            j = response.json()
+            try:
+                j = response.json()
+            except JSONDecodeError as e:
+                return IRCResponse(ResponseType.Say,
+                                   '[Jostle Error: data at {} is not valid JSON]'.format(url),
+                                   message.replyTo)
 
         m = parser.find(j)
         if not m:
