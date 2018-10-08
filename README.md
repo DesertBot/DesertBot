@@ -7,9 +7,10 @@ Features
 --------
 * [Alias](desertbot/modules/utils/Alias.py) any of the following to create new commands on-the-fly, and then alias *those* aliases to create even more
 * Use [Slurp](desertbot/modules/utils/Slurp.py) to extract data from HTML/XML
+* Use [Jostle](desertbot/modules/utils/Jostle.py) to extract data from JSON
 * Use [Sub](desertbot/modules/utils/Sub.py) or [Chain](desertbot/modules/utils/Chain.py) to link multiple modules together
   * and use [Var](desertbot/modules/utils/Var.py) to store data for use within the same command (eg, a URL you want to slurp multiple times)
-* [Follows URLs](desertbot/modules/automatic/URLFollow.py) posted in chat to see where they lead (following all redirects), responding with the page title and final hostname
+* [Follows URLs](desertbot/modules/urlfollow/URLFollow.py) posted in chat to see where they lead (following all redirects), responding with the page title and final hostname
   * with specialised follows to get extra relevant information from Imgur, KickStarter, Steam, Twitch, Twitter, and YouTube links
 * Recognizes [sed-like](desertbot/modules/commands/Sed.py) patterns in chat and replaces the most recent match in the last 20 messages
 * Also recognizes [`*correction`](desertbot/modules/automatic/AsterFix.py) style corrections and replaces the most likely candidate word in that user's previous message
@@ -33,3 +34,13 @@ Running the Bot
 Activate your virtualenv, and run `python start.py -c configs/server.yaml`
 
 You can run `python start.py -h` for help with the command line args
+
+Docker Instructions
+-------------------
+This could be streamlined a bit more, but for now:
+
+* Clone the repo with `git clone https://github.com/DesertBot/DesertBot.git`
+* Edit [_defaults.yaml](configs/_defaults.yaml) to set the bot owner and other details
+* Copy [server.yaml.example](configs/server.yaml.example) and create a server config (you'll want one of these per IRC network)
+* Copy [docker-compose-example.yml](docker-compose-example.yml) to docker-compose.yml and edit in the config file you created above
+* `docker-compose up -d desertbot-server`
