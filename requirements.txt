@@ -24,3 +24,4 @@ six==1.11.0
 ruamel.yaml==0.15.71
 croniter==0.3.25
 pyhedrals==0.0.2
+jsonpath-ng==1.4.3
