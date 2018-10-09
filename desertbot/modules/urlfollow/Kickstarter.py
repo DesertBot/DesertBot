@@ -121,7 +121,7 @@ class Kickstarter(BotCommand):
             pledged = float(data['pledged'])
             goal = float(data['goal'])
             currency = data['currency']
-            percentage = (pledged / goal)
+            percentage = (pledged / goal) * 100
 
         if creator is not None:
             name = str(assembleFormattedText(A.normal['{}',

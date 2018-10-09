@@ -77,7 +77,8 @@ class Imgur(BotCommand):
             if imageData['title'] is None:
                 url = 'http://imgur.com/{0}'.format(imgurID)
                 response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-                imageData['title'] = self.GetTitle(response.content).replace(' - Imgur', '')
+                title = self.bot.moduleHandler.runActionUntilValue('get-html-title', response.content)
+                imageData['title'] = title.replace(' - Imgur', '')
                 if imageData['title'] == 'imgur: the simple image sharer':
                     imageData['title'] = None
 

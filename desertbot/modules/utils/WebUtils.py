@@ -28,6 +28,7 @@ class WebUtils(BotModule):
     def actions(self):
         return super(WebUtils, self).actions() + [('fetch-url', 1, self.fetchURL),
                                                   ('post-url', 1, self.postURL),
+                                                  ('get-html-title', 1, self.getPageTitle),
                                                   ('shorten-url', 1, self.shortenGoogl),
                                                   ('search-web', 1, self.googleSearch),
                                                   ('upload-pasteee', 1, self.pasteEE)]
@@ -95,6 +96,24 @@ class WebUtils(BotModule):
 
         except requests.exceptions.RequestException:
             self.logger.exception("POST to {!r} failed!".format(url))
+
+    def getPageTitle(self, webpage: str) -> str:
+        soup = BeautifulSoup(webpage, 'lxml')
+        title = soup.title
+        if title:
+            title = title.text
+            title = re.sub(u'[\r\n]+', u'', title)  # strip any newlines
+            title = title.strip()  # strip all whitespace either side
+            title = u' '.join(title.split())  # replace multiple whitespace with single space
+            title = html.unescape(title)  # unescape html entities
+
+            # Split on the first space before 300 characters, and replace the rest with '...'
+            if len(title) > 300:
+                title = title[:300].rsplit(u' ', 1)[0] + u" ..."
+
+            return title
+
+        return
 
     def shortenGoogl(self, url: str) -> str:
         post = {"longUrl": url}

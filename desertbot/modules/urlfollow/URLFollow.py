@@ -93,28 +93,10 @@ class URLFollow(BotCommand):
         if response.url != url:
             return self.bot.moduleHandler.runActionUntilValue('urlfollow', message, response.url)
 
-        title = self.GetTitle(response.content)
+        title = self.bot.moduleHandler.runActionUntilValue('get-html-title', response.content)
         if title is not None:
             domain = urlparse(response.url).netloc
             return u'{} (at {})'.format(title, domain), url
-
-        return
-
-    def GetTitle(self, webpage):
-        soup = BeautifulSoup(webpage, 'lxml')
-        title = soup.title
-        if title:
-            title = title.text
-            title = re.sub(u'[\r\n]+', u'', title)  # strip any newlines
-            title = title.strip()  # strip all whitespace either side
-            title = u' '.join(title.split())  # replace multiple whitespace with single space
-            title = html.unescape(title)  # unescape html entities
-
-            # Split on the first space before 300 characters, and replace the rest with '...'
-            if len(title) > 300:
-                title = title[:300].rsplit(u' ', 1)[0] + u" ..."
-
-            return title
 
         return
 
