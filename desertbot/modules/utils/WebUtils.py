@@ -10,11 +10,13 @@ from zope.interface import implementer
 
 import requests
 from requests import Response
-import re
+from bs4 import BeautifulSoup
 
+import html
 import ipaddress
 import socket
 from urllib.parse import urlparse
+import re
 
 from typing import Any, Dict, Optional
 
