@@ -50,13 +50,12 @@ class Imgur(BotCommand):
 
         headers = {'Authorization': 'Client-ID {0}'.format(self.imgurClientID)}
 
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
-                                                              extraHeaders=headers)
+        mh = self.bot.moduleHandler
+        response = mh.runActionUntilValue('fetch-url', url, extraHeaders=headers)
 
         if not response:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
-                                                                  extraHeaders=headers)
+            response = mh.runActionUntilValue('fetch-url', url, extraHeaders=headers)
 
         if not response:
             return
@@ -67,8 +66,7 @@ class Imgur(BotCommand):
 
         if imageData['title'] is None:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
-                                                                  extraHeaders=headers)
+            response = mh.runActionUntilValue('fetch-url', url, extraHeaders=headers)
             if response:
                 j = response.json()
                 if j['success']:
@@ -76,10 +74,11 @@ class Imgur(BotCommand):
 
             if imageData['title'] is None:
                 url = 'http://imgur.com/{0}'.format(imgurID)
-                response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-                title = self.bot.moduleHandler.runActionUntilValue('get-html-title', response.content)
+                response = mh.runActionUntilValue('fetch-url', url)
+                title = mh.runActionUntilValue('get-html-title', response.content)
                 imageData['title'] = title.replace(' - Imgur', '')
-                if imageData['title'] == 'imgur: the simple image sharer':
+                if imageData['title'] in ['imgur: the simple image sharer',
+                                          'Imgur: The magic of the Internet']:
                     imageData['title'] = None
 
         data = []
