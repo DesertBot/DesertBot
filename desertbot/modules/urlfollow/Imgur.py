@@ -12,7 +12,7 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 from desertbot.utils.api_keys import load_key
 
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 import re
 
@@ -100,9 +100,7 @@ class Imgur(BotCommand):
                 data.append(u'Size: {0:,d}kb'.format(int(imageData['size']/1024)))
         data.append(u'Views: {0:,d}'.format(imageData['views']))
 
-        graySplitter = assembleFormattedText(A.normal[' ',
-                                                      A.fg.gray['|'],
-                                                      ' '])
+        graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         return graySplitter.join(data), '[no imgur url]'
 
 

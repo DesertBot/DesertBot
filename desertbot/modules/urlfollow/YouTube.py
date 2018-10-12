@@ -16,7 +16,7 @@ from desertbot.utils import string
 from isodate import parse_duration
 import dateutil.parser
 import dateutil.tz
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 import datetime
 import re
@@ -95,11 +95,11 @@ class YouTube(BotCommand):
             now = datetime.datetime.now(dateutil.tz.tzutc())
             delta = startDateTime - now
             timespan = string.deltaTimeToString(delta, 'm')
-            timeString = assembleFormattedText(A.normal['Live in ', A.fg.cyan[A.bold[timespan]]])
+            timeString = colour(A.normal['Live in ', A.fg.cyan[A.bold[timespan]]])
             data.append(timeString)
             pass  # time till stream starts, indicate it's upcoming
         elif vid['snippet']['liveBroadcastContent'] == 'live':
-            status = str(assembleFormattedText(A.normal[A.fg.red[A.bold['{} Live']]]))
+            status = str(colour(A.normal[A.fg.red[A.bold['{} Live']]]))
             status = status.format(u'●')
             data.append(status)
         else:
@@ -117,9 +117,7 @@ class YouTube(BotCommand):
             description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
         data.append(description)
 
-        graySplitter = assembleFormattedText(A.normal[' ',
-                                                      A.fg.gray['|'],
-                                                      ' '])
+        graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         return graySplitter.join(data), 'http://youtu.be/{}'.format(videoID)
 
 

@@ -12,7 +12,7 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 
 from bs4 import BeautifulSoup
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 import datetime
 from datetime import timezone
@@ -50,16 +50,16 @@ class Kickstarter(BotCommand):
 
         if 'Campaign-state-canceled' in state['class']:
             state = 'cancelled'
-            campaignState = assembleFormattedText(A.normal[A.fg.red['Cancelled']])
+            campaignState = colour(A.normal[A.fg.red['Cancelled']])
         elif 'Campaign-state-suspended' in state['class']:
             state = 'suspended'
-            campaignState = assembleFormattedText(A.normal[A.fg.blue['Suspended']])
+            campaignState = colour(A.normal[A.fg.blue['Suspended']])
         elif 'Campaign-state-failed' in state['class']:
             state = 'failed'
-            campaignState = assembleFormattedText(A.normal[A.fg.red['Failed']])
+            campaignState = colour(A.normal[A.fg.red['Failed']])
         elif 'Campaign-state-successful' in state['class']:
             state = 'successful'
-            campaignState = assembleFormattedText(A.normal[A.fg.green['Successful']])
+            campaignState = colour(A.normal[A.fg.green['Successful']])
         elif 'Campaign-state-live' in state['class']:
             state = 'live'
         else:
@@ -124,10 +124,7 @@ class Kickstarter(BotCommand):
             percentage = (pledged / goal) * 100
 
         if creator is not None:
-            name = str(assembleFormattedText(A.normal['{}',
-                                                      A.fg.gray[' by '],
-                                                      '{}'])).format(title,
-                                                                     creator)
+            name = str(colour(A.normal['{}', A.fg.gray[' by '], '{}'])).format(title, creator)
         else:
             name = title
         output.append(name)
@@ -147,12 +144,12 @@ class Kickstarter(BotCommand):
 
         pledgePerBackerString = A.fg.gray['{3:,.0f}/backer']
 
-        pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}',
-                                                       A.fg.gray['/'],
-                                                       '{1:,.0f} {4} ',
-                                                       percentageString,
-                                                       ' ',
-                                                       pledgePerBackerString])
+        pledgedString = colour(A.normal['Pledged: {0:,.0f}',
+                                        A.fg.gray['/'],
+                                        '{1:,.0f} {4} ',
+                                        percentageString,
+                                        ' ',
+                                        pledgePerBackerString])
         output.append(pledgedString.format(pledged,
                                            goal,
                                            percentage,
@@ -161,9 +158,7 @@ class Kickstarter(BotCommand):
 
         output.append(campaignState)
 
-        graySplitter = assembleFormattedText(A.normal[' ',
-                                                      A.fg.gray['|'],
-                                                      ' '])
+        graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         return graySplitter.join(output), shorturl
 
 

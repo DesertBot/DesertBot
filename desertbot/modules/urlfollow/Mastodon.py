@@ -12,7 +12,7 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 
 from bs4 import BeautifulSoup
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 import dateutil.parser
 import dateutil.tz
@@ -58,13 +58,13 @@ class Mastodon(BotModule):
 
         # strip empty lines, strip leading/ending whitespace,
         # and replace newlines with gray pipes
-        graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
+        graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         lines = [l.strip() for l in text.splitlines() if l.strip()]
         text = graySplitter.join(lines)
 
-        formatString = str(assembleFormattedText(
-            A.normal[A.fg.gray['[{date}]'], A.bold[' {user}:'], ' {text}']))
+        formatString = str(colour( A.normal[A.fg.gray['[{date}]'], A.bold[' {user}:'], ' {text}']))
 
         return formatString.format(date=date, user=user, text=text), ''
+
 
 mastodon = Mastodon()
