@@ -67,7 +67,10 @@ class Twitch(BotCommand):
         else:
             name = colour(A.normal[A.fg.red['{}'.format(chanData['display_name'])]])
         output.append(name)
-        title = ' "{}"'.format(re.sub(r'[\r\n]+', self.graySplitter, chanData['status'].strip()))
+        graySplitter = assembleFormattedText(A.normal[' ',
+                                                      A.fg.gray['|'],
+                                                      ' '])
+        title = ' "{}"'.format(re.sub(r'[\r\n]+', graySplitter, chanData['status'].strip()))
         output.append(title)
         if chanData['game'] is not None:
             game = colour(A.normal[A.fg.gray[', playing '], '{}'.format(chanData['game'])])
