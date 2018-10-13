@@ -9,7 +9,6 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import html
 from urllib.parse import urlparse
 import re
 
@@ -17,8 +16,6 @@ from builtins import str
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
-
-from bs4 import BeautifulSoup
 
 
 @implementer(IPlugin, IModule)

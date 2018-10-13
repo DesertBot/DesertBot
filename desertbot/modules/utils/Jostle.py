@@ -58,7 +58,7 @@ class Jostle(BotCommand):
                                    message.replyTo)
             try:
                 j = response.json()
-            except JSONDecodeError as e:
+            except JSONDecodeError:
                 return IRCResponse(ResponseType.Say,
                                    '[Jostle Error: data at {} is not valid JSON]'.format(url),
                                    message.replyTo)
