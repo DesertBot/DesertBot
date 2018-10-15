@@ -21,7 +21,7 @@ parsedatetime==2.4
 cryptography==2.3.1
 future==0.16.0
 six==1.11.0
-ruamel.yaml==0.15.71
+ruamel.yaml==0.15.72
 croniter==0.3.25
 pyhedrals==0.0.2
 jsonpath-ng==1.4.3
