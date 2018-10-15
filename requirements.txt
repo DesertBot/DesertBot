@@ -1,6 +1,6 @@
 Twisted[tls]==18.9.0
 beautifulsoup4==4.6.3
-lxml==4.2.4
+lxml==4.2.5
 psutil==5.4.7
 python-dateutil==2.7.3
 ply==3.11
