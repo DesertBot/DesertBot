@@ -2,7 +2,7 @@
 """
 Created on Feb 05, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -28,10 +28,12 @@ class CommandChar(BotCommand):
             self.bot.config['commandChar'] = self.bot.commandChar
             self.bot.config.writeConfig()
             return IRCResponse(ResponseType.Say,
-                               'Command prefix char changed to \'{0}\'!'.format(self.bot.commandChar),
+                               'Command prefix char changed to {!r}!'.format(self.bot.commandChar),
                                message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, 'Change my command character to what?', message.replyTo)
+            return IRCResponse(ResponseType.Say,
+                               'Change my command character to what?',
+                               message.replyTo)
 
 
 commandchar = CommandChar()

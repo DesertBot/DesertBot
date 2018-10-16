@@ -26,7 +26,7 @@ class Imgur(BotCommand):
         return 'Automatic module that follows Imgur URLs'
 
     def onLoad(self):
-        self.imgurClientID = load_key(u'imgur Client ID')
+        self.imgurClientID = load_key('imgur Client ID')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
@@ -85,20 +85,20 @@ class Imgur(BotCommand):
         if imageData['title'] is not None:
             data.append(imageData['title'])
         else:
-            data.append(u'<No Title>')
+            data.append('<No Title>')
         if imageData['nsfw']:
-            data.append(u'\x034\x02NSFW!\x0F')
+            data.append('\x034\x02NSFW!\x0F')
         if albumLink:
-            data.append(u'Album: {0} Images'.format(imageData['images_count']))
+            data.append('Album: {0} Images'.format(imageData['images_count']))
         else:
             if 'is_album' in imageData and imageData['is_album']:
-                data.append(u'Album: {0:,d} Images'.format(len(imageData['images'])))
+                data.append('Album: {0:,d} Images'.format(len(imageData['images'])))
             else:
-                if imageData[u'animated']:
-                    data.append(u'\x032\x02Animated!\x0F')
-                data.append(u'{0:,d}x{1:,d}'.format(imageData['width'], imageData['height']))
-                data.append(u'Size: {0:,d}kb'.format(int(imageData['size']/1024)))
-        data.append(u'Views: {0:,d}'.format(imageData['views']))
+                if imageData['animated']:
+                    data.append('\x032\x02Animated!\x0F')
+                data.append('{0:,d}x{1:,d}'.format(imageData['width'], imageData['height']))
+                data.append('Size: {0:,d}kb'.format(int(imageData['size']/1024)))
+        data.append('Views: {0:,d}'.format(imageData['views']))
 
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         return graySplitter.join(data), '[no imgur url]'

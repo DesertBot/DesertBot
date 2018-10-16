@@ -2,7 +2,7 @@
 """
 Created on Feb 28, 2015
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -11,12 +11,10 @@ from zope.interface import implementer
 
 import re
 
-from six import iteritems
-
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 
 class UnbalancedBracesException(Exception):
@@ -37,9 +35,11 @@ class Sub(BotCommand):
         return ['sub']
 
     def help(self, query):
-        return "sub <text> - executes nested commands in <text> and replaces the commands with their output\n" \
-           "syntax: text {command params} more text {command {command params} {command params}}\n" \
-           "example: .sub Some {rainbow magical} {flip topsy-turvy} text"
+        return (
+            "sub <text> - "
+            "executes nested commands in <text> and replaces the commands with their output\n"
+            "syntax: text {command params} more text {command {command params} {command params}}\n"
+            "example: .sub Some {rainbow magical} {flip topsy-turvy} text")
 
     def execute(self, message: IRCMessage):
         subString = self._mangleEscapes(message.parameters)
@@ -47,11 +47,15 @@ class Sub(BotCommand):
         try:
             segments = list(self._parseSubcommandTree(subString))
         except UnbalancedBracesException as e:
-            red = assembleFormattedText(A.bold[A.fg.lightRed['']])
-            normal = assembleFormattedText(A.normal[''])
-            error = subString[:e.column] + red + subString[e.column] + normal + subString[e.column+1:]
+            red = colour(A.bold[A.fg.lightRed['']])
+            normal = colour(A.normal[''])
+            error = (subString[:e.column]
+                     + red + subString[e.column]
+                     + normal + subString[e.column+1:])
             error = self._unmangleEscapes(error, False)
-            return [IRCResponse(ResponseType.Say, u"Sub Error: {}".format(e.message), message.replyTo),
+            return [IRCResponse(ResponseType.Say,
+                                "Sub Error: {}".format(e.message),
+                                message.replyTo),
                     IRCResponse(ResponseType.Say, error, message.replyTo)]
 
         prevLevel = -1
@@ -68,8 +72,8 @@ class Sub(BotCommand):
                 command = self._substituteResponses(command, responseStack, level, extraVars, start)
 
             # Replace any extraVars in the command
-            for var, value in iteritems(extraVars):
-                command = re.sub(r'\$\b{}\b'.format(re.escape(var)), u'{}'.format(value), command)
+            for var, value in extraVars.items():
+                command = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), command)
 
             # Build a new message out of this segment
             inputMessage = IRCMessage(message.type, message.user, message.channel,
@@ -79,11 +83,13 @@ class Sub(BotCommand):
 
             # Execute the constructed message
             if inputMessage.command.lower() in self.bot.moduleHandler.mappedTriggers:
-                response = self.bot.moduleHandler.mappedTriggers[inputMessage.command.lower()].execute(inputMessage)
+                module = self.bot.moduleHandler.mappedTriggers[inputMessage.command.lower()]
+                response = module.execute(inputMessage)
                 """@type : IRCResponse"""
             else:
                 return IRCResponse(ResponseType.Say,
-                                   u"'{}' is not a recognized command trigger".format(inputMessage.command),
+                                   "'{}' is not a recognized command trigger"
+                                   .format(inputMessage.command),
                                    message.replyTo)
 
             # Push the response onto the stack
@@ -96,7 +102,8 @@ class Sub(BotCommand):
 
         responseString = self._substituteResponses(subString, responseStack, -1, extraVars, -1)
         responseString = self._unmangleEscapes(responseString)
-        return IRCResponse(ResponseType.Say, responseString, message.replyTo, extraVars=extraVars, metadata=metadata)
+        return IRCResponse(ResponseType.Say, responseString, message.replyTo,
+                           extraVars=extraVars, metadata=metadata)
 
     @staticmethod
     def _parseSubcommandTree(string):
@@ -110,10 +117,10 @@ class Sub(BotCommand):
                     start = stack.pop()
                     yield (len(stack), string[start + 1: i], start, i)
                 else:
-                    raise UnbalancedBracesException(u"unbalanced closing brace", i)
+                    raise UnbalancedBracesException("unbalanced closing brace", i)
         if stack:
             start = stack.pop()
-            raise UnbalancedBracesException(u"unbalanced opening brace", start)
+            raise UnbalancedBracesException("unbalanced opening brace", start)
 
     @staticmethod
     def _substituteResponses(command, responseStack, commandLevel, extraVars, start):
@@ -129,28 +136,29 @@ class Sub(BotCommand):
             command = command[:cStart] + responseString + command[cEnd:]
 
         # Replace any extraVars generated by functions
-        for var, value in iteritems(extraVars):
-            command = re.sub(r'\$\b{}\b'.format(re.escape(var)), u'{}'.format(value), command)
+        for var, value in extraVars.items():
+            command = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), command)
 
         return command
 
     @staticmethod
     def _mangleEscapes(string):
-        # Replace escaped left and right braces with something that should never show up in messages/responses
-        string = re.sub(r'(?<!\\)\\\{', u'@LB@', string)
-        string = re.sub(r'(?<!\\)\\\}', u'@RB@', string)
+        # Replace escaped left and right braces with something
+        #  that should never show up in messages/responses
+        string = re.sub(r'(?<!\\)\\\{', '@LB@', string)
+        string = re.sub(r'(?<!\\)\\\}', '@RB@', string)
         return string
 
     @staticmethod
     def _unmangleEscapes(string, unescape=True):
         if unescape:
             # Replace the mangled escaped braces with unescaped braces
-            string = string.replace(u'@LB@', u'{')
-            string = string.replace(u'@RB@', u'}')
+            string = string.replace('@LB@', '{')
+            string = string.replace('@RB@', '}')
         else:
             # Just unmangle them, ie, keep the escapes
-            string = string.replace(u'@LB@', u'\\{')
-            string = string.replace(u'@RB@', u'\\}')
+            string = string.replace('@LB@', '\\{')
+            string = string.replace('@RB@', '\\}')
         return string
 
     def _recursiveMerge(self, d1, d2):
@@ -160,7 +168,7 @@ class Sub(BotCommand):
         if either mapping has leaves that are non-dicts,
         the second's leaf overwrites the first's.
         '''
-        for k, v in iteritems(d1):
+        for k, v in d1.items():
             if k in d2:
                 if all(isinstance(e, MutableMapping) for e in (v, d2[k])):
                     d2[k] = self._recursiveMerge(v, d2[k])

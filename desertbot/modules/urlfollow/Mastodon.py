@@ -17,23 +17,25 @@ from twisted.words.protocols.irc import assembleFormattedText as colour, attribu
 import dateutil.parser
 import dateutil.tz
 
+
 @implementer(IPlugin, IModule)
 class Mastodon(BotModule):
     def actions(self):
         return super(Mastodon, self).actions() + [('urlfollow', 2, self.followURL)]
 
     def help(self, query):
-        return 'Automatic module that fetches toots from Mastodon URLs. May have more functionality in future.'
+        return ('Automatic module that fetches toots from Mastodon URLs. '
+                'May have more functionality in future.')
 
     def followURL(self, _: IRCMessage, url: str) -> [str, None]:
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-        
+
         if not response:
             return
-        
+
         # we'd check Server: Mastodon here but it seems that not every server
         # sets that correctly
-        if not 'Set-Cookie' in response.headers:
+        if 'Set-Cookie' not in response.headers:
             return
         if not response.headers['Set-Cookie'].startswith('_mastodon_session'):
             return
@@ -62,7 +64,7 @@ class Mastodon(BotModule):
         lines = [l.strip() for l in text.splitlines() if l.strip()]
         text = graySplitter.join(lines)
 
-        formatString = str(colour( A.normal[A.fg.gray['[{date}]'], A.bold[' {user}:'], ' {text}']))
+        formatString = str(colour(A.normal[A.fg.gray['[{date}]'], A.bold[' {user}:'], ' {text}']))
 
         return formatString.format(date=date, user=user, text=text), ''
 

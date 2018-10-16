@@ -2,7 +2,7 @@
 """
 Created on Feb 09, 2018
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -28,14 +28,14 @@ class Ignore(BotCommand):
         Nick alone will be converted to a glob hostmask, eg: *!user@host"""
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say,
-                               u"You didn't give me a user to ignore!",
+                               "You didn't give me a user to ignore!",
                                message.replyTo)
 
         for ignore in message.parameterList[1:]:
             if message.replyTo in self.bot.channels:
                 if ignore in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[ignore]
-                    ignore = u'*!{}@{}'.format(user.nick, user.host)
+                    ignore = '*!{}@{}'.format(user.nick, user.host)
 
             ignores = self.bot.config.getWithDefault('ignored', [])
             ignores.append(ignore)
@@ -43,7 +43,7 @@ class Ignore(BotCommand):
 
         self.bot.config.writeConfig()
         return IRCResponse(ResponseType.Say,
-                           u"Now ignoring specified users!",
+                           "Now ignoring specified users!",
                            message.replyTo)
 
     @admin("Only my admins may remove ignores!")
@@ -52,7 +52,7 @@ class Ignore(BotCommand):
         You can list multiple users to remove them all at once."""
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say,
-                               u"You didn't give me a user to unignore!",
+                               "You didn't give me a user to unignore!",
                                message.replyTo)
 
         deleted = []
@@ -62,7 +62,7 @@ class Ignore(BotCommand):
             if message.replyTo in self.bot.channels:
                 if unignore in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[unignore]
-                    unignore = u'*!{}@{}'.format(user.nick, user.host)
+                    unignore = '*!{}@{}'.format(user.nick, user.host)
 
             if unignore not in ignores:
                 skipped.append(unignore)
@@ -75,40 +75,44 @@ class Ignore(BotCommand):
         self.bot.config.writeConfig()
 
         return IRCResponse(ResponseType.Say,
-                           u"Removed '{}' from ignored list, {} skipped"
-                           .format(u', '.join(deleted), len(skipped)),
+                           "Removed '{}' from ignored list, {} skipped"
+                           .format(', '.join(deleted), len(skipped)),
                            message.replyTo)
 
     def _list(self, message):
         """list - lists all ignored users"""
         ignores = self.bot.config.getWithDefault('ignored', [])
         return IRCResponse(ResponseType.Say,
-                           u"Ignored Users: {}".format(u', '.join(ignores)),
+                           "Ignored Users: {}".format(', '.join(ignores)),
                            message.replyTo)
 
     subCommands = OrderedDict([
-        (u'add', _add),
-        (u'del', _del),
-        (u'list', _list)])
+        ('add', _add),
+        ('del', _del),
+        ('list', _list)])
 
     def help(self, message: IRCMessage) -> str:
         if len(message.parameterList) > 1:
             subCommand = message.parameterList[1].lower()
             if subCommand in self.subCommands:
-                return u'{1}ignore {0}'.format(re.sub(r"\s+", u" ", self.subCommands[subCommand].__doc__),
-                                               self.bot.commandChar)
+                return ('{1}ignore {0}'
+                        .format(re.sub(r"\s+", " ", self.subCommands[subCommand].__doc__),
+                                self.bot.commandChar))
             else:
                 return self._unrecognizedSubcommand(subCommand)
         else:
             return self._helpText()
 
     def _unrecognizedSubcommand(self, subCommand):
-        return u"unrecognized subcommand '{}', " \
-               u"available subcommands for ignore are: {}".format(subCommand, u', '.join(self.subCommands.keys()))
+        return ("unrecognized subcommand '{}', "
+                "available subcommands for ignore are: {}"
+                .format(subCommand, ', '.join(self.subCommands)))
 
     def _helpText(self):
-        return u"{1}ignore ({0}) - manages ignored users. Use '{1}help ignore <subcommand> for subcommand help.".format(
-            u'/'.join(self.subCommands.keys()), self.bot.commandChar)
+        return ("{1}ignore ({0})"
+                " - manages ignored users."
+                " Use '{1}help ignore <subcommand> for subcommand help."
+                .format('/'.join(self.subCommands), self.bot.commandChar))
 
     def execute(self, message):
         if len(message.parameterList) > 0:

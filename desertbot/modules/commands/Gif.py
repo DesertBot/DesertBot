@@ -22,14 +22,14 @@ class Gif(BotCommand):
 
     def help(self, query):
         return 'gif [<year>] - fetches a random gif posted during Desert Bus'
-    
+
     def execute(self, message: IRCMessage):
         baseURL = "http://greywool.com/desertbus/{}/gifs/random.php"
         years = range(7, 11)
 
         if len(message.parameterList) > 0:
-            invalid = u"'{}' is not a valid year, valid years are {} to {}"\
-                .format(message.parameterList[0], years[0], years[-1])
+            invalid = ("'{}' is not a valid year, valid years are {} to {}"
+                       .format(message.parameterList[0], years[0], years[-1]))
             try:
                 if len(message.parameterList[0]) < 4:
                     year = int(message.parameterList[0])
@@ -50,7 +50,7 @@ class Gif(BotCommand):
         link = response.content
 
         return IRCResponse(ResponseType.Say,
-                           u"Random DB{} gif: {}".format(year, link),
+                           "Random DB{} gif: {}".format(year, link),
                            message.replyTo)
 
 

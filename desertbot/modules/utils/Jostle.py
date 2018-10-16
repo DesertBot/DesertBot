@@ -76,8 +76,8 @@ class Jostle(BotCommand):
 
         # sanitize the value
         value = value.strip()
-        value = re.sub(r'[\r\n]+', u' ', value)
-        value = re.sub(r'\s+', u' ', value)
+        value = re.sub(r'[\r\n]+', ' ', value)
+        value = re.sub(r'\s+', ' ', value)
 
         return IRCResponse(ResponseType.Say, value, message.replyTo,
                            extraVars={'jostleURL': url},

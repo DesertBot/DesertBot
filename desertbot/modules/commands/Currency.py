@@ -9,9 +9,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-from six import iteritems
-
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -23,7 +21,8 @@ class Currency(BotCommand):
         return ['currency']
 
     def help(self, query):
-        return "currency [<amount>] <from> in <to> - converts <amount> in <from> currency to <to> currency"
+        return ("currency [<amount>] <from> in <to>"
+                " - converts <amount> in <from> currency to <to> currency")
 
     runInThread = True
 
@@ -39,13 +38,16 @@ class Currency(BotCommand):
             offset = 0
 
         ccFrom = message.parameterList[offset].upper()
-        ccTo   = message.parameterList[offset + 2:]
-        ccTo   = ",".join(ccTo)
-        ccTo   = ccTo.upper()
+        ccTo = message.parameterList[offset + 2:]
+        ccTo = ",".join(ccTo)
+        ccTo = ccTo.upper()
 
-        url = "https://exchangeratesapi.io/api/latest?base={}&symbols={}"
-        url = url.format(ccFrom, ccTo)
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        url = "https://exchangeratesapi.io/api/latest"
+        params = {
+            'base': ccFrom,
+            'symbols': ccTo,
+            }
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, params=params)
         j = response.json()
         rates = j['rates']
 
@@ -55,10 +57,10 @@ class Currency(BotCommand):
                                message.replyTo)
 
         data = []
-        for curr,rate in iteritems(rates):
+        for curr, rate in rates.items():
             data.append("{:.2f} {}".format(rate*amount, curr))
 
-        graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
+        graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         return IRCResponse(ResponseType.Say, graySplitter.join(data), message.replyTo)
 
 

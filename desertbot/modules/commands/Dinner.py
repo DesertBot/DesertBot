@@ -21,9 +21,9 @@ class Dinner(BotCommand):
         return ['dinner']
 
     def help(self, query):
-        return 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com' \
-           ' what you should make for dinner'
-    
+        return ('dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com'
+                ' what you should make for dinner')
+
     def execute(self, message: IRCMessage):
         wtfsimfd = "http://whatthefuckshouldimakefordinner.com/{}"
 
@@ -34,7 +34,8 @@ class Dinner(BotCommand):
             option = message.parameterList[0]
 
         if option in options:
-            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', wtfsimfd.format(options[option]))
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url',
+                                                                  wtfsimfd.format(options[option]))
 
             soup = BeautifulSoup(response.content, 'lxml')
 
@@ -43,12 +44,12 @@ class Dinner(BotCommand):
             link = self.bot.moduleHandler.runActionUntilValue('shorten-url', item['href'])
 
             return IRCResponse(ResponseType.Say,
-                               u"{}... {} {}".format(phrase, item.text, link),
+                               "{}... {} {}".format(phrase, item.text, link),
                                message.replyTo)
 
         else:
-            error = u"'{}' is not a recognized dinner type, please choose one of {}"\
-                .format(option, u'/'.join(options.keys()))
+            error = ("'{}' is not a recognized dinner type, please choose one of {}"
+                     .format(option, '/'.join(options.keys())))
             return IRCResponse(ResponseType.Say, error, message.replyTo)
 
 

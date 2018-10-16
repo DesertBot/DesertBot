@@ -2,7 +2,7 @@
 """
 Created on Feb 14, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule, ignore
@@ -31,13 +31,22 @@ class Sed(BotCommand):
 
     def triggers(self):
         return ['sed']
-    
+
     historySize = 20
-    
+
     def help(self, query):
-        return 's/search/replacement/[flags] [input for c flag] - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last {}\n'\
-           'flags are g (global), i (case-insensitive), o (only user messages), v (verbose, ignores whitespace), c (chained)\n'\
-           'Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'.format(self.historySize)
+        return ('s/search/replacement/[flags] [input for c flag]'
+                ' - matches sed-like regex replacement patterns and'
+                ' attempts to execute them on the latest matching line from the last {}\n'
+                'flags are'
+                ' g (global),'
+                ' i (case-insensitive),'
+                ' o (only user messages),'
+                ' v (verbose, ignores whitespace),'
+                ' c (chained)\n'
+                'Example usage:'
+                ' "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
+                .format(self.historySize))
 
     def onLoad(self):
         self.messages = {}
@@ -70,7 +79,10 @@ class Sed(BotCommand):
                 return IRCResponse(responseType, response.messageString, message.replyTo)
 
             else:
-                return IRCResponse(ResponseType.Say, "No text matching '{}' found in the last {} messages".format(search, self.historySize), message.replyTo)
+                return IRCResponse(ResponseType.Say,
+                                   "No text matching '{}' found in the last {} messages"
+                                   .format(search, self.historySize),
+                                   message.replyTo)
 
         else:
             self.storeMessage(message)
@@ -95,14 +107,15 @@ class Sed(BotCommand):
         return search, replace, flags, text
 
     def substitute(self, search, replace, flags, text, inputMessage, channel):
-        # Apparently re.sub understands escape sequences in the replacement string; strip all but the backreferences
+        # Apparently re.sub understands escape sequences in the replacement string;
+        #  strip all but the backreferences
         replace = replace.replace('\\', '\\\\')
         replace = re.sub(r'\\([1-9][0-9]?([^0-9]|$))', r'\1', replace)
-        
+
         if channel not in self.messages:
             self.messages[channel] = []
             self.unmodifiedMessages[channel] = []
-        
+
         messages = self.unmodifiedMessages[channel] if 'o' in flags else self.messages[channel]
 
         if 'g' in flags:
@@ -118,21 +131,21 @@ class Sed(BotCommand):
 
         if 'c' in flags:
             newMessage = copy.copy(inputMessage)
-            
+
             try:
                 searchC = re2.compile(search, subFlags)
                 new = searchC.sub(replace, text, count)
             except sre_constants.error as e:
                 newMessage.messageString = "[Regex Error in Sed pattern: {}]".format(e.message)
                 return newMessage
-            
+
             if new != text:
                 newMessage.messageString = new
                 self.storeMessage(newMessage, False)
             else:
                 newMessage.messageString = text
                 self.storeMessage(newMessage, False)
-            
+
             return newMessage
 
         for message in reversed(messages):
@@ -158,12 +171,14 @@ class Sed(BotCommand):
         if message.replyTo not in self.messages:
             self.messages[message.replyTo] = []
             self.unmodifiedMessages[message.replyTo] = []
-        self.messages[message.replyTo].append(message)
-        self.messages[message.replyTo] = self.messages[message.replyTo][-self.historySize:]
+        userList = self.unmodifiedMessages[message.replyTo]
+        userList.append(message)
+        self.messages[message.replyTo] = userList[-self.historySize:]
 
         if unmodified:
-            self.unmodifiedMessages[message.replyTo].append(message)
-            self.unmodifiedMessages[message.replyTo] = self.unmodifiedMessages[message.replyTo][-self.historySize:]
+            userList = self.unmodifiedMessages[message.replyTo]
+            userList.append(message)
+            self.unmodifiedMessagesi[message.replyTo] = userList[-self.historySize:]
 
 
 sed = Sed()

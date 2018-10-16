@@ -12,14 +12,14 @@ from desertbot.response import IRCResponse, ResponseType
 @implementer(IPlugin, IModule)
 class Conversation(BotModule):
     def actions(self):
-        return super(Conversation, self).actions() + [('message-channel', 1, self.handleConversation),
-                                                      ('message-user', 1, self.handleConversation)]
+        return super(Conversation, self).actions() + [('message-channel', 1, self.converse),
+                                                      ('message-user', 1, self.converse)]
 
     def help(self, arg):
         return 'Responds to greetings and such'
 
     @ignore
-    def handleConversation(self, message: IRCMessage):
+    def converse(self, message: IRCMessage):
         greetings = ["(wa+s+|')?so?u+p",
                      "hi(ya)?",
                      "hello",
@@ -40,8 +40,8 @@ class Conversation(BotModule):
                      "herrow"
                      ]
 
-        regex = r"^(?P<greeting>{0})( there)?,?[ ]{1}([^a-zA-Z0-9_\|`\[\]\^-]|$)".format('|'.join(greetings),
-                                                                                         self.bot.nick)
+        regex = (r"^(?P<greeting>{0})( there)?,?[ ]{1}([^a-zA-Z0-9_\|`\[\]\^-]|$)"
+                 .format('|'.join(greetings), self.bot.nick))
 
         match = re.search(regex,
                           message.messageString,

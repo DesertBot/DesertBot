@@ -2,7 +2,7 @@
 """
 Created on May 04, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -12,7 +12,7 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 
 @implementer(IPlugin, IModule)
@@ -21,42 +21,44 @@ class Rainbow(BotCommand):
         return ['rainbow', 'rrainbow']
 
     def help(self, query):
-        return 'rainbow <text> - outputs the specified text with rainbow colours; rrainbow uses background colours'
+        return ('rainbow <text>'
+                ' - outputs the specified text with rainbow colours;'
+                ' rrainbow uses background colours')
 
-    colours = [assembleFormattedText(A.fg.white['']),        #0
-               assembleFormattedText(A.fg.black['']),        #1
-               assembleFormattedText(A.fg.blue['']),         #2
-               assembleFormattedText(A.fg.green['']),        #3
-               assembleFormattedText(A.fg.lightRed['']),     #4
-               assembleFormattedText(A.fg.red['']),          #5
-               assembleFormattedText(A.fg.magenta['']),      #6
-               assembleFormattedText(A.fg.orange['']),       #7
-               assembleFormattedText(A.fg.yellow['']),       #8
-               assembleFormattedText(A.fg.lightGreen['']),   #9
-               assembleFormattedText(A.fg.cyan['']),         #10
-               assembleFormattedText(A.fg.lightCyan['']),    #11
-               assembleFormattedText(A.fg.lightBlue['']),    #12
-               assembleFormattedText(A.fg.lightMagenta['']), #13
-               assembleFormattedText(A.fg.gray['']),         #14
-               assembleFormattedText(A.fg.lightGray['']),    #15
+    colours = [colour(A.fg.white['']),         # 0
+               colour(A.fg.black['']),         # 1
+               colour(A.fg.blue['']),          # 2
+               colour(A.fg.green['']),         # 3
+               colour(A.fg.lightRed['']),      # 4
+               colour(A.fg.red['']),           # 5
+               colour(A.fg.magenta['']),       # 6
+               colour(A.fg.orange['']),        # 7
+               colour(A.fg.yellow['']),        # 8
+               colour(A.fg.lightGreen['']),    # 9
+               colour(A.fg.cyan['']),          # 10
+               colour(A.fg.lightCyan['']),     # 11
+               colour(A.fg.lightBlue['']),     # 12
+               colour(A.fg.lightMagenta['']),  # 13
+               colour(A.fg.gray['']),          # 14
+               colour(A.fg.lightGray['']),     # 15
                ]
-    
-    bgcolours = [assembleFormattedText(A.bg.white['']),        #0
-                 assembleFormattedText(A.bg.black['']),        #1
-                 assembleFormattedText(A.bg.blue['']),         #2
-                 assembleFormattedText(A.bg.green['']),        #3
-                 assembleFormattedText(A.bg.lightRed['']),     #4
-                 assembleFormattedText(A.bg.red['']),          #5
-                 assembleFormattedText(A.bg.magenta['']),      #6
-                 assembleFormattedText(A.bg.orange['']),       #7
-                 assembleFormattedText(A.bg.yellow['']),       #8
-                 assembleFormattedText(A.bg.lightGreen['']),   #9
-                 assembleFormattedText(A.bg.cyan['']),         #10
-                 assembleFormattedText(A.bg.lightCyan['']),    #11
-                 assembleFormattedText(A.bg.lightBlue['']),    #12
-                 assembleFormattedText(A.bg.lightMagenta['']), #13
-                 assembleFormattedText(A.bg.gray['']),         #14
-                 assembleFormattedText(A.bg.lightGray['']),    #15
+
+    bgcolours = [colour(A.bg.white['']),         # 0
+                 colour(A.bg.black['']),         # 1
+                 colour(A.bg.blue['']),          # 2
+                 colour(A.bg.green['']),         # 3
+                 colour(A.bg.lightRed['']),      # 4
+                 colour(A.bg.red['']),           # 5
+                 colour(A.bg.magenta['']),       # 6
+                 colour(A.bg.orange['']),        # 7
+                 colour(A.bg.yellow['']),        # 8
+                 colour(A.bg.lightGreen['']),    # 9
+                 colour(A.bg.cyan['']),          # 10
+                 colour(A.bg.lightCyan['']),     # 11
+                 colour(A.bg.lightBlue['']),     # 12
+                 colour(A.bg.lightMagenta['']),  # 13
+                 colour(A.bg.gray['']),          # 14
+                 colour(A.bg.lightGray['']),     # 15
                  ]
 
     def execute(self, message: IRCMessage):
@@ -64,7 +66,7 @@ class Rainbow(BotCommand):
             return IRCResponse(ResponseType.Say,
                                "You didn't give me any text to rainbow!",
                                message.replyTo)
-        
+
         if message.command == 'rainbow':
             fg = True
         else:
@@ -76,9 +78,9 @@ class Rainbow(BotCommand):
             startPos = len(message.parameterList[0]) + 1
         except ValueError:
             if fg:
-                colList = [4,8,9,11,12,13]
+                colList = [4, 8, 9, 11, 12, 13]
             else:
-                colList = [5,7,8,3,10,2,6]
+                colList = [5, 7, 8, 3, 10, 2, 6]
 
         if not message.parameters[startPos:]:
             return IRCResponse(ResponseType.Say,
@@ -94,7 +96,7 @@ class Rainbow(BotCommand):
             for i, c in enumerate(message.parameters[startPos:]):
                 outputMessage += self.bgcolours[colList[i % len(colList)]] + c
 
-        outputMessage += assembleFormattedText(A.normal[''])
+        outputMessage += colour(A.normal[''])
 
         return IRCResponse(ResponseType.Say, outputMessage, message.replyTo)
 

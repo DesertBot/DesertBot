@@ -12,7 +12,8 @@ class StringUtils(BotModule):
     def actions(self):
         return super(StringUtils, self).actions() + [('closest-matches', 1, self.closestMatches)]
 
-    def closestMatches(self, search: str, wordList: List[str], numMatches: int, threshold: float) -> List[str]:
+    def closestMatches(self, search: str, wordList: List[str],
+                       numMatches: int, threshold: float) -> List[str]:
         similarities = sorted([(ndld(search, word), word) for word in wordList])
         closeMatches = [word for (diff, word) in similarities if diff <= threshold]
         topN = closeMatches[:numMatches]

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import copy, os
-from ruamel.yaml import YAML
-from six import iteritems
+import copy
+import os
 from typing import Any, Dict
+
+from ruamel.yaml import YAML
 
 
 _required = ['server']
@@ -37,8 +38,10 @@ class Config(object):
             return configData
 
         for fname in configData['import']:
-            includeConfig = self._readConfig('{}/{}.yaml'.format(os.path.dirname(os.path.abspath(fileName)), fname))
-            for key, val in iteritems(includeConfig):
+            includeConfig = self._readConfig('{}/{}.yaml'
+                                             .format(os.path.dirname(os.path.abspath(fileName)),
+                                                     fname))
+            for key, val in includeConfig.items():
                 # not present in base config, just assign it
                 if key not in configData:
                     configData[key] = val
@@ -63,7 +66,7 @@ class Config(object):
                     except TypeError:
                         # dicts can't merge with +
                         try:
-                            for subKey, subVal in iteritems(val):
+                            for subKey, subVal in val.items():
                                 if subKey not in configData[key]:
                                     configData[key][subKey] = subVal
                         except (AttributeError, TypeError):
@@ -98,7 +101,8 @@ class Config(object):
     def _validate(self, configData) -> None:
         for key in _required:
             if key not in configData:
-                raise ConfigError(self.configFile, 'Required item {!r} was not found in the config.'.format(key))
+                raise ConfigError(self.configFile,
+                                  'Required item {!r} was not found in the config.'.format(key))
 
     def __len__(self):
         return len(self._configData)

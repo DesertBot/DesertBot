@@ -2,7 +2,7 @@
 """
 Created on May 11, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 
 from twisted.plugin import IPlugin
@@ -21,8 +21,8 @@ class StripColour(BotModule):
                                                      ('response-notice', 99, self.execute)]
 
     def help(self, query):
-        return "Automatic module that strips colours from responses " \
-               "if colours are blocked by channel mode"
+        return ("Automatic module that strips colours from responses"
+                " if colours are blocked by channel mode")
 
     def execute(self, response: IRCResponse):
         if response.target in self.bot.channels:

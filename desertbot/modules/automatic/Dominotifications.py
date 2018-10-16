@@ -46,9 +46,13 @@ class Dominotifications(BotModule):
             self.trackers[orderID] = TrackingDetails(message.user.nick, message.channel,
                                                      task.LoopingCall(self._pizzaLoop, orderID))
             self._startPizzaTracker(orderID)
-            return u"PIZZA DETECTED! Now tracking {}'s Domino's pizza order!".format(message.user.nick), ''
+            return ("PIZZA DETECTED! Now tracking {}'s Domino's pizza order!"
+                    .format(message.user.nick),
+                    '')
         else:
-            return u"I'm already tracking that pizza for {}".format(self.trackers[orderID].orderer), ''
+            return ("I'm already tracking that pizza for {}"
+                    .format(self.trackers[orderID].orderer),
+                    '')
 
     def _startPizzaTracker(self, orderID: str):
         self.trackers[orderID].tracker.start(30)
@@ -57,25 +61,26 @@ class Dominotifications(BotModule):
         return threads.deferToThread(self._pizzaTracker, orderID)
 
     def _pizzaTracker(self, orderID: str):
-        steps = {6: u"{}'s pizza order has been placed",
-                 7: u"{}'s pizza is being prepared",
-                 5: u"{}'s pizza is in the oven",
-                 8: u"{}'s pizza is sitting on a shelf, waiting for a driver",
-                 9: u"{}'s pizza is out for delivery",
-                 3: u"{}'s pizza has been delivered! Tracking stopped"}
+        steps = {6: "{}'s pizza order has been placed",
+                 7: "{}'s pizza is being prepared",
+                 5: "{}'s pizza is in the oven",
+                 8: "{}'s pizza is sitting on a shelf, waiting for a driver",
+                 9: "{}'s pizza is out for delivery",
+                 3: "{}'s pizza has been delivered! Tracking stopped"}
 
         trackingDetails = self.trackers[orderID]
 
-        trackURL = u'https://www.dominos.co.uk/pizzaTracker/getOrderDetails?id={}'.format(orderID)
+        trackURL = 'https://www.dominos.co.uk/pizzaTracker/getOrderDetails?id={}'.format(orderID)
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', trackURL)
 
         if not response:
             # tracking API didn't respond
             self._stopPizzaTracker(orderID)
             self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                  u"The pizza tracking page linked by {} "
-                                  u"had some kind of error, tracking stopped".format(trackingDetails.orderer),
-                                  trackingDetails.channel.name))
+                                              "The pizza tracking page linked by {}"
+                                              " had some kind of error, tracking stopped"
+                                              .format(trackingDetails.orderer),
+                                              trackingDetails.channel.name))
             return
 
         j = response.json()
@@ -83,12 +88,14 @@ class Dominotifications(BotModule):
         if j['customerName'] is None:
             self._stopPizzaTracker(orderID)
             self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                  u"There are no pizza tracking details at the page linked by {}.".format(trackingDetails.orderer),
-                                  trackingDetails.channel.name))
+                                              "There are no pizza tracking details"
+                                              " at the page linked by {}."
+                                              .format(trackingDetails.orderer),
+                                              trackingDetails.channel.name))
             return
-        
+
         response = None
-        
+
         step = j['statusId']
         if step != trackingDetails.step:
             trackingDetails.step = step
@@ -98,7 +105,7 @@ class Dominotifications(BotModule):
 
         if step == 3:
             self._stopPizzaTracker(orderID)
-        
+
         if response is not None:
             self.bot.sendResponse(response)
 

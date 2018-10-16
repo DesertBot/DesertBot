@@ -2,7 +2,7 @@
 """
 Created on Dec 20, 2011
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -22,8 +22,10 @@ class Source(BotCommand):
         return "source - returns a link to {0}'s source".format(self.bot.nick)
 
     def execute(self, message: IRCMessage):
+        sourceURL = self.bot.config.getWithDefault('source',
+                                                   'https://github.com/DesertBot/DesertBot/')
         return IRCResponse(ResponseType.Say,
-                           self.bot.config.getWithDefault('source', 'https://github.com/DesertBot/DesertBot/'),
+                           sourceURL,
                            message.replyTo)
 
 

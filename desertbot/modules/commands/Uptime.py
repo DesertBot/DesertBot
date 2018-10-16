@@ -2,7 +2,7 @@
 """
 Created on Dec 18, 2011
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -23,12 +23,12 @@ class Uptime(BotCommand):
         return ['uptime']
 
     def help(self, query):
-        return "uptime - tells you the bot's uptime " \
-           "(actually that's a lie right now, it gives you the bot's server's uptime)"
+        return ("uptime - tells you the bot's uptime"
+                " (actually that's a lie right now, it gives you the bot's server's uptime)")
 
     def execute(self, message: IRCMessage):
         uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.BOOT_TIME)
-        
+
         return IRCResponse(ResponseType.Say,
                            'Uptime: %s' % str(uptime).split('.')[0],
                            message.replyTo)

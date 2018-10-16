@@ -2,7 +2,7 @@
 """
 Created on Dec 07, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -49,7 +49,9 @@ class Manhole(BotCommand):
 
     @admin
     def execute(self, message: IRCMessage):
-        return IRCResponse(ResponseType.Notice, "Manhole port: {}".format(self.port), message.user.nick)
+        return IRCResponse(ResponseType.Notice,
+                           "Manhole port: {}".format(self.port),
+                           message.user.nick)
 
 
 manhole = Manhole()

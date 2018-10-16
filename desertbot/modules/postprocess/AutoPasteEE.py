@@ -2,7 +2,7 @@
 """
 Created on May 21, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 
 from twisted.plugin import IPlugin
@@ -21,21 +21,23 @@ class AutoPasteEE(BotModule):
                                                      ('response-notice', 100, self.execute)]
 
     def help(self, query):
-        return "Automatic module that uploads overly " \
-               "long reponses to paste.ee and gives you a link instead"
+        return ("Automatic module that uploads overly "
+                "long reponses to paste.ee and gives you a link instead")
 
     def execute(self, response: IRCResponse):
         limit = 700  # chars
         expire = 10  # minutes
         if len(response.response) > limit:
-            description = u'Response longer than {} chars intended for {}'.format(limit, response.target)
-            replaced = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
-                                                                  string.stripFormatting(response.response),
-                                                                  description,
-                                                                  expire)
+            description = ('Response longer than {} chars intended for {}'
+                           .format(limit, response.target))
+            mh = self.bot.moduleHandler
+            replaced = mh.runActionUntilValue('upload-pasteee',
+                                              string.stripFormatting(response.response),
+                                              description,
+                                              expire)
 
-            response.response = u'Response too long, pasted here instead: {} (Expires in {} minutes)'.format(replaced,
-                                                                                                             expire)
+            response.response = ('Response too long, pasted here instead: '
+                                 '{} (Expires in {} minutes)'.format(replaced, expire))
 
 
 autopasteee = AutoPasteEE()

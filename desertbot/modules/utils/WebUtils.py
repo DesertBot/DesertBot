@@ -104,14 +104,14 @@ class WebUtils(BotModule):
         title = soup.title
         if title:
             title = title.text
-            title = re.sub(u'[\r\n]+', u'', title)  # strip any newlines
+            title = re.sub('[\r\n]+', '', title)  # strip any newlines
             title = title.strip()  # strip all whitespace either side
-            title = u' '.join(title.split())  # replace multiple whitespace with single space
+            title = ' '.join(title.split())  # replace multiple whitespace with single space
             title = html.unescape(title)  # unescape html entities
 
             # Split on the first space before 300 characters, and replace the rest with '...'
             if len(title) > 300:
-                title = title[:300].rsplit(u' ', 1)[0] + u" ..."
+                title = title[:300].rsplit(' ', 1)[0] + " ..."
 
             return title
 
@@ -120,7 +120,7 @@ class WebUtils(BotModule):
     def shortenGoogl(self, url: str) -> str:
         post = {"longUrl": url}
 
-        googlKey = load_key(u'goo.gl')
+        googlKey = load_key('goo.gl')
 
         if googlKey is None:
             return "[goo.gl API key not found]"
@@ -141,7 +141,7 @@ class WebUtils(BotModule):
             self.logger.exception("Goo.gl error")
 
     def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
-        googleKey = load_key(u'Google')
+        googleKey = load_key('Google')
         if not googleKey:
             return None
 
@@ -155,22 +155,22 @@ class WebUtils(BotModule):
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L74
     def pasteEE(self, data: str, description: str, expire: int, raw: bool=True) -> str:
-        # pasteEEKey = load_key(u'Paste.ee') (Heufneutje, 2018-4-27): Unused?
+        # pasteEEKey = load_key('Paste.ee') (Heufneutje, 2018-4-27): Unused?
 
-        values = {u"key": "public",
-                  u"description": description,
-                  u"paste": data,
-                  u"expiration": expire,
-                  u"format": u"json"}
-        result = self.postURL(u"http://paste.ee/api", values)
+        values = {"key": "public",
+                  "description": description,
+                  "paste": data,
+                  "expiration": expire,
+                  "format": "json"}
+        result = self.postURL("http://paste.ee/api", values)
         if result:
             jsonResult = result.json()
             if jsonResult["status"] == "success":
                 linkType = "raw" if raw else "link"
                 return jsonResult["paste"][linkType]
             elif jsonResult["status"] == "error":
-                return u"An error occurred while posting to Paste.ee, code: {}, reason: {}"\
-                    .format(jsonResult["errorcode"], jsonResult["error"])
+                return ("An error occurred while posting to Paste.ee, code: {}, reason: {}"
+                        .format(jsonResult["errorcode"], jsonResult["error"]))
 
 
 web = WebUtils()

@@ -2,7 +2,7 @@
 """
 Created on Feb 13, 2018
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -36,11 +36,14 @@ class BotControl(BotCommand):
     @admin
     def _restart(self, message):
         """restart - restarts the bot"""
-        # can't restart within 10 seconds of starting (avoids chanhistory triggering another restart)
+        # can't restart within 10 seconds of starting
+        # (avoids chanhistory triggering another restart)
         if datetime.datetime.utcnow() - self.bot.startTime > datetime.timedelta(seconds=10):
             reactor.addSystemEventTrigger('after',
                                           'shutdown',
-                                          lambda: os.execl(sys.executable, sys.executable, *sys.argv))
+                                          lambda: os.execl(sys.executable,
+                                                           sys.executable,
+                                                           *sys.argv))
             if message.parameters:
                 self.bot.disconnect(message.parameters)
             else:
@@ -50,7 +53,8 @@ class BotControl(BotCommand):
     @admin
     def _shutdown(self, message):
         """shutdown - shuts down the bot"""
-        # can't shutdown within 10 seconds of starting (avoids chanhistory triggering another shutdown)
+        # can't shutdown within 10 seconds of starting
+        # (avoids chanhistory triggering another shutdown)
         if datetime.datetime.utcnow() - self.bot.startTime > datetime.timedelta(seconds=10):
             if message.parameters:
                 self.bot.disconnect(message.parameters)
@@ -69,7 +73,7 @@ class BotControl(BotCommand):
         if command in self._commands:
             return self._commands[command].__doc__
         else:
-            return '{} - pretty obvious'.format(u', '.join(self._commands.keys()))
+            return '{} - pretty obvious'.format(', '.join(self._commands.keys()))
 
     def execute(self, message: IRCMessage):
         return self._commands[message.command.lower()](self, message)

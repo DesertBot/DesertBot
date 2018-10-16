@@ -25,12 +25,12 @@ class Lists(BotCommand):
         Valid subcommands:
         <None> - get random entry from list
         <Integer> - get specific entry from list
-        add - add new entry             (entry text as params)
+        add - add new entry           (entry text as params)
         last - get last entry
-        list - list entries             (optional regex as params)
-        search - search for entry       (regex as params, last in params list optionally match ID integer)
-        remove - remove an entry        (regex as params, only remove if matches only single entry)
-        removebyid - remove an entry    (ID as param)
+        list - list entries           (optional regex as params)
+        search - search for entry     (regex as params, last param optional match ID integer)
+        remove - remove an entry      (regex as params, only remove if matches only single entry)
+        removebyid - remove an entry  (ID as param)
         """
         prefix = "{}list <list_name>".format(self.bot.commandChar)
         helpDict = {
@@ -38,26 +38,30 @@ class Lists(BotCommand):
             "<number>": "returns a specific entry from the named list",
             "add": "add <list entry> - adds the given text to the named list",
             "last": "last - returns the last entry from the named list",
-            "list": "list <regex search> - uploads the named list to paste.ee and gives you a link. "
-                    "If a regex search is given, only matching entries are uploaded",
-            "search": "search <regex> <number> - regex search entries, returning a random matching one. "
-                      "If a number is given, return the nth matching entry",
+            "list": "list <regex search>"
+                    " - uploads the named list to paste.ee and gives you a link."
+                    " If a regex search is given, only matching entries are uploaded",
+            "search": "search <regex> <number>"
+                      " - regex search entries, returning a random matching one."
+                      " If a number is given, return the nth matching entry",
             "remove": "remove <regex> - remove the matching entry, only if there is only one match",
             "removebyid": "removebyid <id> - remove an entry by id"
         }
         if len(query) == 1:
-            return "{} <nothing>/<number>/add/list/search/remove/removebyid - manages named lists. " \
-                   "Use {}help list <subcommand> for help with the subcommands".format(prefix, self.bot.commandChar)
+            return ("{} <nothing>/<number>/add/list/search/remove/removebyid - manages named lists."
+                    " Use {}help list <subcommand> for help with the subcommands"
+                    .format(prefix, self.bot.commandChar))
         else:
             if query[1].lower() in helpDict:
                 return "{} {}".format(prefix, helpDict[query[1].lower()])
             else:
-                return "{!r} is not a valid subcommand, use {}help list for a list of subcommands".format(query[1], self.bot.commandChar)
+                return ("{!r} is not a valid subcommand, use {}help list for a list of subcommands"
+                        .format(query[1], self.bot.commandChar))
 
     def onLoad(self):
         if "lists" not in self.bot.storage:
             self.bot.storage["lists"] = {}
-        self.lists= self.bot.storage["lists"]
+        self.lists = self.bot.storage["lists"]
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
@@ -69,7 +73,8 @@ class Lists(BotCommand):
                                    message.replyTo)
             else:
                 return IRCResponse(ResponseType.Say,
-                                   "I don't have a list named {!r}".format(message.parameterList[0]),
+                                   "I don't have a list named {!r}"
+                                   .format(message.parameterList[0]),
                                    message.replyTo)
         elif len(message.parameterList) >= 2:
             listName = message.parameterList[0].lower()
@@ -79,7 +84,8 @@ class Lists(BotCommand):
             if subcommand == "add":
                 text = self._addEntry(listName, " ".join(paramsList))
             elif listName not in self.lists:
-                text = "I don't have a list named {!r}, maybe add some entries to it to create it?".format(listName)
+                text = ("I don't have a list named {!r}, maybe add some entries to it to create it?"
+                        .format(listName))
             elif subcommand == "last":
                 text = self._getLastEntry(listName)
             elif subcommand == "list":
@@ -128,12 +134,12 @@ class Lists(BotCommand):
             choice = int(number)
         except ValueError:
             return "I don't know what you mean by {!r}".format(number)
-        
+
         chosen = None
         for entry in self.lists[listName]:
             if entry["id"] == choice:
                 chosen = entry
-        
+
         if chosen is None:
             return "There is no entry with the id {} in the {!r} list!".format(number, listName)
         return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
@@ -148,7 +154,8 @@ class Lists(BotCommand):
     def _getMultipleEntries(self, listName, regexPattern=None):
         """
         Get multiple entries from the list with the given name as a paste.ee link
-        If regexPattern is None, just use the whole list, otherwise make a list of all entries matching the regexPattern.
+        If regexPattern is None, just use the whole list,
+        otherwise make a list of all entries matching the regexPattern.
         """
         if len(self.lists[listName]) == 0:
             return "That list is empty!"
@@ -167,13 +174,16 @@ class Lists(BotCommand):
         # Paste entries found into paste.EE
         pasteString = ""
         for entry in entries:
-            pasteString += "Entry #{} - {} - {}".format(entry["id"],  entry["timestamp"], entry["text"])
+            pasteString += "Entry #{} - {} - {}".format(entry["id"],
+                                                        entry["timestamp"],
+                                                        entry["text"])
             pasteString += "\n"
 
-        pasteEElink = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
-                                                                 string.stripFormatting(pasteString),
-                                                                 listName,
-                                                                 10)
+        mh = self.bot.moduleHandler
+        pasteEElink = mh.runActionUntilValue('upload-pasteee',
+                                             string.stripFormatting(pasteString),
+                                             listName,
+                                             10)
 
         return "Link posted! (Expires in 10 minutes) {}".format(pasteEElink)
 
@@ -188,7 +198,7 @@ class Lists(BotCommand):
             # Get the ID for the last entry in the list and give the new ID as 1 larger than that
             lastEntry = self.lists[listName][-1]
             return int(lastEntry["id"]) + 1
-    
+
     def _addEntry(self, listName, entryText):
         """
         Add a new entry to the given list with the given text.
@@ -203,13 +213,15 @@ class Lists(BotCommand):
         }
         self.lists[listName].append(entryObject)
         self.bot.storage["lists"] = self.lists
-        return "Entry #{} - {} - {} added to list {}".format(entryObject["id"], entryObject["timestamp"],
-                                                             entryObject["text"], listName)
+        return ("Entry #{} - {} - {} added to list {}".format(entryObject["id"],
+                                                              entryObject["timestamp"],
+                                                              entryObject["text"], listName))
 
     def _search(self, listName, regexPattern, desiredNumber=None):
         """
         Search the list with the given name using the given regex pattern.
-        If desiredNumber is not none, try to return a specific match from the list of entries matching the regex.
+        If desiredNumber is not none, try to return a specific match
+        from the list of entries matching the regex.
         """
         if len(self.lists[listName]) == 0:
             return "That list is empty!"
@@ -253,13 +265,16 @@ class Lists(BotCommand):
             return "That list doesn't contain anything matching {!r}!".format(regexPattern)
 
         elif len(entries) > 1:
-            return "There are too many entries matching {!r} in that list, please be more specific.".format(regexPattern)
+            return ("There are too many entries matching {!r} in that list,"
+                    " please be more specific."
+                    .format(regexPattern))
 
         else:
             entryCopy = entries[0].copy()
             self.lists[listName].remove(entries[0])
             self.bot.storage["lists"] = self.lists
-            return "Entry #{} - {} from list {} was removed".format(entryCopy["id"], entryCopy["text"], listName)
+            return ("Entry #{} - {} from list {} was removed"
+                    .format(entryCopy["id"], entryCopy["text"], listName))
 
     def _removeEntryByID(self, listName, idNumber):
         """
@@ -274,7 +289,8 @@ class Lists(BotCommand):
                 entryCopy = entry.copy()
                 self.lists[listName].remove(entry)
                 self.bot.storage["lists"] = self.lists
-                return "Entry #{} - {} from list {} was removed".format(entryCopy["id"], entryCopy["text"], listName)
+                return ("Entry #{} - {} from list {} was removed"
+                        .format(entryCopy["id"], entryCopy["text"], listName))
             else:
                 return "Could not find an entry with ID {} in list {}".format(idNumber, listName)
 

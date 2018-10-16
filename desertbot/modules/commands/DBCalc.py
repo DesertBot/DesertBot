@@ -16,17 +16,22 @@ class DBCalc(BotCommand):
         return ['dbcalc']
 
     def help(self, query):
-        return 'dbcalc (hours <hours> / money <money>) - tells you how much money is required for a given number of hours, ' \
-           'or how many hours will be bussed for a given amount of money'
+        return ('dbcalc (hours <hours> / money <money>)'
+                ' - tells you how much money is required for a given number of hours,'
+                ' or how many hours will be bussed for a given amount of money')
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say, self.help, message.replyTo)
 
         if message.parameterList[0].lower() == 'hours':
-            return IRCResponse(ResponseType.Say, DBCalc.hours(message.parameterList[1]), message.replyTo)
+            return IRCResponse(ResponseType.Say,
+                               DBCalc.hours(message.parameterList[1]),
+                               message.replyTo)
         elif message.parameterList[0].lower() == 'money':
-            return IRCResponse(ResponseType.Say, DBCalc.money(message.parameterList[1]), message.replyTo)
+            return IRCResponse(ResponseType.Say,
+                               DBCalc.money(message.parameterList[1]),
+                               message.replyTo)
         else:
             return IRCResponse(ResponseType.Say, self.help, message.replyTo)
 
@@ -41,7 +46,8 @@ class DBCalc(BotCommand):
         try:
             money = (1-(1.07**f_hours))/(-0.07)
         except OverflowError:
-            return "The amount of money you would need for that many hours is higher than I can calculate!"
+            return ("The amount of money you would need for"
+                    " that many hours is higher than I can calculate!")
 
         return "For {0:,} hour(s), the team needs a total of ${1:,.2f}".format(f_hours, money)
 

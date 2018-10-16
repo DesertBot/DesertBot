@@ -14,15 +14,18 @@ from desertbot.response import IRCResponse, ResponseType
 
 import pyhedrals as dice
 
+
 @implementer(IPlugin, IModule)
 class Roll(BotCommand):
     def triggers(self):
         return ['roll', 'rollv']
 
     def help(self, query):
-        return 'roll(v) - dice roller, \'rollv\' outputs every roll. ' \
-            'supported operators are #d#(kh#/kl#/dh#/dl#/!/r/ro/s/sa/sd), + - * / % ^ ( ) #comments | ' \
-            'see https://git.io/PyMoBo-Roll for example usage and a detailed explanation of the dice modifiers'
+        return ('roll(v) - dice roller, \'rollv\' outputs every roll.'
+                ' supported operators are'
+                ' #d#(kh#/kl#/dh#/dl#/!/r/ro/s/sa/sd), + - * / % ^ ( ) #comments'
+                ' | see https://git.io/PyMoBo-Roll for example usage'
+                ' and a detailed explanation of the dice modifiers')
 
     def onLoad(self):
         self.roller = dice.DiceParser()
@@ -36,7 +39,7 @@ class Roll(BotCommand):
             result = self.roller.parse(message.parameters)
         except OverflowError:
             return IRCResponse(ResponseType.Say,
-                               u'Error: result too large to calculate',
+                               'Error: result too large to calculate',
                                message.replyTo)
         except (ZeroDivisionError,
                 dice.UnknownCharacterException,
@@ -45,25 +48,26 @@ class Roll(BotCommand):
                 RecursionError,
                 NotImplementedError) as e:
             return IRCResponse(ResponseType.Say,
-                               u'Error: {}'.format(e),
+                               'Error: {}'.format(e),
                                message.replyTo)
 
         if verbose:
             rollStrings = self.roller.getRollStrings()
-            rollString = u' | '.join(rollStrings)
+            rollString = ' | '.join(rollStrings)
 
             if len(rollString) > 200:
-                rollString = u"LOTS O' DICE"
+                rollString = "LOTS O' DICE"
 
-            response = u'{} rolled: [{}] {}'.format(message.user.nick, rollString, result)
+            response = '{} rolled: [{}] {}'.format(message.user.nick, rollString, result)
 
         else:
-            response = u'{} rolled: {}'.format(message.user.nick, result)
+            response = '{} rolled: {}'.format(message.user.nick, result)
 
         if self.roller.description:
-            response += u' {}'.format(self.roller.description)
+            response += ' {}'.format(self.roller.description)
 
-        return IRCResponse(ResponseType.Say, response, message.replyTo, {'rollTotal': result})
+        return IRCResponse(ResponseType.Say, response, message.replyTo,
+                           {'rollTotal': result})
 
 
 roll = Roll()

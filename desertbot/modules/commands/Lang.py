@@ -28,9 +28,9 @@ class Lang(BotCommand):
 
     def help(self, query: List[str]) -> str:
         command = query[0].lower()
-        helpText = re.sub(r"\s+", u" ", self.commands[command].__doc__)
-        return u"{cmdChar}{help}".format(cmdChar=self.bot.commandChar,
-                                         help=helpText)
+        helpText = re.sub(r"\s+", " ", self.commands[command].__doc__)
+        return "{cmdChar}{help}".format(cmdChar=self.bot.commandChar,
+                                        help=helpText)
 
     def onLoad(self):
         self.languages = None
@@ -61,7 +61,7 @@ int main() {{
 
         if len(message.parameterList) > 0:
             lang = message.parameterList[0].lower()
-            code = u' '.join(message.parameterList[1:])
+            code = ' '.join(message.parameterList[1:])
             if lang in self.templates:
                 code = self.templates[lang].format(code=code)
             result = self._tio(lang, code)
@@ -97,8 +97,8 @@ int main() {{
                                message.replyTo)
 
     commands = OrderedDict([
-        (u'lang', _lang),
-        (u'langurl', _langurl)])
+        ('lang', _lang),
+        ('langurl', _langurl)])
 
     def execute(self, message: IRCMessage):
         return self.commands[message.command.lower()](self, message)
@@ -114,7 +114,7 @@ int main() {{
         self.logger.info("Language list loaded")
 
     def _tio(self, lang: str, code: str, userInput: str="") -> str:
-        if self.languages == None:
+        if self.languages is None:
             self._setLanguages(self._fetchLanguages())
 
         if lang not in self.languages:
@@ -174,6 +174,7 @@ int main() {{
                 error += " (language uses a template, see link for framing code)"
             return error
 
-        return u' | '.join(r.decode('utf-8', 'ignore') for r in returned)
+        return ' | '.join(r.decode('utf-8', 'ignore') for r in returned)
+
 
 lang = Lang()

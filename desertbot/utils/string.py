@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from html.entities import name2codepoint
-from builtins import chr
-from six import iteritems
 from datetime import timedelta
 import re
 
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 
-graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
+graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
 
 
 def isNumber(s: str) -> bool:
@@ -54,7 +52,8 @@ def stripFormatting(message: str) -> str:
 # mostly taken from dave_random's UnsafeBot (whose source is not generally accessible)
 def deltaTimeToString(timeDelta: timedelta, resolution: str='m') -> str:
     """
-    returns a string version of the given timedelta, with a resolution of minutes ('m') or seconds ('s')
+    returns a string version of the given timedelta,
+    with a resolution of minutes ('m') or seconds ('s')
     """
     d = OrderedDict()
     d['days'] = timeDelta.days
@@ -70,7 +69,7 @@ def deltaTimeToString(timeDelta: timedelta, resolution: str='m') -> str:
         else:
             return '{0} {1}'.format(duration, durationWord)
 
-    deltaString = ' '.join([lex(word, number) for word, number in iteritems(d) if number > 0])
+    deltaString = ' '.join([lex(word, number) for word, number in d.items() if number > 0])
     return deltaString if len(deltaString) > 0 else 'seconds'
 
 

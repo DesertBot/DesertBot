@@ -2,7 +2,7 @@
 """
 Created on May 03, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -10,8 +10,6 @@ from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 import re
-from builtins import str
-from six import iteritems
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -25,10 +23,13 @@ class Chain(BotCommand):
         return ['chain']
 
     def help(self, query):
-        return 'chain <command 1> | <command 2> [| <command n>] - chains multiple commands together, feeding the output of each command into the next\n' \
-           'syntax: command1 params | command2 $output | command3 $var\n' \
-           '$output is the output text of the previous command in the chain\n' \
-           '$var is any extra var that may have been added to the message by commands earlier in the chain'
+        return ('chain <command 1> | <command 2> [| <command n>] -'
+                ' chains multiple commands together,'
+                ' feeding the output of each command into the next\n'
+                'syntax: command1 params | command2 $output | command3 $var\n'
+                '$output is the output text of the previous command in the chain\n'
+                '$var is any extra var that may have been added'
+                ' to the message by commands earlier in the chain')
 
     def execute(self, message: IRCMessage):
         # split on unescaped |
@@ -43,17 +44,20 @@ class Chain(BotCommand):
             if response is not None:
                 if hasattr(response, '__iter__'):
                     return IRCResponse(ResponseType.Say,
-                                       u"Chain Error: segment before '{}' returned a list".format(link),
+                                       "Chain Error: segment before '{}' returned a list"
+                                       .format(link),
                                        message.replyTo)
-                link = link.replace('$output', response.response)  # replace $output with output of previous command
+                # replace $output with output of previous command
+                link = link.replace('$output', response.response)
                 extraVars.update(response.ExtraVars)
-                for var, value in iteritems(extraVars):
+                for var, value in extraVars.items():
                     link = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), link)
             else:
                 # replace $output with empty string if previous command had no output
-                # (or this is the first command in the chain, but for some reason has $output as a param)
+                # (or this is the first command in the chain,
+                #  but for some reason has $output as a param)
                 link = link.replace('$output', '')
-            
+
             link = link.replace('$sender', message.user.nick)
             if message.channel is not None:
                 link = link.replace('$channel', message.channel.name)
@@ -64,13 +68,16 @@ class Chain(BotCommand):
             inputMessage = IRCMessage(message.type, message.user, message.channel,
                                       self.bot.commandChar + link.lstrip(),
                                       self.bot)
-            inputMessage.chained = True  # might be used at some point to tell commands they're being called from Chain
+            # might be used at some point to tell commands they're being called from Chain
+            inputMessage.chained = True
 
             if inputMessage.command.lower() in self.bot.moduleHandler.mappedTriggers:
-                response = self.bot.moduleHandler.mappedTriggers[inputMessage.command.lower()].execute(inputMessage)
+                command = self.bot.moduleHandler.mappedTriggers[inputMessage.command.lower()]
+                response = command.execute(inputMessage)
             else:
                 return IRCResponse(ResponseType.Say,
-                                   "'{0}' is not a recognized command trigger".format(inputMessage.command),
+                                   "{!r} is not a recognized command trigger"
+                                   .format(inputMessage.command),
                                    message.replyTo)
 
         if response.response is not None:

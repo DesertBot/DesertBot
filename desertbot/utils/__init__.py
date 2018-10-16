@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Tyranic-Moron'
+__author__ = 'StarlitGhost'

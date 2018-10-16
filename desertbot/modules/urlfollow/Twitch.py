@@ -26,7 +26,7 @@ class Twitch(BotCommand):
         return 'Automatic module that follows Twitch URLs'
 
     def onLoad(self):
-        self.twitchClientID = load_key(u'Twitch Client ID')
+        self.twitchClientID = load_key('Twitch Client ID')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         # Heavily based on Didero's DideRobot code for the same
@@ -43,7 +43,7 @@ class Twitch(BotCommand):
         channelOnline = False
         twitchHeaders = {'Accept': 'application/vnd.twitchtv.v3+json',
                          'Client-ID': self.twitchClientID}
-        url = u'https://api.twitch.tv/kraken/streams/{}'.format(channel)
+        url = 'https://api.twitch.tv/kraken/streams/{}'.format(channel)
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
                                                               extraHeaders=twitchHeaders)
 
@@ -53,7 +53,7 @@ class Twitch(BotCommand):
             chanData = streamData['stream']['channel']
             channelOnline = True
         elif 'error' not in streamData:
-            url = u'https://api.twitch.tv/kraken/channels/{}'.format(channel)
+            url = 'https://api.twitch.tv/kraken/channels/{}'.format(channel)
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
                                                                   extraHeaders=twitchHeaders)
             chanData = response.json()
