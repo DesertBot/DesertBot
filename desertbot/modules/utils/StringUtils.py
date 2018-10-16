@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule, BotModule
 from zope.interface import implementer

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 from html.entities import name2codepoint
 from datetime import timedelta

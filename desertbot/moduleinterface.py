@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from zope.interface import Interface
 from functools import wraps
 from fnmatch import fnmatch
