@@ -2,7 +2,7 @@
 """
 Created on Oct 16, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -19,11 +19,14 @@ class Notice(BotCommand):
         return ['notice']
 
     def help(self, query):
-        return 'notice <target> <text> - makes the bot send the specified text as a notice to the specified target'
+        return ('notice <target> <text>'
+                ' - makes the bot send the specified text as a notice to the specified target')
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) > 1:
-            return IRCResponse(ResponseType.Notice, " ".join(message.parameterList[1:]), message.parameterList[0])
+            return IRCResponse(ResponseType.Notice,
+                               " ".join(message.parameterList[1:]),
+                               message.parameterList[0])
         else:
             return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 

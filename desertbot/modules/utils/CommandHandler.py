@@ -2,7 +2,7 @@
 """
 Created on Feb 28, 2018
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 
 from twisted.plugin import IPlugin

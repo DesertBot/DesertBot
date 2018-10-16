@@ -28,16 +28,23 @@ class CTCP(BotModule):
             return self._getResponse(target, 'PING', msg[5:])
         elif ctcpCommand == 'VERSION':
             try:
-                versionNum = subprocess.check_output(['git', 'describe', '--always']).decode('utf-8').strip()
+                versionNum = (subprocess.check_output(['git', 'describe', '--always'])
+                              .decode('utf-8')
+                              .strip())
             except FileNotFoundError:
                 versionNum = '1.0'
-            return self._getResponse(target, 'VERSION', '{} v{} / {}'.format(self.bot.nick, versionNum, platform()))
+            return self._getResponse(target, 'VERSION',
+                                     '{} v{} / {}'.format(self.bot.nick, versionNum, platform()))
         elif ctcpCommand == 'TIME':
-            return self._getResponse(target, 'TIME', datetime.utcnow().replace(microsecond=0).strftime('%Y-%m-%d %H:%M UTC'))
+            time = datetime.utcnow().replace(microsecond=0).strftime('%Y-%m-%d %H:%M UTC')
+            return self._getResponse(target, 'TIME', time)
         elif ctcpCommand == 'SOURCE':
-            return self._getResponse(target, 'SOURCE', self.bot.config.getWithDefault('source', 'https://github.com/DesertBot/DesertBot/'))
+            source = self.bot.config.getWithDefault('source',
+                                                    'https://github.com/DesertBot/DesertBot/')
+            return self._getResponse(target, 'SOURCE', source)
         elif ctcpCommand == 'FINGER':
-            return self._getResponse(target, 'FINGER', self.bot.config.getWithDefault('finger', 'GET YOUR FINGER OUT OF THERE'))
+            finger = self.bot.config.getWithDefault('finger', 'GET YOUR FINGER OUT OF THERE')
+            return self._getResponse(target, 'FINGER', finger)
 
         return None
 

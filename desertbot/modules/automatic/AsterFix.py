@@ -2,7 +2,7 @@
 """
 Created on Feb 17, 2015
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule, BotModule, ignore
@@ -25,7 +25,8 @@ class AsterFix(BotModule):
                                                   ('action-user', 1, self.storeMessage)]
 
     def help(self, query):
-        return '**<fix> - looks for similar text in your last message and attempts to replace the most likely candidate'
+        return ('**<fix> - looks for similar text in your last message'
+                ' and attempts to replace the most likely candidate')
 
     def onLoad(self):
         self.messages = {}

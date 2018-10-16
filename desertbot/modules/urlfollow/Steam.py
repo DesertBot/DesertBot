@@ -15,8 +15,6 @@ from twisted.words.protocols.irc import assembleFormattedText as colour, attribu
 
 import re
 
-from six import iteritems
-
 
 @implementer(IPlugin, IModule)
 class Steam(BotCommand):
@@ -27,7 +25,8 @@ class Steam(BotCommand):
         return 'Automatic module that follows Steam URLs'
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
-        match = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
+        match = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)',
+                          url)
         if not match:
             return
 
@@ -49,7 +48,7 @@ class Steam(BotCommand):
 
         # name
         if 'developers' in appData:
-            developers = u', '.join(appData['developers'])
+            developers = ', '.join(appData['developers'])
             name = colour(A.normal[appData['name'], A.fg.gray[' by '], developers])
         else:
             name = appData['name']
@@ -58,19 +57,19 @@ class Steam(BotCommand):
         # package contents (might need to trim this...)
         if 'apps' in appData:
             appNames = [app['name'] for app in appData['apps']]
-            apps = u'Package containing: {}'.format(u', '.join(appNames))
+            apps = 'Package containing: {}'.format(', '.join(appNames))
             data.append(apps)
 
         # genres
         if 'genres' in appData:
             genres = ', '.join([genre['description'] for genre in appData['genres']])
-            data.append(u'Genres: ' + genres)
+            data.append('Genres: ' + genres)
 
         # release date
         releaseDate = appData['release_date']
         if not releaseDate['coming_soon']:
             if releaseDate['date']:
-                data.append(u'Released: ' + releaseDate['date'])
+                data.append('Released: ' + releaseDate['date'])
         else:
             upcomingDate = A.fg.cyan[A.bold[str(releaseDate['date'])]]
             data.append(colour(A.normal['To Be Released: ', upcomingDate]))
@@ -86,7 +85,7 @@ class Steam(BotCommand):
                 metacritic = colour(A.normal[A.fg.orange[str(metaScore)]])
             else:
                 metacritic = colour(A.normal[A.fg.green[str(metaScore)]])
-            data.append(u'Metacritic: {0}'.format(metacritic))
+            data.append('Metacritic: {0}'.format(metacritic))
 
         # prices
         priceField = {'app': 'price_overview', 'package': 'price'}[steamType]
@@ -96,20 +95,20 @@ class Steam(BotCommand):
                       'EUR': self.getSteamPrice(steamType, steamId, 'FR'),
                       'AUD': self.getSteamPrice(steamType, steamId, 'AU')}
 
-            currencies = {'USD': u'$',
-                          'GBP': u'\u00A3',
-                          'EUR': u'\u20AC',
-                          'AUD': u'AU$'}
+            currencies = {'USD': '$',
+                          'GBP': '\u00A3',
+                          'EUR': '\u20AC',
+                          'AUD': 'AU$'}
 
             # filter out AUD if same as USD (most are)
             if not prices['AUD'] or prices['AUD']['final'] == prices['USD']['final']:
                 del prices['AUD']
 
             # filter out any missing prices
-            prices = {key: val for key, val in iteritems(prices) if val}
+            prices = {key: val for key, val in prices.items() if val}
             priceList = [currencies[val['currency']] + str(val['final'] / 100.0)
                          for val in prices.values()]
-            priceString = u'/'.join(priceList)
+            priceString = '/'.join(priceList)
             if prices['USD']['discount_percent'] > 0:
                 discount = ' ({0}% sale!)'.format(prices['USD']['discount_percent'])
                 priceString += colour(A.normal[A.fg.green[A.bold[discount]]])
@@ -121,18 +120,18 @@ class Steam(BotCommand):
             platforms = appData['platforms']
             platformArray = []
             if platforms['windows']:
-                platformArray.append(u'Win')
+                platformArray.append('Win')
             else:
-                platformArray.append(u'---')
+                platformArray.append('---')
             if platforms['mac']:
-                platformArray.append(u'Mac')
+                platformArray.append('Mac')
             else:
-                platformArray.append(u'---')
+                platformArray.append('---')
             if platforms['linux']:
-                platformArray.append(u'Lin')
+                platformArray.append('Lin')
             else:
-                platformArray.append(u'---')
-            data.append(u'/'.join(platformArray))
+                platformArray.append('---')
+            data.append('/'.join(platformArray))
 
         # description
         if 'about_the_game' in appData and appData['about_the_game'] is not None:
@@ -140,16 +139,18 @@ class Steam(BotCommand):
             description = re.sub(r'(<[^>]+>|[\r\n\t])+', colour(A.normal[' ', A.fg.gray['>'], ' ']),
                                  appData['about_the_game'])
             if len(description) > limit:
-                description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+                description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
 
-        url = 'http://store.steampowered.com/{}/{}'.format({'app': 'app', 'package': 'sub'}[steamType], steamId)
+        url = ('http://store.steampowered.com/{}/{}'
+               .format({'app': 'app', 'package': 'sub'}[steamType],
+                       steamId))
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         return graySplitter.join(data), url
 
     def getSteamPrice(self, appType, appId, region):
-        url = 'http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc={2}&l=english&v=1'.format(appType, appId,
-                                                                                                     region)
+        url = ('http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc={2}&l=english&v=1'
+               .format(appType, appId, region))
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         priceField = {'app': 'price_overview', 'package': 'price'}[appType]
         j = response.json()

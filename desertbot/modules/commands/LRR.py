@@ -10,8 +10,8 @@ from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 import datetime
+# TODO: replace this with BeautifulSoup
 import xml.etree.ElementTree as ET
-from six import iteritems
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -59,7 +59,7 @@ class LRR(BotCommand):
 
     def checkLRR(self, _: IRCMessage):
         responses = []
-        for feedName, feedDeets in iteritems(DataStore):
+        for feedName, feedDeets in DataStore.items():
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
                 continue
 
@@ -68,14 +68,15 @@ class LRR(BotCommand):
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', feedDeets['url'])
 
             if not response:
-                #TODO: log an error here that the feed likely no longer exists!
+                # TODO: log an error here that the feed likely no longer exists!
                 continue
 
+            # TODO: replace this with BeautifulSoup
             root = ET.fromstring(response.content)
             item = root.find('channel/item')
 
             if item is None:
-                #TODO: log an error here that the feed likely no longer exists!
+                # TODO: log an error here that the feed likely no longer exists!
                 continue
 
             newestDate = dparser.parse(item.find('pubDate').text, fuzzy=True, ignoretz=True)
@@ -105,33 +106,33 @@ class LRR(BotCommand):
                 feedLatest = DataStore[feedName]['lastTitle']
                 feedLink = DataStore[feedName]['lastLink']
 
-                response = u'Latest {0}: {1} | {2}'.format(feedName, feedLatest, feedLink)
+                response = 'Latest {}: {} | {}'.format(feedName, feedLatest, feedLink)
 
                 return IRCResponse(ResponseType.Say, response, message.replyTo)
 
             return IRCResponse(ResponseType.Say,
-                               u"{0} is not one of the LRR series being monitored "
-                               u"(leave a tell for my owners if it's a new series or "
-                               u"should be an alias!)".format(message.parameters.strip()),
+                               "{} is not one of the LRR series being monitored "
+                               "(leave a tell for my owners if it's a new series or "
+                               "should be an alias!)".format(message.parameters.strip()),
                                message.replyTo)
         else:
             latestDate = datetime.datetime.utcnow() - datetime.timedelta(days=365 * 10)
             latestFeed = None
             latestTitle = None
             latestLink = None
-            for feedName, feedDeets in iteritems(DataStore):
+            for feedName, feedDeets in DataStore.items():
                 if feedDeets['lastUpdate'] > latestDate:
                     latestDate = feedDeets['lastUpdate']
                     latestFeed = feedName
                     latestTitle = feedDeets['lastTitle']
                     latestLink = feedDeets['lastLink']
 
-            response = u'Latest {0}: {1} | {2}'.format(latestFeed, latestTitle, latestLink)
+            response = 'Latest {}: {} | {}'.format(latestFeed, latestTitle, latestLink)
             return IRCResponse(ResponseType.Say, response, message.replyTo)
 
     @classmethod
     def handleAliases(cls, series):
-        for feedName, feedDeets in iteritems(DataStore):
+        for feedName, feedDeets in DataStore.items():
             if series.lower() in feedDeets['aliases']:
                 return feedName
         return series

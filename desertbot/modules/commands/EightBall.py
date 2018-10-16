@@ -2,7 +2,7 @@
 """
 Created on Aug 14, 2013
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule

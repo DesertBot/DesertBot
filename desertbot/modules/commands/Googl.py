@@ -14,14 +14,18 @@ class Googl(BotCommand):
         return ['googl', 'shorten', 'goo.gl']
 
     def help(self, query):
-        return "googl/shorten <url> - Gives you a shortened version of a url, via Goo.gl"
-    
+        return ("googl/shorten <url>"
+                " - Gives you a shortened version of a url, via Goo.gl")
+
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say, "You didn't give a URL to shorten!", message.replyTo)
-        
-        url = self.bot.moduleHandler.runActionUntilValue('shorten-url', message.parameters)
-        
+            return IRCResponse(ResponseType.Say,
+                               "You didn't give a URL to shorten!",
+                               message.replyTo)
+
+        url = self.bot.moduleHandler.runActionUntilValue('shorten-url',
+                                                         message.parameters)
+
         return IRCResponse(ResponseType.Say, url, message.replyTo)
 
 

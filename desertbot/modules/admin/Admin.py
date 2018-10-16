@@ -2,7 +2,7 @@
 """
 Created on Feb 09, 2018
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -29,14 +29,14 @@ class Admin(BotCommand):
 
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say,
-                               u"You didn't give me a user to add!",
+                               "You didn't give me a user to add!",
                                message.replyTo)
 
         for adminName in message.parameterList[1:]:
             if message.replyTo in self.bot.channels:
                 if adminName in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[adminName]
-                    adminName = u'*!{}@{}'.format(user.ident, user.host)
+                    adminName = '*!{}@{}'.format(user.ident, user.host)
 
             admins = self.bot.config.getWithDefault('admins', [])
             admins.append(adminName)
@@ -44,7 +44,7 @@ class Admin(BotCommand):
 
         self.bot.config.writeConfig()
         return IRCResponse(ResponseType.Say,
-                           u"Added specified users as bot admins!",
+                           "Added specified users as bot admins!",
                            message.replyTo)
 
     @admin("Only my admins may remove admins!")
@@ -53,7 +53,7 @@ class Admin(BotCommand):
         You can list multiple users to remove them all at once."""
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say,
-                               u"You didn't give me a user to remove!",
+                               "You didn't give me a user to remove!",
                                message.replyTo)
 
         deleted = []
@@ -63,7 +63,7 @@ class Admin(BotCommand):
             if message.replyTo in self.bot.channels:
                 if adminName in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[admin]
-                    adminName = u'*!{}@{}'.format(user.user, user.host)
+                    adminName = '*!{}@{}'.format(user.user, user.host)
 
             if adminName not in admins:
                 skipped.append(adminName)
@@ -76,8 +76,8 @@ class Admin(BotCommand):
         self.bot.config.writeConfig()
 
         return IRCResponse(ResponseType.Say,
-                           u"Removed '{}' as admin(s), {} skipped"
-                           .format(u', '.join(deleted), len(skipped)),
+                           "Removed '{}' as admin(s), {} skipped"
+                           .format(', '.join(deleted), len(skipped)),
                            message.replyTo)
 
     def _list(self, message):
@@ -85,34 +85,36 @@ class Admin(BotCommand):
         owners = self.bot.config.getWithDefault('owners', [])
         admins = self.bot.config.getWithDefault('admins', [])
         return IRCResponse(ResponseType.Say,
-                           u"Owners: {} | Admins: {}".format(u', '.join(owners),
-                                                             u', '.join(admins)),
+                           "Owners: {} | Admins: {}".format(', '.join(owners),
+                                                            ', '.join(admins)),
                            message.replyTo)
 
     subCommands = OrderedDict([
-        (u'add', _add),
-        (u'del', _del),
-        (u'list', _list)])
+        ('add', _add),
+        ('del', _del),
+        ('list', _list)])
 
     def help(self, query: List[str]) -> str:
         if len(query) > 1:
             subCommand = query[1].lower()
             if subCommand in self.subCommands:
-                return u'{1}admin {0}'.format(re.sub(r"\s+", u" ", self.subCommands[subCommand].__doc__),
-                                              self.bot.commandChar)
+                return ('{1}admin {0}'
+                        .format(re.sub(r"\s+", " ", self.subCommands[subCommand].__doc__),
+                                self.bot.commandChar))
             else:
                 return self._unrecognizedSubcommand(subCommand)
         else:
             return self._helpText()
 
     def _helpText(self):
-        return u"{1}admin ({0}) - manages users with bot admin permissions. " \
-               u"Use '{1}help admin <subcommand> for subcommand help.".format(u'/'.join(self.subCommands.keys()),
-                                                                              self.bot.commandChar)
+        return ("{1}admin ({0}) - manages users with bot admin permissions. "
+                "Use '{1}help admin <subcommand> for subcommand help."
+                .format('/'.join(self.subCommands.keys()), self.bot.commandChar))
 
     def _unrecognizedSubcommand(self, subCommand):
-        return u"unrecognized subcommand '{}', " \
-               u"available subcommands for admin are: {}".format(subCommand, u', '.join(self.subCommands.keys()))
+        return ("unrecognized subcommand '{}', "
+                "available subcommands for admin are: {}"
+                .format(subCommand, ', '.join(self.subCommands.keys())))
 
     def execute(self, message):
         if len(message.parameterList) > 0:

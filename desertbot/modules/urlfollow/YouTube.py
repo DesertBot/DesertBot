@@ -31,7 +31,7 @@ class YouTube(BotCommand):
         return 'Automatic module that follows YouTube URLs'
 
     def onLoad(self):
-        self.youtubeKey = load_key(u'YouTube')
+        self.youtubeKey = load_key('YouTube')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)
@@ -84,9 +84,9 @@ class YouTube(BotCommand):
             m, s = divmod(int(length), 60)
             h, m = divmod(m, 60)
             if h > 0:
-                length = u'{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
+                length = '{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
             else:
-                length = u'{0:02d}:{1:02d}'.format(m, s)
+                length = '{0:02d}:{1:02d}'.format(m, s)
 
             data.append(length)
         elif vid['snippet']['liveBroadcastContent'] == 'upcoming':
@@ -100,7 +100,7 @@ class YouTube(BotCommand):
             pass  # time till stream starts, indicate it's upcoming
         elif vid['snippet']['liveBroadcastContent'] == 'live':
             status = str(colour(A.normal[A.fg.red[A.bold['{} Live']]]))
-            status = status.format(u'●')
+            status = status.format('●')
             data.append(status)
         else:
             pass  # if we're here, wat
@@ -110,11 +110,11 @@ class YouTube(BotCommand):
 
         description = vid['snippet']['description']
         if not description:
-            description = u'<no description available>'
+            description = '<no description available>'
         description = re.sub('(\n|\s)+', ' ', description)
         limit = 150
         if len(description) > limit:
-            description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
+            description = '{} ...'.format(description[:limit].rsplit(' ', 1)[0])
         data.append(description)
 
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])

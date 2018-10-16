@@ -2,7 +2,7 @@
 """
 Created on May 20, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -23,7 +23,8 @@ class Find(BotCommand):
         return ['find', 'google', 'g']
 
     def help(self, query):
-        return 'find/google/g <searchterm> - returns the first google result for the given search term'
+        return ('find/google/g <searchterm>'
+                ' - returns the first google result for the given search term')
 
     def execute(self, message: IRCMessage):
         try:
@@ -31,23 +32,24 @@ class Find(BotCommand):
 
             if not results:
                 return IRCResponse(ResponseType.Say,
-                                   u'[google developer key missing]',
+                                   '[google developer key missing]',
                                    message.replyTo)
 
-            if u'items' not in results:
+            if 'items' not in results:
                 return IRCResponse(ResponseType.Say,
-                                   u'No results found for query!',
+                                   'No results found for query!',
                                    message.replyTo)
 
-            firstResult = results[u'items'][0]
+            firstResult = results['items'][0]
 
-            title = firstResult[u'title']
+            title = firstResult['title']
             title = re.sub(r'\s+', ' ', title)
-            content = firstResult[u'snippet']
-            content = re.sub(r'\s+', ' ', content)  # replace multiple spaces with single ones (includes newlines?)
+            content = firstResult['snippet']
+            # replace multiple spaces with single ones (includes newlines?)
+            content = re.sub(r'\s+', ' ', content)
             content = string.unescapeXHTML(content)
-            url = firstResult[u'link']
-            replyText = u'{1}{0}{2}{0}{3}'.format(string.graySplitter, title, content, url)
+            url = firstResult['link']
+            replyText = '{1}{0}{2}{0}{3}'.format(string.graySplitter, title, content, url)
 
             return IRCResponse(ResponseType.Say, replyText, message.replyTo)
         except Exception as x:

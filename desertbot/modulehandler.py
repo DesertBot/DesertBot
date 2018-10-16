@@ -8,7 +8,6 @@ from twisted.plugin import getPlugins
 from twisted.python.rebuild import rebuild
 from twisted.internet import threads
 from enum import Enum
-from six import iteritems
 from typing import Any, List, TYPE_CHECKING
 
 from desertbot.moduleinterface import IModule
@@ -61,11 +60,11 @@ class ModuleHandler(object):
         actions = {}
         for action in module.actions():
             if action[0] not in actions:
-                actions[action[0]] = [ (action[2], action[1]) ]
+                actions[action[0]] = [(action[2], action[1])]
             else:
                 actions[action[0]].append((action[2], action[1]))
 
-        for action, actionList in iteritems(actions):
+        for action, actionList in actions.items():
             if action not in self.actions:
                 self.actions[action] = []
             for actionData in actionList:
@@ -81,9 +80,11 @@ class ModuleHandler(object):
             for trigger in module.triggers():
                 self.mappedTriggers[trigger] = module
 
-        self.modules.update({module.__class__.__name__: module})
-        self.fileMap.update({inspect.getsourcefile(module.__class__).split(os.path.sep)[-1]: module.__class__.__name__})
-        self.caseMap.update({module.__class__.__name__.lower(): module.__class__.__name__})
+        className = module.__class__.__name__
+        fileName = inspect.getsourcefile(module.__class__).split(os.path.sep)[-1]
+        self.modules.update({className: module})
+        self.fileMap.update({fileName: className})
+        self.caseMap.update({className.lower(): className})
 
     def unloadModule(self, name: str) -> str:
         if name.lower() not in self.caseMap:
@@ -170,8 +171,9 @@ class ModuleHandler(object):
                 elif response.type == ResponseType.Raw:
                     self.bot.sendMessage(response.response)
             except Exception:
-                # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
-                self.logger.exception("Python Execution Error sending responses {!r}".format(responses))
+                # ^ dirty, but we don't want any modules to kill the bot
+                self.logger.exception("Python Execution Error sending responses {!r}"
+                                      .format(responses))
 
     def _deferredError(self, error):
         self.logger.exception("Python Execution Error in deferred call {!r}".format(error))
@@ -181,7 +183,9 @@ class ModuleHandler(object):
         configModulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
         modulesToLoad = set()
         if 'all' in configModulesToLoad:
-            modulesToLoad.update(set([module.__class__.__name__ for module in getPlugins(IModule, desertbot.modules)]))
+            modulesToLoad.update(set(
+                [module.__class__.__name__ for module in getPlugins(IModule, desertbot.modules)]
+                ))
 
         for module in configModulesToLoad:
             if module == 'all':

@@ -8,8 +8,6 @@ import random
 import datetime
 import re
 
-from six import iteritems
-
 from desertbot.message import IRCMessage
 from desertbot.response import ResponseType, IRCResponse
 
@@ -23,8 +21,9 @@ class Responses(BotCommand):
                                                    ('action-user', 1, self.respond)]
 
     def help(self, query):
-        return 'Talkwords from the mouth place - response <name> to enable/disable a particular response ' \
-           '(might need to check the source for names)'
+        return ('Talkwords from the mouth place'
+                ' - response <name> to enable/disable a particular response'
+                ' (might need to check the source for names)')
 
     def onLoad(self):
         try:
@@ -89,26 +88,26 @@ class Responses(BotCommand):
                                              'loves cheese',
                                              '([^a-zA-Z]|^)cheese([^a-zA-Z]|$)',
                                              ResponseType.Do))
-                                             
+
             '''Also respond to French cheese'''
             self.responses.add(MobroResponse('fromage',
                                              'adore le fromage',
                                              '([^a-zA-Z]|^)fromage([^a-zA-Z]|$)',
                                              ResponseType.Do))
-            
-            '''And Dutch cheese because it'll be funny if it ever comes up'''                                 
+
+            '''And Dutch cheese because it'll be funny if it ever comes up'''
             self.responses.add(MobroResponse('kaas',
                                              'is gek op kaas',
                                              '([^a-zA-Z]|^)kaas([^a-zA-Z]|$)',
                                              ResponseType.Do))
-                                             
+
             '''Respond to Finnish cheese because lel'''
             self.responses.add(MobroResponse('juusto',
                                              'rakastaa juustoa',
                                              '([^a-zA-Z]|^)juusto([^a-zA-Z]|$)',
                                              ResponseType.Do))
 
-            '''And why not German too?''' # because it breaks everything apparently
+            '''And why not German too?'''  # because it breaks everything apparently
 #            self.responses.add(MobroResponse(u'Käse',
 #                                             u'liebt Käse',
 #                                             ur'([^a-zA-Z]|^)Käse([^a-zA-Z]|$)',
@@ -189,7 +188,7 @@ class Responses(BotCommand):
                 }
 
                 self.animal = None
-                for match, animal in iteritems(matchDict):
+                for match, animal in matchDict.items():
                     if re.search(r'^{}([^\s\w]+)?$'.format(match), message, re.IGNORECASE):
                         self.animal = animal
                         return True
@@ -209,7 +208,7 @@ class Responses(BotCommand):
                 # Emily Bonus
                 if message.user.nick == 'Emily':
                     randomChance = random.randint(1, 25)
-                    
+
                 article = 'an' if self.animal[0] in 'aeiou' else 'a'
 
                 # General user animals
@@ -435,7 +434,7 @@ class Responses(BotCommand):
         else:
             enabled = []
             disabled = []
-            for name, response in iteritems(self.responses.dict):
+            for name, response in self.responses.dict.items():
                 if response.enabled:
                     enabled.append(name)
                 else:

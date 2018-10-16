@@ -17,7 +17,8 @@ class Apples(BotCommand):
         return ['playapples', 'stopapples']
 
     def help(self, query):
-        return 'playapples, stopapples - For when you need a 4th for Apples to Apples (will always pick 0)'
+        return ('playapples, stopapples'
+                ' - For when you need a 4th for Apples to Apples (will always pick 0)')
 
     playApples = 0
 
@@ -30,7 +31,8 @@ class Apples(BotCommand):
                 return IRCResponse(ResponseType.Say, "!join", message.replyTo)
             elif name.lower() == self.bot.nick and cmd == "is judging.":
                 return IRCResponse(ResponseType.Say, "!pick 0", message.replyTo)
-            elif name.lower() != self.bot.nick and (cmd == "is judging next." or cmd == "is judging first."):
+            elif name.lower() != self.bot.nick and (cmd == "is judging next."
+                                                    or cmd == "is judging first."):
                 return IRCResponse(ResponseType.Say, "!play 0", message.replyTo)
             elif cmd == "wins the game!" or name == "Sorry,":
                 self.playApples = 0

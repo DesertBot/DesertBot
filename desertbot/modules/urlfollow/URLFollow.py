@@ -12,8 +12,6 @@ from zope.interface import implementer
 from urllib.parse import urlparse
 import re
 
-from builtins import str
-
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
@@ -59,9 +57,9 @@ class URLFollow(BotCommand):
         if not match:
             if not auto:
                 return IRCResponse(ResponseType.Say,
-                                   u'[no url recognized]',
+                                   '[no url recognized]',
                                    message.replyTo,
-                                   {'urlfollowURL': u'[no url recognized]'})
+                                   {'urlfollowURL': '[no url recognized]'})
             return
 
         url = match.group('url')
@@ -69,9 +67,9 @@ class URLFollow(BotCommand):
         if not follows:
             if not auto:
                 return IRCResponse(ResponseType.Say,
-                                   u'[no follows worked for {}]'.format(url),
+                                   '[no follows worked for {}]'.format(url),
                                    message.replyTo,
-                                   {'urlfollowURL': u'[no follows worked for {}]'})
+                                   {'urlfollowURL': '[no follows worked for {}]'})
             return
         text, url = follows
 
@@ -93,7 +91,7 @@ class URLFollow(BotCommand):
         title = self.bot.moduleHandler.runActionUntilValue('get-html-title', response.content)
         if title is not None:
             domain = urlparse(response.url).netloc
-            return u'{} (at {})'.format(title, domain), url
+            return '{} (at {})'.format(title, domain), url
 
         return
 

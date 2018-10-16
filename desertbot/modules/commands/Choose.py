@@ -2,7 +2,7 @@
 """
 Created on May 04, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -21,12 +21,14 @@ class Choose(BotCommand):
         return ['choose']
 
     def help(self, query):
-        return 'choose <option1>, <option2>[, <optionN>] - randomly chooses one of the given options for you'
+        return ('choose <option1>, <option2>[, <optionN>]'
+                ' - randomly chooses one of the given options for you')
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say,
-                               "You didn't give me any options to choose from! {}".format(self.help(None)),
+                               "You didn't give me any options to choose from! {}"
+                               .format(self.help(None)),
                                message.replyTo)
 
         if ',' in message.parameters:

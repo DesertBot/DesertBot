@@ -2,7 +2,7 @@
 """
 Created on Feb 15, 2018
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -21,7 +21,6 @@ from twisted.internet import task
 from twisted.internet import reactor
 # from pytimeparse.timeparse import timeparse
 from ruamel.yaml import YAML, yaml_object
-from six import iteritems
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -34,7 +33,7 @@ yaml = YAML()
 
 @yaml_object(yaml)
 class Task(object):
-    yaml_tag = u'!Task'
+    yaml_tag = '!Task'
 
     def __init__(self, type, timeStr, command, params, user, channel, bot):
         """
@@ -84,15 +83,15 @@ class Task(object):
         self.task.addErrback(self._deferredError)
 
     def activate(self):
-        commandStr = u'{}{} {}'.format(self.bot.commandChar, self.command,
-                                       u' '.join(self.params))
+        commandStr = '{}{} {}'.format(self.bot.commandChar, self.command,
+                                      ' '.join(self.params))
         self.logger.info("Activated {!r}".format(commandStr))
         message = IRCMessage('PRIVMSG',
                              IRCUser(self.user),
                              IRCChannel(self.channel, self.bot),
                              commandStr,
                              self.bot)
-        
+
         trigger = self.bot.moduleHandler.mappedTriggers[self.command].execute
 
         return trigger(message)
@@ -133,24 +132,24 @@ class Schedule(BotCommand):
         - schedules a repeating task using cron syntax https://crontab.guru/"""
         if len(message.parameterList) < 7:
             return IRCResponse(ResponseType.Say,
-                               u'{}'.format(re.sub(r"\s+", u" ",
-                                                   self._cron.__doc__)),
+                               '{}'.format(re.sub(r"\s+", " ",
+                                                  self._cron.__doc__)),
                                message.replyTo)
 
         taskName = message.parameterList[6]
         if taskName in self.schedule:
-            response = u'There is already a scheduled task called {!r}'.format(taskName)
+            response = 'There is already a scheduled task called {!r}'.format(taskName)
             return IRCResponse(ResponseType.Say, response, message.replyTo)
 
         command = message.parameterList[7].lower()
         if command not in self.bot.moduleHandler.mappedTriggers:
             return IRCResponse(ResponseType.Say,
-                               u'{!r} is not a recognized command'.format(command),
+                               '{!r} is not a recognized command'.format(command),
                                message.replyTo)
 
         params = message.parameterList[8:]
 
-        cronStr = u' '.join(message.parameterList[1:6])
+        cronStr = ' '.join(message.parameterList[1:6])
 
         self.schedule[taskName] = Task('cron', cronStr, command, params,
                                        message.user.fullUserPrefix(),
@@ -161,16 +160,16 @@ class Schedule(BotCommand):
         self._saveSchedule()
 
         return IRCResponse(ResponseType.Say,
-                           u'Task {!r} created! Next execution: {}'
+                           'Task {!r} created! Next execution: {}'
                            .format(taskName, self.schedule[taskName].nextTime),
                            message.replyTo)
 
     def _list(self, message):
         """list - lists scheduled task titles with their next execution time.
         * after the time indicates a repeating task"""
-        taskList = [u'{} ({}){}'.format(n, t.nextTime, '*' if t.type in ['cron'] else '')
-                    for n, t in iteritems(self.schedule)]
-        tasks = u'Scheduled Tasks: ' + u', '.join(taskList)
+        taskList = ['{} ({}){}'.format(n, t.nextTime, '*' if t.type in ['cron'] else '')
+                    for n, t in self.schedule.items()]
+        tasks = 'Scheduled Tasks: ' + ', '.join(taskList)
         return IRCResponse(ResponseType.Say, tasks, message.replyTo)
 
     def _show(self, message):
@@ -178,35 +177,35 @@ class Schedule(BotCommand):
         for the named task"""
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say,
-                               u'Show which task?',
+                               'Show which task?',
                                message.replyTo)
 
         taskName = message.parameterList[1]
 
         if taskName not in self.schedule:
             return IRCResponse(ResponseType.Say,
-                               u'Task {!r} is unknown'.format(taskName),
+                               'Task {!r} is unknown'.format(taskName),
                                message.replyTo)
 
         t = self.schedule[taskName]
         return IRCResponse(ResponseType.Say,
-                           u'{} {} {} {} | {}'
+                           '{} {} {} {} | {}'
                            .format(t.type, t.timeStr, t.command,
-                                   u' '.join(t.params), t.nextTime),
+                                   ' '.join(t.params), t.nextTime),
                            message.replyTo)
 
     def _stop(self, message):
         """stop <task name> - stops the named task"""
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say,
-                               u'Stop which task?',
+                               'Stop which task?',
                                message.replyTo)
 
         taskName = message.parameterList[1]
 
         if taskName not in self.schedule:
             return IRCResponse(ResponseType.Say,
-                               u'Task {!r} is unknown'.format(taskName),
+                               'Task {!r} is unknown'.format(taskName),
                                message.replyTo)
 
         self.schedule[taskName].stop()
@@ -215,37 +214,37 @@ class Schedule(BotCommand):
         self._saveSchedule()
 
         return IRCResponse(ResponseType.Say,
-                           u'Task {!r} stopped'.format(taskName),
+                           'Task {!r} stopped'.format(taskName),
                            message.replyTo)
 
     subCommands = OrderedDict([
-        (u'cron', _cron),
-        (u'list', _list),
-        (u'show', _show),
-        (u'stop', _stop),
+        ('cron', _cron),
+        ('list', _list),
+        ('show', _show),
+        ('stop', _stop),
     ])
 
     def help(self, query: List[str]) -> str:
         if len(query) > 1:
             subCommand = query[1].lower()
             if subCommand in self.subCommands:
-                sub = re.sub(r"\s+", u" ",
+                sub = re.sub(r"\s+", " ",
                              self.subCommands[subCommand].__doc__)
-                return u'{1}schedule {0}'.format(sub, self.bot.commandChar)
+                return '{1}schedule {0}'.format(sub, self.bot.commandChar)
             else:
                 return self._unrecognizedSubCommand(subCommand)
         else:
             return self._helpText()
 
     def _unrecognizedSubCommand(self, subCommand):
-        return (u"unrecognized sub-command '{}', "
-                u"available sub-commands for schedule are: {}"
-                .format(subCommand, u', '.join(self.subCommands.keys())))
+        return ("unrecognized sub-command '{}', "
+                "available sub-commands for schedule are: {}"
+                .format(subCommand, ', '.join(self.subCommands.keys())))
 
     def _helpText(self):
-        return (u"{1}schedule ({0}) - manages scheduled tasks. "
-                u"Use '{1}help schedule <sub-command> for sub-command help."
-                .format(u'/'.join(self.subCommands.keys()),
+        return ("{1}schedule ({0}) - manages scheduled tasks. "
+                "Use '{1}help schedule <sub-command> for sub-command help."
+                .format('/'.join(self.subCommands.keys()),
                         self.bot.commandChar))
 
     def _saveSchedule(self):
@@ -264,7 +263,7 @@ class Schedule(BotCommand):
                 self.schedule = {}
 
             # start them all going
-            for _, t in iteritems(self.schedule):
+            for _, t in self.schedule.items():
                 t.reInit(self.bot)
                 t.start()
         except FileNotFoundError:
@@ -272,7 +271,7 @@ class Schedule(BotCommand):
 
     def onUnload(self):
         # cancel everything
-        for _, t in iteritems(self.schedule):
+        for _, t in self.schedule.items():
             t.stop()
 
     def execute(self, message: IRCMessage):

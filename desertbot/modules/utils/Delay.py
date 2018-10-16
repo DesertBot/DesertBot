@@ -2,7 +2,7 @@
 """
 Created on May 26, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -26,7 +26,8 @@ class Delay(BotCommand):
         return ['delay', 'later']
 
     def help(self, query):
-        return 'delay <duration> <command> (<parameters>) - executes the given command after the specified delay'
+        return ('delay <duration> <command> (<parameters>)'
+                ' - executes the given command after the specified delay')
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 2:
@@ -37,15 +38,17 @@ class Delay(BotCommand):
         delayDelta = datetime.timedelta(seconds=delay)
         delayString = string.deltaTimeToString(delayDelta, 's')
         params = message.parameterList[2:]
-        commandString = u'{}{} {}'.format(self.bot.commandChar, command, u' '.join(params))
+        commandString = '{}{} {}'.format(self.bot.commandChar, command, ' '.join(params))
         commandString = commandString.replace('$delayString', delayString)
         commandString = commandString.replace('$delay', str(delay))
 
-        newMessage = IRCMessage(message.type, message.user, message.channel, commandString, self.bot)
+        newMessage = IRCMessage(message.type, message.user, message.channel,
+                                commandString, self.bot)
 
         moduleHandler = self.bot.moduleHandler
         if command in moduleHandler.mappedTriggers:
-            d = task.deferLater(reactor, delay, moduleHandler.mappedTriggers[command].execute, newMessage)
+            module = moduleHandler.mappedTriggers[command].execute
+            d = task.deferLater(reactor, delay, module, newMessage)
             d.addCallback(self._activate)
             d.addErrback(self._deferredError)
             return IRCResponse(ResponseType.Say,

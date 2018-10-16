@@ -2,7 +2,7 @@
 """
 Created on Dec 20, 2011
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -24,9 +24,13 @@ class Leave(BotCommand):
     @admin('Only my admins can tell me to leave')
     def execute(self, message: IRCMessage):
         if len(message.parameterList) > 0:
-            return IRCResponse(ResponseType.Raw, 'PART {} :{}'.format(message.replyTo, message.parameters), '')
+            return IRCResponse(ResponseType.Raw,
+                               'PART {} :{}'.format(message.replyTo, message.parameters),
+                               '')
         else:
-            return IRCResponse(ResponseType.Raw, 'PART {} :toodles!'.format(message.replyTo), '')
+            return IRCResponse(ResponseType.Raw,
+                               'PART {} :toodles!'.format(message.replyTo),
+                               '')
 
 
 leave = Leave()

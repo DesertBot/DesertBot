@@ -11,7 +11,6 @@ from zope.interface import implementer
 
 from html.parser import HTMLParser
 import re
-from six import string_types
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -25,33 +24,40 @@ class Slurp(BotCommand):
         return ['slurp']
 
     def help(self, query):
-        return "slurp <attribute> <url> <css selector> - scrapes the given attribute from the tag selected " \
-            "at the given url"
+        return ("slurp <attribute> <url> <css selector>"
+                " - scrapes the given attribute from the tag selected "
+                "at the given url")
 
     htmlParser = HTMLParser()
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 3:
-            return IRCResponse(ResponseType.Say, u"Not enough parameters, usage: {}".format(self.help(None)), message.replyTo)
+            return IRCResponse(ResponseType.Say,
+                               "Not enough parameters, usage: {}".format(self.help(None)),
+                               message.replyTo)
 
-        prop, url, selector = (message.parameterList[0], message.parameterList[1], u" ".join(message.parameterList[2:]))
+        prop, url, selector = (message.parameterList[0],
+                               message.parameterList[1],
+                               " ".join(message.parameterList[2:]))
 
         if not re.match(r'^\w+://', url):
-            url = u"http://{}".format(url)
+            url = "http://{}".format(url)
 
         if 'slurp' in message.metadata and url in message.metadata['slurp']:
             soup = message.metadata['slurp'][url]
         else:
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             if not response:
-                return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.replyTo)
+                return IRCResponse(ResponseType.Say,
+                                   "Problem fetching {}".format(url),
+                                   message.replyTo)
             soup = BeautifulSoup(response.content, 'lxml')
 
         tag = soup.select_one(selector)
 
         if tag is None:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' does not select a tag at {}".format(selector, url),
+                               "'{}' does not select a tag at {}".format(selector, url),
                                message.replyTo)
 
         specials = {
@@ -64,19 +70,17 @@ class Slurp(BotCommand):
         elif prop in tag.attrs:
             value = tag[prop]
         else:
-            return IRCResponse(ResponseType.Say,
-                               u"The tag selected by '{}' ({}) does not have attribute '{}'".format(selector,
-                                                                                                    tag.name,
-                                                                                                    prop),
-                               message.replyTo)
+            attrMissing = ("The tag selected by '{}' ({}) does not have attribute '{}'"
+                           .format(selector, tag.name, prop))
+            return IRCResponse(ResponseType.Say, attrMissing, message.replyTo)
 
-        if not isinstance(value, string_types):
-            value = u" ".join(value)
+        if not isinstance(value, str):
+            value = " ".join(value)
 
         # sanitize the value
         value = value.strip()
-        value = re.sub(r'[\r\n]+', u' ', value)
-        value = re.sub(r'\s+', u' ', value)
+        value = re.sub(r'[\r\n]+', ' ', value)
+        value = re.sub(r'\s+', ' ', value)
         value = self.htmlParser.unescape(value)
 
         return IRCResponse(ResponseType.Say, value, message.replyTo,

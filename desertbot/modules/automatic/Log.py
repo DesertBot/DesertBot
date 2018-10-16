@@ -2,7 +2,7 @@
 """
 Created on May 11, 2014
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 
 from twisted.plugin import IPlugin
@@ -18,22 +18,22 @@ from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
 logFuncs = {
-    'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.user.nick, m.messageString),
-    'ACTION': lambda m: u'*{0} {1}*'.format(m.user.nick, m.messageString),
-    'NOTICE': lambda m: u'[{0}] {1}'.format(m.user.nick, m.messageString),
-    'JOIN': lambda m: u' >> {0} ({1}@{2}) joined {3}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo),
-    'NICK': lambda m: u'{0} is now known as {1}'.format(m.user.nick, m.messageString),
-    'PART': lambda m: u' << {0} ({1}@{2}) left {3}{4}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo, m.messageString),
-    'QUIT': lambda m: u' << {0} ({1}@{2}) quit{3}'.format(m.user.nick, m.user.ident, m.user.host, m.messageString),
-    'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.metadata['kicked'], m.user.nick, m.messageString),
-    'TOPIC': lambda m: u'# {0} set the topic to: {1}'.format(m.user.nick, m.messageString),
+    'PRIVMSG': lambda m: '<{0}> {1}'.format(m.user.nick, m.messageString),
+    'ACTION': lambda m: '*{0} {1}*'.format(m.user.nick, m.messageString),
+    'NOTICE': lambda m: '[{0}] {1}'.format(m.user.nick, m.messageString),
+    'JOIN': lambda m: ' >> {0} ({1}@{2}) joined {3}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo),
+    'NICK': lambda m: '{0} is now known as {1}'.format(m.user.nick, m.messageString),
+    'PART': lambda m: ' << {0} ({1}@{2}) left {3}{4}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo, m.messageString),
+    'QUIT': lambda m: ' << {0} ({1}@{2}) quit{3}'.format(m.user.nick, m.user.ident, m.user.host, m.messageString),
+    'KICK': lambda m: '!<< {0} was kicked by {1}{2}'.format(m.metadata['kicked'], m.user.nick, m.messageString),
+    'TOPIC': lambda m: '# {0} set the topic to: {1}'.format(m.user.nick, m.messageString),
     'MODE': lambda m: formatMode(m),
 }
 
 logSelfFuncs = {
-    ResponseType.Say: lambda nick, r: u'<{0}> {1}'.format(nick, r.response),
-    ResponseType.Do: lambda nick, r: u'*{0} {1}*'.format(nick, r.response),
-    ResponseType.Notice: lambda nick, r: u'[{0}] {1}'.format(nick, r.response),
+    ResponseType.Say: lambda nick, r: '<{0}> {1}'.format(nick, r.response),
+    ResponseType.Do: lambda nick, r: '*{0} {1}*'.format(nick, r.response),
+    ResponseType.Notice: lambda nick, r: '[{0}] {1}'.format(nick, r.response),
 }
 
 
@@ -60,10 +60,11 @@ def formatMode(msg: IRCMessage):
 
     return '# {} sets mode: {}'.format(msg.user.nick, modeStr)
 
+
 def log(path, target, text):
     now = datetime.datetime.utcnow()
     time = now.strftime("[%H:%M]")
-    data = u'{0} {1}'.format(time, text)
+    data = '{0} {1}'.format(time, text)
     print(target, data)
 
     fileName = "{0}{1}.txt".format(target, now.strftime("-%Y%m%d"))
@@ -99,13 +100,14 @@ class Log(BotCommand):
                                              ('response-notice', -1, self.output)]
 
     def triggers(self):
-        return []#['log']
+        return []  # ['log']
 
     def help(self, arg):
-        return "Logs {} messages.".format("/".join(logFuncs.keys()))#"log (-n / yyyy-mm-dd) - " \
-            #"without parameters, links to today's log. " \
-            #"-n links to the log n days ago. " \
-            #"yyyy-mm-dd links to the log for the specified date"
+        return "Logs {} messages.".format("/".join(logFuncs.keys()))
+        # return ("log (-n / yyyy-mm-dd) - "
+        # "without parameters, links to today's log. "
+        # "-n links to the log n days ago. "
+        # "yyyy-mm-dd links to the log for the specified date")
 
     def input(self, message: IRCMessage):
         if message.type in logFuncs:

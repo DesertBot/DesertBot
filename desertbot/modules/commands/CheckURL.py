@@ -14,6 +14,7 @@ from desertbot.response import IRCResponse, ResponseType
 
 from desertbot.utils.api_keys import load_key
 
+
 @implementer(IPlugin, IModule)
 class CheckURL(BotCommand):
     def triggers(self):
@@ -28,10 +29,13 @@ class CheckURL(BotCommand):
 
         urlToCheck = message.parameterList[0]
         apiKey = load_key("WebCargo")
-        urlF = "https://api.webcargo.io/availability?key={}&domain={}"
-        url = urlF.format(apiKey, urlToCheck)
+        url = "https://api.webcargo.io/availability"
+        params = {
+            'key': apiKey,
+            'domain': urlToCheck,
+        }
 
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, params=params)
 
         if not response:
             return IRCResponse(ResponseType.Say,
@@ -54,5 +58,6 @@ class CheckURL(BotCommand):
                 return IRCResponse(ResponseType.Say,
                                    "{!r} is not available".format(urlToCheck),
                                    message.replyTo)
+
 
 checkURL = CheckURL()

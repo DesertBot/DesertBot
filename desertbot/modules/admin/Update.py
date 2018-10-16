@@ -2,7 +2,7 @@
 """
 Created on Dec 07, 2013
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -22,7 +22,7 @@ import sys
 class Update(BotCommand):
     def triggers(self):
         return ['update']
-    
+
     def help(self, query: List[str]) -> str:
         return "update - pulls the latest code from GitHub and reloads affected modules"
 
@@ -38,14 +38,22 @@ class Update(BotCommand):
             return IRCResponse(ResponseType.Say, 'The bot is already up to date', message.replyTo)
 
         changes = list(reversed(changes))
-        response = u'New commits: {}'.format(u' | '.join(changes))
+        response = 'New commits: {}'.format(' | '.join(changes))
 
         # Get modified files
-        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '--diff-filter=M', '..origin/master'])
+        output = subprocess.check_output(['git', 'show',
+                                          '--pretty=format:',
+                                          '--name-only',
+                                          '--diff-filter=M',
+                                          '..origin/master'])
         changedFiles = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         # Get added files
-        output = subprocess.check_output(['git', 'show', '--pretty=format:', '--name-only', '--diff-filter=A', '..origin/master'])
+        output = subprocess.check_output(['git', 'show',
+                                          '--pretty=format:',
+                                          '--name-only',
+                                          '--diff-filter=A',
+                                          '..origin/master'])
         addedFiles = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         returnCode = subprocess.check_call(['git', 'merge', 'origin/master'])
@@ -72,19 +80,22 @@ class Update(BotCommand):
             modulesToLoad = set()
 
             for filepath in changedPyFiles:
-                filename = filepath.split(os.path.sep)[-1]  # list contains full filepaths, split on os.path.sep and get last for filename
+                # list contains full filepaths, split on os.path.sep and get last for filename
+                filename = filepath.split(os.path.sep)[-1]
                 if "modules" in filepath:
                     if filename in self.bot.moduleHandler.fileMap:
                         modulesToReload.add(self.bot.moduleHandler.fileMap[filename])
                 else:
                     modulesToReload = set()
                     modulesToLoad = set()
-                    response += " | No auto-reload due to change(s) in bot core, please restart bot."
+                    response += (" | No auto-reload due to change(s) in bot core, "
+                                 "please restart bot.")
                     self.logger.info("No auto-reload due to change in file {!r}".format(filename))
                     break
 
             for filepath in addedPyFiles:
-                filename = filepath.split(os.path.sep)[-1]  # list contains full filepaths, split on os.path.sep and get last for filename
+                # list contains full filepaths, split on os.path.sep and get last for filename
+                filename = filepath.split(os.path.sep)[-1]
                 if "modules" in filepath:
                     # TODO a better way to do this, module name might not match file name.
                     modulesToLoad.add(filename.split(".py")[0])
@@ -105,7 +116,8 @@ class Update(BotCommand):
                         self.bot.moduleHandler.reloadModule(moduleName)
                     except Exception:
                         failures.append(moduleName)
-                        self.logger.exception("Exception when auto-reloading module {!r}".format(moduleName))
+                        self.logger.exception("Exception when auto-reloading module {!r}"
+                                              .format(moduleName))
                     else:
                         reloadedModules.append(moduleName)
             if len(reloadedModules) > 0:
@@ -120,7 +132,8 @@ class Update(BotCommand):
                     self.bot.moduleHandler.reloadModule(moduleName)
                 except Exception:
                     failures.append(moduleName)
-                    self.logger.exception("Exception when auto-reloading module {!r}".format(moduleName))
+                    self.logger.exception("Exception when auto-reloading module {!r}"
+                                          .format(moduleName))
                 else:
                     loadedModules.append(moduleName)
             if len(loadedModules) > 0:

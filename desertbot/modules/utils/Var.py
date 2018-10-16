@@ -2,7 +2,7 @@
 """
 Created on Mar 09, 2016
 
-@author: Tyranic-Moron
+@author: StarlitGhost
 """
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
@@ -19,15 +19,19 @@ class Var(BotCommand):
         return ['var']
 
     def help(self, query):
-        return "var <varname> <value> - sets <varname> to <value>, which can be accessed later using $<varname>. " \
-           "the variables don't persist between messages, so it is only useful as a support function for aliases using sub and/or chain"
+        return ("var <varname> <value>"
+                " - sets <varname> to <value>, which can be accessed later using $<varname>."
+                " the variables don't persist between messages,"
+                " so it is only useful as a support function for aliases using sub and/or chain")
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 1:
-            return IRCResponse(ResponseType.Say, "You didn't give a variable name!", message.replyTo)
-            
+            return IRCResponse(ResponseType.Say,
+                               "You didn't give a variable name!",
+                               message.replyTo)
+
         varname = message.parameterList[0]
-        value = u' '.join(message.parameters.split(' ')[1:])
+        value = ' '.join(message.parameters.split(' ')[1:])
         return IRCResponse(ResponseType.Say, "", message.replyTo, extraVars={varname: value})
 
 
