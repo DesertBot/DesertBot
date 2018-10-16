@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from enum import Enum
 from typing import Dict, Optional, TYPE_CHECKING
 import re

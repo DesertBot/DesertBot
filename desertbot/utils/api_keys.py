@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 
 path = 'data/api_keys.json'

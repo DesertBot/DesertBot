@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from twisted.plugin import pluginPackagePaths
 import os
 
