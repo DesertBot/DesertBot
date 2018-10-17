@@ -177,7 +177,7 @@ class Sed(BotCommand):
         if unmodified:
             userList = self.unmodifiedMessages[message.replyTo]
             userList.append(message)
-            self.unmodifiedMessagesi[message.replyTo] = userList[-self.historySize:]
+            self.unmodifiedMessages[message.replyTo] = userList[-self.historySize:]
 
 
 sed = Sed()
