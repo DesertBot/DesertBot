@@ -73,7 +73,7 @@ class DesertBot(IRCBase, object):
         self.startTime = datetime.utcnow()
 
     def cleanup(self) -> None:
-        self.storage.close()
+        self.storage.save()
         self.config.writeConfig()
         self.logger.info('Saved config and data.')
 

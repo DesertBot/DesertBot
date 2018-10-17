@@ -29,3 +29,9 @@ class DataStore(object):
 
     def __getitem__(self, item):
         return self.data[item]
+
+    def __setitem__(self, key, value):
+        self.data[key] = value
+    
+    def __contains__(self, key):
+        return key in self.data
