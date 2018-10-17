@@ -14,6 +14,7 @@ except ImportError:
 class DesertBotFactory(protocol.ReconnectingClientFactory):
     def __init__(self, config: Config):
         self.logger = logging.getLogger('desertbot.factory')
+        self.exitStatus = 0
 
         self.bot = DesertBot(self, config)
         self.protocol = self.bot
@@ -21,12 +22,14 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
         self.server = config['server']
         self.port = config.getWithDefault('port', 6667)
         if config.getWithDefault('tls', False):
-            self.logger.info('Attempting secure connection to {}:{}...'.format(self.server, self.port))
+            self.logger.info('Attempting secure connection to {}:{}...'
+                             .format(self.server, self.port))
             if ssl is not None:
                 reactor.connectSSL(self.server, self.port, self, ssl.ClientContextFactory())
             else:
-                self.logger.error('Connection to {}:{} failed; PyOpenSSL is required for secure connections.'.format(
-                                  self.server, self.port))
+                self.logger.error('Connection to {}:{} failed;'
+                                  ' PyOpenSSL is required for secure connections.'
+                                  .format(self.server, self.port))
         else:
             self.logger.info('Attempting connection to {}:{}'.format(self.server, self.port))
             reactor.connectTCP(self.server, self.port, self)
