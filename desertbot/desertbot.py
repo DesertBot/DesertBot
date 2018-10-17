@@ -153,3 +153,8 @@ class DesertBot(IRCBase, object):
             'added': modesAdded,
             'removed': modesRemoved
         }
+
+    def reraiseIfDebug(self, e: Exception) -> None:
+        # if we're in debug mode, let the exception kill the bot
+        if self.logLevel == logging.DEBUG:
+            raise e

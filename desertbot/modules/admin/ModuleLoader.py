@@ -4,7 +4,6 @@ from desertbot.modules.commandinterface import BotCommand, admin
 from zope.interface import implementer
 
 from typing import List, Tuple
-import logging
 
 from desertbot.message import IRCMessage
 from desertbot.modulehandler import ModuleHandler
@@ -75,9 +74,7 @@ class ModuleLoader(BotCommand):
                 exceptions.append("{} ({})".format(moduleNameCaseMap[moduleName], xName))
                 self.logger.exception("Exception when loading module {!r}"
                                       .format(moduleNameCaseMap[moduleName]))
-                # if we're in debug mode, let the exception kill the bot
-                if self.bot.logLevel == logging.DEBUG:
-                    raise x
+                self.bot.reraiseIfDebug(x)
 
         return successes, failures, exceptions
 
@@ -113,9 +110,7 @@ class ModuleLoader(BotCommand):
                     exceptions.append("{} ({})".format(moduleNameCaseMap[moduleName], xName))
                     self.logger.exception("Exception when loading module {!r}"
                                           .format(moduleNameCaseMap[moduleName]))
-                    # if we're in debug mode, let the exception kill the bot
-                    if self.bot.logLevel == logging.DEBUG:
-                        raise x
+                    self.bot.reraiseIfDebug(x)
 
         return successes, failures, exceptions
 
@@ -138,9 +133,7 @@ class ModuleLoader(BotCommand):
                 exceptions.append("{} ({})".format(moduleNameCaseMap[moduleName], xName))
                 self.logger.exception("Exception when loading module {!r}"
                                       .format(moduleNameCaseMap[moduleName]))
-                # if we're in debug mode, let the exception kill the bot
-                if self.bot.logLevel == logging.DEBUG:
-                    raise x
+                self.bot.reraiseIfDebug(x)
 
         return successes, failures, exceptions
 
