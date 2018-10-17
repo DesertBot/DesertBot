@@ -174,9 +174,7 @@ class ModuleHandler(object):
                 # ^ dirty, but we don't want any modules to kill the bot
                 self.logger.exception("Python Execution Error sending responses {!r}"
                                       .format(responses))
-                # if we're in debug mode, let the exception kill the bot
-                if self.bot.logLevel == logging.DEBUG:
-                    raise e
+                self.bot.reraiseIfDebug(e)
 
     def _deferredError(self, error):
         self.logger.exception("Python Execution Error in deferred call {!r}".format(error))
@@ -209,9 +207,7 @@ class ModuleHandler(object):
             except Exception as e:
                 # ^ dirty, but we don't want any modules to kill the bot
                 self.logger.exception("Exception when loading module {!r}".format(module))
-                # if we're in debug mode, let the exception kill the bot
-                if self.bot.logLevel == logging.DEBUG:
-                    raise e
+                self.bot.reraiseIfDebug(e)
 
     def runGenericAction(self, actionName: str, *params: Any, **kw: Any) -> None:
         actionList = []
