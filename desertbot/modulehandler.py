@@ -1,3 +1,4 @@
+from enum import Enum
 import importlib
 import inspect
 import logging
@@ -6,14 +7,14 @@ import os
 from twisted.plugin import getPlugins
 from twisted.python.rebuild import rebuild
 from twisted.internet import threads
-from enum import Enum
-from typing import Any, List, TYPE_CHECKING
+from twisted.internet import reactor
 
 from desertbot.moduleinterface import IModule
 import desertbot.modules
 from desertbot.message import IRCMessage, TargetTypes
 from desertbot.response import ResponseType
 
+from typing import Any, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from desertbot.desertbot import DesertBot
 
@@ -169,14 +170,22 @@ class ModuleHandler(object):
                     self.bot.output.cmdNOTICE(response.target, response.response)
                 elif response.type == ResponseType.Raw:
                     self.bot.sendMessage(response.response)
-            except Exception:
+            except Exception as e:
                 # ^ dirty, but we don't want any modules to kill the bot
                 self.logger.exception("Python Execution Error sending responses {!r}"
                                       .format(responses))
+                # if we're in debug mode, let the exception kill the bot
+                if self.bot.logLevel == logging.DEBUG:
+                    raise e
 
     def _deferredError(self, error):
         self.logger.exception("Python Execution Error in deferred call {!r}".format(error))
         self.logger.exception(error)
+        # if we're in debug mode, let the exception kill the bot
+        if self.bot.logLevel == logging.DEBUG:
+            # we can't just re-raise because twisted will eat the deferred error
+            self.bot.factory.exitStatus = 1
+            reactor.stop()
 
     def loadAll(self) -> None:
         configModulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
@@ -197,8 +206,12 @@ class ModuleHandler(object):
         for module in modulesToLoad:
             try:
                 self.loadModule(module, rebuild_=False)
-            except Exception:
+            except Exception as e:
+                # ^ dirty, but we don't want any modules to kill the bot
                 self.logger.exception("Exception when loading module {!r}".format(module))
+                # if we're in debug mode, let the exception kill the bot
+                if self.bot.logLevel == logging.DEBUG:
+                    raise e
 
     def runGenericAction(self, actionName: str, *params: Any, **kw: Any) -> None:
         actionList = []

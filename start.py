@@ -23,7 +23,8 @@ if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     # Set up logging for stdout on the root 'desertbot' logger
-    # Modules can then just add more handlers to the root logger to capture all logs to files in various ways
+    # Modules can then just add more handlers to the root logger
+    # to capture all logs to files in various ways
     rootLogger = logging.getLogger('desertbot')
     numericLevel = getattr(logging, cmdArgs.loglevel.upper(), None)
     if isinstance(numericLevel, int):
@@ -31,16 +32,17 @@ if __name__ == '__main__':
     else:
         raise ValueError('Invalid log level {}'.format(cmdArgs.loglevel))
 
-    logFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', '%H:%M:%S')
+    logFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                                     '%H:%M:%S')
 
     streamHandler = logging.StreamHandler(stream=sys.stdout)
     streamHandler.setFormatter(logFormatter)
 
     rootLogger.addHandler(streamHandler)
-    
+
     observer = log.PythonLoggingObserver(loggerName='desertbot.twisted')
     observer.start()
-    
+
     config = Config(cmdArgs.config)
     try:
         config.loadConfig()
@@ -49,3 +51,4 @@ if __name__ == '__main__':
     else:
         factory = DesertBotFactory(config)
         reactor.run()
+        sys.exit(factory.exitStatus)

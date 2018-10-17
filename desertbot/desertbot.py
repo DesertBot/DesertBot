@@ -1,10 +1,11 @@
 import logging
 import os
+from datetime import datetime
 
 from twisted.internet.interfaces import ISSLTransport
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
-from datetime import datetime
+
 from desertbot.config import Config
 from desertbot.datastore import DataStore
 from desertbot.input import InputHandler
@@ -13,6 +14,7 @@ from desertbot.modulehandler import ModuleHandler
 from desertbot.output import OutputHandler
 from desertbot.support import ISupport
 from desertbot.utils.string import isNumber
+
 from typing import Dict, Optional, List, TYPE_CHECKING
 from weakref import WeakValueDictionary
 
@@ -23,6 +25,7 @@ if TYPE_CHECKING:
 class DesertBot(IRCBase, object):
     def __init__(self, factory: 'DesertBotFactory', config: Config):
         self.logger = logging.getLogger('desertbot.core')
+        self.logLevel = logging.getLogger('desertbot').getEffectiveLevel()
         self.factory = factory
         self.config = config
         self.input = InputHandler(self)
@@ -43,7 +46,12 @@ class DesertBot(IRCBase, object):
         self.initializingCapabilities = True
         self.capabilities = {
             'init': True,
-            'available': ['account-notify', 'away-notify', 'chghost', 'extended-join', 'invite-notify', 'multi-prefix',
+            'available': ['account-notify',
+                          'away-notify',
+                          'chghost',
+                          'extended-join',
+                          'invite-notify',
+                          'multi-prefix',
                           'userhost-in-names'],
             'requested': [],
             'enabled': [],
@@ -105,7 +113,8 @@ class DesertBot(IRCBase, object):
         self.output.cmdNICK(self.nick)
         self.output.cmdUSER(self.ident, self.gecos)
 
-    def handleCommand(self, command: str, params: List[str], prefix: str, tags: Dict[str, Optional[str]]) -> None:
+    def handleCommand(self, command: str, params: List[str],
+                      prefix: str, tags: Dict[str, Optional[str]]) -> None:
         self.logger.debug('IN: {} {} {} {}'.format(tags, prefix, command, ' '.join(params)))
         if isNumber(command):
             self.input.handleNumeric(command, prefix, params)
@@ -131,7 +140,8 @@ class DesertBot(IRCBase, object):
             elif mode == '-':
                 adding = False
             elif mode not in self.supportHelper.userModes:
-                self.logger.warning('Received unknown MODE char {} in MODE string {}.'.format(mode, modes))
+                self.logger.warning('Received unknown MODE char {} in MODE string {}.'
+                                    .format(mode, modes))
                 return None
             elif adding:
                 self.userModes[mode] = None

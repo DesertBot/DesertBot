@@ -6,6 +6,7 @@ Created on Feb 28, 2018
 
 from fnmatch import fnmatch
 from functools import wraps, partial
+import logging
 from typing import Callable, List, Optional, Tuple, Union
 
 from desertbot.message import IRCMessage
@@ -42,7 +43,8 @@ class BotCommand(BotModule):
         self.triggerHelp = {}
 
     def displayHelp(self, query: str) -> str:
-        if query[0].lower() in self.triggers() or query[0].lower() == self.__class__.__name__.lower():
+        lowQuery = query[0].lower()
+        if lowQuery in self.triggers() or lowQuery == self.__class__.__name__.lower():
             return self.help(query)
 
     def help(self, query: str) -> str:
@@ -66,9 +68,14 @@ class BotCommand(BotModule):
         try:
             return self.execute(message)
         except Exception as e:
-            self.logger.exception("Python execution error while running command {!r}".format(message.command))
-            error_text = "Python execution error while running command {!r}: {}: {}".format(message.command, type(e).__name__, e)
-            self.bot.output.cmdPRIVMSG(error_text, message.replyTo)
+            self.logger.exception("Python execution error while running command {!r}"
+                                  .format(message.command))
+            errorText = ("Python execution error while running command {!r}: {}: {}"
+                         .format(message.command, type(e).__name__, str(e)))
+            self.bot.output.cmdPRIVMSG(message.replyTo, errorText)
+            # if we're in debug mode, let the exception kill the bot
+            if self.bot.logLevel == logging.DEBUG:
+                raise e
 
     def shouldExecute(self, message: IRCMessage) -> bool:
         if message.command.lower() not in [t.lower() for t in self.triggers()]:
