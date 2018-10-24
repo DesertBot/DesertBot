@@ -9,35 +9,45 @@ from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 import datetime
-# TODO: replace this with BeautifulSoup
-import xml.etree.ElementTree as ET
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
 import dateutil.parser as dparser
+from bs4 import BeautifulSoup
 
 
 aYearAgo = datetime.datetime.utcnow() - datetime.timedelta(days=365)
 tenMinsAgo = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)
 
 DataStore = {
+    'LRR Video': {
+        'url': 'https://feeds.feedburner.com/Loadingreadyrun',
+        'lastUpdate': aYearAgo,
+        'lastTitle': '',
+        'lastLink': '',
+        'lastCheck': tenMinsAgo,
+        'aliases': ['vid', 'vids', 'video', 'videos', 'v'],
+        'supress': True
+    },
     'LRRCast': {
-        'url': 'http://feeds.feedburner.com/lrrcast',
+        'url': 'https://loadingreadyrun.com/lrrcasts/feed/all',
         'lastUpdate': aYearAgo,
         'lastTitle': '',
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ["podcast", "cast", "lrrc", "llrc", "lcast", "lc", 'chat'],
-        'suppress': True},
+        'suppress': True
+    },
     'LRR Blog': {
-        'url': 'http://loadingreadyrun.com/blog/feed/',
+        'url': 'https://loadingreadyrun.com/blog/feed/',
         'lastUpdate': aYearAgo,
         'lastTitle': '',
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ['blog'],
-        'suppress': True}
+        'suppress': True
+    }
 }
 
 
@@ -67,18 +77,20 @@ class LRR(BotCommand):
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', feedDeets['url'])
 
             if not response:
-                # TODO: log an error here that the feed likely no longer exists!
+                self.logger.warning('failed to fetch {!r}, either a server hiccup '
+                                    'or the feed no longer exists'.format(feedDeets['url']))
                 continue
 
-            # TODO: replace this with BeautifulSoup
-            root = ET.fromstring(response.content)
-            item = root.find('channel/item')
+            soup = BeautifulSoup(response.content)
+            item = soup.find('item')
 
             if item is None:
-                # TODO: log an error here that the feed likely no longer exists!
+                self.logger.warning("the feed at {!r} doesn't have any items, has it shut down?"
+                                    .format(feedDeets['url']))
                 continue
 
-            newestDate = dparser.parse(item.find('pubDate').text, fuzzy=True, ignoretz=True)
+            itemDate = item.find('pubdate').text
+            newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True)
 
             if newestDate > feedDeets['lastUpdate']:
                 DataStore[feedName]['lastUpdate'] = newestDate
@@ -87,9 +99,9 @@ class LRR(BotCommand):
                     DataStore[feedName]['suppress'] = False
                 else:
                     title = item.find('title').text
+                    link = item.find('link').text
+                    link = self.bot.moduleHandler.runActionUntilValue('shorten-url', link)
                     DataStore[feedName]['lastTitle'] = title
-                    link = self.bot.moduleHandler.runActionUntilValue('shorten-url',
-                                                                      item.find('link').text)
                     DataStore[feedName]['lastLink'] = link
                     response = 'New {0}! Title: {1} | {2}'.format(feedName, title, link)
                     responses.append(IRCResponse(ResponseType.Say, response, '#desertbus'))
