@@ -28,7 +28,7 @@ DataStore = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ['vid', 'vids', 'video', 'videos', 'v'],
-        'supress': True
+        'suppress': True
     },
     'LRRCast': {
         'url': 'https://loadingreadyrun.com/lrrcasts/feed/all',
@@ -81,7 +81,7 @@ class LRR(BotCommand):
                                     'or the feed no longer exists'.format(feedDeets['url']))
                 continue
 
-            soup = BeautifulSoup(response.content)
+            soup = BeautifulSoup(response.content, 'lxml')
             item = soup.find('item')
 
             if item is None:
