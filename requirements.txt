@@ -6,6 +6,7 @@ google-api-python-client==1.7.4
 isodate==0.6.0
 jsonpath-ng==1.4.3
 lxml==4.2.5
+numpy==1.15.3
 parsedatetime==2.4
 psutil==5.4.7
 pyhedrals==0.0.2
