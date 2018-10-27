@@ -30,7 +30,7 @@ class WebUtils(BotModule):
         return super(WebUtils, self).actions() + [('fetch-url', 1, self.fetchURL),
                                                   ('post-url', 1, self.postURL),
                                                   ('get-html-title', 1, self.getPageTitle),
-                                                  ('shorten-url', 1, self.shortenGoogl),
+                                                  ('shorten-url', 1, self.shortenURL),
                                                   ('search-web', 1, self.googleSearch),
                                                   ('upload-pasteee', 1, self.pasteEE)]
 
@@ -116,28 +116,18 @@ class WebUtils(BotModule):
 
         return
 
-    def shortenGoogl(self, url: str) -> str:
-        post = {"longUrl": url}
-
-        googlKey = load_key('goo.gl')
-
-        if googlKey is None:
-            return "[goo.gl API key not found]"
-
-        apiURL = 'https://www.googleapis.com/urlshortener/v1/url?key={}'.format(googlKey)
-
-        headers = {"Content-Type": "application/json"}
+    def shortenURL(self, url: str) -> str:
+        apiURL = 'https://dbco.link/u'
+        post = {'content': url}
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
 
         try:
             response = requests.post(apiURL, json=post, headers=headers)
             responseJson = response.json()
-            if 'error' in responseJson:
-                return '[Googl Error: {} {}]'.format(responseJson['error']['message'],
-                                                     post['longUrl'])
-            return responseJson['id']
-
+            return responseJson['url']
         except requests.exceptions.RequestException:
-            self.logger.exception("Goo.gl error")
+            self.logger.exception("dbco.link url error")
 
     def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
         googleKey = load_key('Google')

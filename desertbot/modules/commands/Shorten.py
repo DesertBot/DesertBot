@@ -8,13 +8,12 @@ from desertbot.response import IRCResponse, ResponseType
 
 
 @implementer(IPlugin, IModule)
-class Googl(BotCommand):
+class Shorten(BotCommand):
     def triggers(self):
-        return ['googl', 'shorten', 'goo.gl']
+        return ['shorten']
 
     def help(self, query):
-        return ("googl/shorten <url>"
-                " - Gives you a shortened version of a url, via Goo.gl")
+        return ("shorten <url> - Gives you a shortened version of a url, via https://dbco.link")
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
@@ -28,4 +27,4 @@ class Googl(BotCommand):
         return IRCResponse(ResponseType.Say, url, message.replyTo)
 
 
-googl = Googl()
+shorten = Shorten()
