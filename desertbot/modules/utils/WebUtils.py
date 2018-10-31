@@ -99,10 +99,7 @@ class WebUtils(BotModule):
             self.logger.exception("POST to {!r} failed!".format(url))
 
     def getPageTitle(self, webpage: str) -> str:
-        soup = BeautifulSoup(webpage, 'lxml')
-        title = soup.title
-        if title:
-            title = title.text
+        def cleanTitle(title: str) -> str:
             title = re.sub('[\r\n]+', '', title)  # strip any newlines
             title = title.strip()  # strip all whitespace either side
             title = ' '.join(title.split())  # replace multiple whitespace with single space
@@ -113,6 +110,16 @@ class WebUtils(BotModule):
                 title = title[:300].rsplit(' ', 1)[0] + " ..."
 
             return title
+
+        soup = BeautifulSoup(webpage, 'lxml')
+        # look for a meta title first, it will probably be more relevant if there is one
+        title = soup.find('meta', {'property': 'og:title'})
+        if title:
+            return cleanTitle(title['content'])
+        # fall back to the html title tag
+        title = soup.title
+        if title:
+            return cleanTitle(title.text)
 
         return
 
