@@ -36,7 +36,7 @@ class Mastodon(BotModule):
         # sets that correctly
         if 'Set-Cookie' not in response.headers:
             return
-        if not response.headers['Set-Cookie'].startswith('_mastodon_session'):
+        if '_mastodon_session' not in response.headers['Set-Cookie']:
             return
 
         soup = BeautifulSoup(response.content, 'lxml')
