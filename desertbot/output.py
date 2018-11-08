@@ -28,7 +28,7 @@ class OutputHandler(object):
     def cmdKICK(self, channel: str, user: str, reason: str = "") -> None:
         self.bot.sendMessage("KICK", channel, user, reason)
 
-    def cmdMODE(self, target: str, modes:str = "", params:str = "") -> None:
+    def cmdMODE(self, target: str, modes: str = "", params: str = "") -> None:
         if params and isinstance(params, str):
             params = [params]
         self.bot.sendMessage("MODE", target, modes, params)

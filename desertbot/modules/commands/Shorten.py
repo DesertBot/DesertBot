@@ -13,7 +13,7 @@ class Shorten(BotCommand):
         return ['shorten']
 
     def help(self, query):
-        return ("shorten <url> - Gives you a shortened version of a url, via https://dbco.link")
+        return "shorten <url> - Gives you a shortened version of a url, via https://dbco.link"
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:

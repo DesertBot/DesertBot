@@ -19,7 +19,7 @@ class EightBall(BotCommand):
     def triggers(self):
         return ['8ball', 'eightball']
 
-    def help(self):
+    def help(self, query):
         return '8ball (question) - swirls a magic 8-ball to give you the answer to your questions'
 
     def execute(self, message: IRCMessage):

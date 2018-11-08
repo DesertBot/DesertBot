@@ -12,6 +12,7 @@ import random
 import re
 from collections import OrderedDict
 from unicodedata import category as unicodeCategory
+from typing import List, Union
 
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
@@ -269,7 +270,7 @@ class Hangman(BotCommand):
             maxBadMessage = '[Hangman] maximum bad guesses should be an integer between 1 and 20'
             return IRCResponse(ResponseType.Say, maxBadMessage, message.replyTo)
 
-    def _guess(self, message: IRCMessage) -> IRCResponse:
+    def _guess(self, message: IRCMessage) -> Union[IRCResponse, List[IRCResponse]]:
         channel = message.replyTo.lower()
         if channel not in self.gameStates:
             return IRCResponse(ResponseType.Say,

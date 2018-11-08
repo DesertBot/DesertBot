@@ -49,7 +49,7 @@ class WebUtils(BotModule):
 
     def fetchURL(self, url: str,
                  params: Any=None,
-                 extraHeaders: Optional[Dict[str, str]]=None) -> Response:
+                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
         # check the requested url is public
         if not self.isPublicURL(url):
             return
@@ -81,7 +81,7 @@ class WebUtils(BotModule):
     def postURL(self, url: str,
                 data: Any=None,
                 json: Any=None,
-                extraHeaders: Optional[Dict[str, str]]=None) -> Response:
+                extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
         # check the requested url is public
         if not self.isPublicURL(url):
             return
@@ -98,7 +98,7 @@ class WebUtils(BotModule):
         except requests.exceptions.RequestException:
             self.logger.exception("POST to {!r} failed!".format(url))
 
-    def getPageTitle(self, webpage: str) -> str:
+    def getPageTitle(self, webpage: str) -> Optional[str]:
         def cleanTitle(title: str) -> str:
             title = re.sub('[\r\n]+', '', title)  # strip any newlines
             title = title.strip()  # strip all whitespace either side
