@@ -59,10 +59,6 @@ class Steam(BotCommand):
             apps = 'Package containing: {}'.format(', '.join(appNames))
             data.append(apps)
 
-        if 'dlc' in appData:
-            dlc = 'DLC: {}'.format(len(appData['dlc']))
-            data.append(dlc)
-
         # genres
         if 'genres' in appData:
             genres = ', '.join([genre['description'] for genre in appData['genres']])
@@ -89,6 +85,11 @@ class Steam(BotCommand):
             else:
                 metacritic = colour(A.normal[A.fg.green[str(metaScore)]])
             data.append('Metacritic: {0}'.format(metacritic))
+
+        # dlc count
+        if 'dlc' in appData:
+            dlc = 'DLC: {}'.format(len(appData['dlc']))
+            data.append(dlc)
 
         # prices
         priceField = {'app': 'price_overview', 'package': 'price'}[steamType]
