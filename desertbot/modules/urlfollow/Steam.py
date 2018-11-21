@@ -59,6 +59,10 @@ class Steam(BotCommand):
             apps = 'Package containing: {}'.format(', '.join(appNames))
             data.append(apps)
 
+        if 'dlc' in appData:
+            dlc = 'DLC: {}'.format(len(appData['dlc']))
+            data.append(dlc)
+
         # genres
         if 'genres' in appData:
             genres = ', '.join([genre['description'] for genre in appData['genres']])
@@ -157,9 +161,14 @@ class Steam(BotCommand):
         if 'data' not in j[appId]:
             return
 
+        data = j[appId]['data']
+
+        if priceField not in data:
+            return
+
         if region == 'AU':
-            j[appId]['data'][priceField]['currency'] = 'AUD'
-        return j[appId]['data'][priceField]
+            data[priceField]['currency'] = 'AUD'
+        return data[priceField]
 
 
 steam = Steam()
