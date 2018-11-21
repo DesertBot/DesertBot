@@ -112,7 +112,13 @@ class WebUtils(BotModule):
             return title
 
         soup = BeautifulSoup(webpage, 'lxml')
-        # look for a meta title first, it will probably be more relevant if there is one
+        # look for an h1 inside an article tag first, this should be the actual title on the page
+        article = soup.find('article')
+        if article:
+            title = article.find('h1')
+            if title:
+                return cleanTitle(title.text)
+        # look for a meta title next, it will probably be more relevant if there is one
         title = soup.find('meta', {'property': 'og:title'})
         if title:
             return cleanTitle(title['content'])
