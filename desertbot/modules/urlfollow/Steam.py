@@ -79,12 +79,12 @@ class Steam(BotCommand):
         if 'metacritic' in appData:
             metaScore = appData['metacritic']['score']
             if metaScore < 50:
-                metacritic = colour(A.normal[A.fg.red[str(metaScore)]])
+                metacritic = colour(A.fg.red[str(metaScore)])
             elif metaScore < 75:
-                metacritic = colour(A.normal[A.fg.orange[str(metaScore)]])
+                metacritic = colour(A.fg.orange[str(metaScore)])
             else:
-                metacritic = colour(A.normal[A.fg.green[str(metaScore)]])
-            data.append('Metacritic: {0}'.format(metacritic))
+                metacritic = colour(A.fg.green[str(metaScore)])
+            data.append('Metacritic: {}'.format(metacritic))
 
         # dlc count
         if 'dlc' in appData:
@@ -92,6 +92,11 @@ class Steam(BotCommand):
             data.append(dlc)
 
         # prices
+        if 'is_free' in appData:
+            if appData['is_free']:
+                free = colour(A.fg.cyan['Free'])
+                data.append(free)
+
         priceField = {'app': 'price_overview', 'package': 'price'}[steamType]
         if priceField in appData:
             prices = {'USD': appData[priceField],
@@ -110,12 +115,12 @@ class Steam(BotCommand):
 
             # filter out any missing prices
             prices = {key: val for key, val in prices.items() if val}
-            priceList = [currencies[val['currency']] + str(val['final'] / 100.0)
+            priceList = ['{}{:,.2f}'.format(currencies[val['currency']], val['final'] / 100.0)
                          for val in prices.values()]
             priceString = '/'.join(priceList)
             if prices['USD']['discount_percent'] > 0:
-                discount = ' ({0}% sale!)'.format(prices['USD']['discount_percent'])
-                priceString += colour(A.normal[A.fg.green[A.bold[discount]]])
+                discount = ' ({}% sale!)'.format(prices['USD']['discount_percent'])
+                priceString += colour(A.fg.green[A.bold[discount]])
 
             data.append(priceString)
 
@@ -143,7 +148,7 @@ class Steam(BotCommand):
             description = re.sub(r'(<[^>]+>|[\r\n\t])+', colour(A.normal[' ', A.fg.gray['>'], ' ']),
                                  appData['about_the_game'])
             if len(description) > limit:
-                description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+                description = '{} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
 
         url = ('http://store.steampowered.com/{}/{}'
