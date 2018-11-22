@@ -80,7 +80,7 @@ class Etymology(BotCommand):
 
         defn = words[index].find(class_='word__defination--2q7ZH')
         defn = defn.text
-        limit = 300
+        limit = 500
         if len(defn) > limit:
             defn = '{} ...'.format(defn[:limit].rsplit(' ', 1)[0])
 
