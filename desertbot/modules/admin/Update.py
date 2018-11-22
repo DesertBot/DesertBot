@@ -128,7 +128,7 @@ class Update(BotCommand):
             failures = []
             for moduleName in modulesToLoad:
                 try:
-                    self.bot.moduleHandler.reloadModule(moduleName)
+                    self.bot.moduleHandler.loadModule(moduleName)
                 except Exception:
                     failures.append(moduleName)
                     self.logger.exception("Exception when auto-reloading module {!r}"
