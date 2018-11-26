@@ -1,6 +1,6 @@
 beautifulsoup4==4.6.3
 croniter==0.3.26
-Cython==0.29
+Cython==0.29.1
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
 google-api-python-client==1.7.4
 isodate==0.6.0
