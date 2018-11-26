@@ -40,7 +40,12 @@ class Twitter(BotCommand):
 
         tweet = soup.find(class_='permalink-tweet')
 
+        displayName = tweet['data-name']
         user = tweet.find(class_='username').text
+
+        reply = tweet.find(class_='ReplyingToContextBelowAuthor')
+        if reply:
+            reply = 'r' + reply.text.strip()[1:]
 
         tweetText = tweet.find(class_='tweet-text')
 
@@ -64,9 +69,17 @@ class Twitter(BotCommand):
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         text = re.sub('[\r\n]+', graySplitter, text)
 
-        formatString = str(colour(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
+        formatString = str(colour(A.normal[A.fg.gray['[{time}]'],
+                                           A.bold[' {name} ({user})',
+                                                  A.normal[A.fg.gray[' {reply}']] if reply else '',
+                                                  ':'],
+                                           ' {text}']))
 
-        return formatString.format(tweetTimeText, user, text), url
+        return formatString.format(time=tweetTimeText,
+                                   name=displayName,
+                                   user=user,
+                                   reply=reply,
+                                   text=text), url
 
 
 twitter = Twitter()

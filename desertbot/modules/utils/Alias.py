@@ -215,6 +215,7 @@ class Alias(BotCommand):
             importList = [alias.lower() for alias in message.parameterList[2:]]
         else:
             onlyListed = False
+            importList = None
 
         url = message.parameterList[1]
         try:
@@ -241,7 +242,7 @@ class Alias(BotCommand):
             if splitLine[0].lower() != "{}alias".format(self.bot.commandChar):
                 notAlias = "Line {} at {} does not begin with {}alias".format(lineNumber,
                                                                               url,
-                                                                              self.bot.commandChar),
+                                                                              self.bot.commandChar)
                 return IRCResponse(ResponseType.Say, notAlias, message.replyTo)
             subCommand = splitLine[1].lower()
             if subCommand not in ["add", "help"]:
@@ -270,7 +271,7 @@ class Alias(BotCommand):
 
         importMessage = "Imported {} alias(es) and {} help string(s) from {}".format(numAliases,
                                                                                      numHelpTexts,
-                                                                                     url),
+                                                                                     url)
         return IRCResponse(ResponseType.Say, importMessage, message.replyTo)
 
     subCommands = OrderedDict([

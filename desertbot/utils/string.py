@@ -41,6 +41,8 @@ def splitUTF8(s: str, n: int) -> str:
 # \x03FF: set foreground
 # \x03FF,BB: set fore/background
 format_chars = re.compile(r'[\x02\x1f\x16\x1d\x0f]|\x03([0-9]{1,2}(,[0-9]{1,2})?)?')
+
+
 def stripFormatting(message: str) -> str:
     """
     Removes IRC formatting from the provided message.

@@ -68,7 +68,9 @@ class Responses(BotCommand):
             '''Responds to Pokemon as Joseph Ducreux'''
             self.responses.add(MobroResponse('pokemon',
                                              'Portable Atrocities! Must be encapsulated en masse!',
-                                             '([^a-zA-Z]|^)pokemon([^a-zA-Z]|$)'))
+                                             '([^a-zA-Z]|^)pokemon([^a-zA-Z]|$)',
+                                             ResponseType.Say,
+                                             False))
 
             '''Guards against the Dutch'''
             self.responses.add(MobroResponse('dutch',

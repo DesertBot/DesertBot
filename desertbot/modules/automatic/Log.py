@@ -22,9 +22,9 @@ logFuncs = {
     'NOTICE': lambda m: '[{0}] {1}'.format(m.user.nick, m.messageString),
     'JOIN': lambda m: ' >> {0} ({1}@{2}) joined {3}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo),
     'NICK': lambda m: '{0} is now known as {1}'.format(m.user.nick, m.messageString),
-    'PART': lambda m: ' << {0} ({1}@{2}) left {3}{4}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo, m.messageString),
-    'QUIT': lambda m: ' << {0} ({1}@{2}) quit{3}'.format(m.user.nick, m.user.ident, m.user.host, m.messageString),
-    'KICK': lambda m: '!<< {0} was kicked by {1}{2}'.format(m.metadata['kicked'], m.user.nick, m.messageString),
+    'PART': lambda m: ' << {0} ({1}@{2}) left {3}{4}'.format(m.user.nick, m.user.ident, m.user.host, m.replyTo, ': ' + m.messageString if m.messageString else ''),
+    'QUIT': lambda m: ' << {0} ({1}@{2}) quit{3}'.format(m.user.nick, m.user.ident, m.user.host, ': '+m.messageString if m.messageString else ''),
+    'KICK': lambda m: '!<< {0} was kicked by {1}{2}'.format(m.metadata['kicked'], m.user.nick, ': '+m.messageString if m.messageString else ''),
     'TOPIC': lambda m: '# {0} set the topic to: {1}'.format(m.user.nick, m.messageString),
     'MODE': lambda m: formatMode(m),
 }

@@ -8,7 +8,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-from html.parser import HTMLParser
+from html import unescape
 import re
 
 from desertbot.message import IRCMessage
@@ -26,8 +26,6 @@ class Slurp(BotCommand):
         return ("slurp <attribute> <url> <css selector>"
                 " - scrapes the given attribute from the tag selected "
                 "at the given url")
-
-    htmlParser = HTMLParser()
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 3:
@@ -80,7 +78,7 @@ class Slurp(BotCommand):
         value = value.strip()
         value = re.sub(r'[\r\n]+', ' ', value)
         value = re.sub(r'\s+', ' ', value)
-        value = self.htmlParser.unescape(value)
+        value = unescape(value)
 
         return IRCResponse(ResponseType.Say, value, message.replyTo,
                            extraVars={'slurpURL': url},

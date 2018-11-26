@@ -30,7 +30,7 @@ class WebUtils(BotModule):
         return super(WebUtils, self).actions() + [('fetch-url', 1, self.fetchURL),
                                                   ('post-url', 1, self.postURL),
                                                   ('get-html-title', 1, self.getPageTitle),
-                                                  ('shorten-url', 1, self.shortenGoogl),
+                                                  ('shorten-url', 1, self.shortenURL),
                                                   ('search-web', 1, self.googleSearch),
                                                   ('upload-pasteee', 1, self.pasteEE)]
 
@@ -49,7 +49,7 @@ class WebUtils(BotModule):
 
     def fetchURL(self, url: str,
                  params: Any=None,
-                 extraHeaders: Optional[Dict[str, str]]=None) -> Response:
+                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
         # check the requested url is public
         if not self.isPublicURL(url):
             return
@@ -66,7 +66,10 @@ class WebUtils(BotModule):
             headers.update(extraHeaders)
         try:
             response = requests.get(url, params=params, headers=headers, timeout=10)
-            pageType = response.headers["content-type"]
+            if 'content-type' in response.headers:
+                pageType = response.headers["content-type"]
+            else:
+                pageType = 'text/nothing'
 
             if check.match(pageType):
                 return response
@@ -81,7 +84,7 @@ class WebUtils(BotModule):
     def postURL(self, url: str,
                 data: Any=None,
                 json: Any=None,
-                extraHeaders: Optional[Dict[str, str]]=None) -> Response:
+                extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
         # check the requested url is public
         if not self.isPublicURL(url):
             return
@@ -98,11 +101,8 @@ class WebUtils(BotModule):
         except requests.exceptions.RequestException:
             self.logger.exception("POST to {!r} failed!".format(url))
 
-    def getPageTitle(self, webpage: str) -> str:
-        soup = BeautifulSoup(webpage, 'lxml')
-        title = soup.title
-        if title:
-            title = title.text
+    def getPageTitle(self, webpage: str) -> Optional[str]:
+        def cleanTitle(title: str) -> str:
             title = re.sub('[\r\n]+', '', title)  # strip any newlines
             title = title.strip()  # strip all whitespace either side
             title = ' '.join(title.split())  # replace multiple whitespace with single space
@@ -114,30 +114,36 @@ class WebUtils(BotModule):
 
             return title
 
+        soup = BeautifulSoup(webpage, 'lxml')
+        # look for an h1 inside an article tag first, this should be the actual title on the page
+        article = soup.find('article')
+        if article:
+            title = article.find('h1')
+            if title:
+                return cleanTitle(title.text)
+        # look for a meta title next, it will probably be more relevant if there is one
+        title = soup.find('meta', {'property': 'og:title'})
+        if title:
+            return cleanTitle(title['content'])
+        # fall back to the html title tag
+        title = soup.title
+        if title:
+            return cleanTitle(title.text)
+
         return
 
-    def shortenGoogl(self, url: str) -> str:
-        post = {"longUrl": url}
-
-        googlKey = load_key('goo.gl')
-
-        if googlKey is None:
-            return "[goo.gl API key not found]"
-
-        apiURL = 'https://www.googleapis.com/urlshortener/v1/url?key={}'.format(googlKey)
-
-        headers = {"Content-Type": "application/json"}
+    def shortenURL(self, url: str) -> str:
+        apiURL = 'https://dbco.link/u'
+        post = {'content': url}
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
 
         try:
             response = requests.post(apiURL, json=post, headers=headers)
             responseJson = response.json()
-            if 'error' in responseJson:
-                return '[Googl Error: {} {}]'.format(responseJson['error']['message'],
-                                                     post['longUrl'])
-            return responseJson['id']
-
+            return responseJson['url']
         except requests.exceptions.RequestException:
-            self.logger.exception("Goo.gl error")
+            self.logger.exception("dbco.link url error")
 
     def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
         googleKey = load_key('Google')

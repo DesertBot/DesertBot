@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict
+from typing import Dict, Union
 
 
 class ResponseType(Enum):
@@ -14,7 +14,7 @@ class IRCResponse(object):
     response = ''
     target = ''
 
-    def __init__(self, messageType: ResponseType, response: str, target: str,
+    def __init__(self, messageType: ResponseType, response: Union[str, bytes], target: Union[str, bytes],
                  extraVars: Dict=None, metadata: Dict=None):
         if extraVars is None:
             extraVars = {}
