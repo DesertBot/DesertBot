@@ -27,7 +27,7 @@ class Roll(BotCommand):
                 ' and a detailed explanation of the dice modifiers')
 
     def onLoad(self):
-        self.roller = dice.DiceParser()
+        self.roller = dice.DiceRoller()
 
     def execute(self, message: IRCMessage):
         verbose = False
