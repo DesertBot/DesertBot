@@ -2,7 +2,7 @@ beautifulsoup4==4.6.3
 croniter==0.3.26
 Cython==0.29.1
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
-google-api-python-client==1.7.4
+google-api-python-client==1.7.5
 isodate==0.6.0
 jsonpath-ng==1.4.3
 lxml==4.2.5
