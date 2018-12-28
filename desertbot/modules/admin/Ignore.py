@@ -90,9 +90,9 @@ class Ignore(BotCommand):
         ('del', _del),
         ('list', _list)])
 
-    def help(self, message: IRCMessage) -> str:
-        if len(message.parameterList) > 1:
-            subCommand = message.parameterList[1].lower()
+    def help(self, query) -> str:
+        if len(query) > 1:
+            subCommand = query[1].lower()
             if subCommand in self.subCommands:
                 return ('{1}ignore {0}'
                         .format(re.sub(r"\s+", " ", self.subCommands[subCommand].__doc__),
