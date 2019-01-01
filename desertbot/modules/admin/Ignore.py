@@ -11,7 +11,6 @@ from zope.interface import implementer
 import re
 from collections import OrderedDict
 
-from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
 
