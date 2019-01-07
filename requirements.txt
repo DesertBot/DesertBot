@@ -1,4 +1,4 @@
-beautifulsoup4==4.6.3
+beautifulsoup4==4.7.1
 croniter==0.3.26
 Cython==0.29.2
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
