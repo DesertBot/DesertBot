@@ -5,7 +5,7 @@ git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
 google-api-python-client==1.7.7
 isodate==0.6.0
 jsonpath-ng==1.4.3
-lxml==4.2.5
+lxml==4.3.0
 numpy==1.15.4
 parsedatetime==2.4
 psutil==5.4.8
