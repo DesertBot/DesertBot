@@ -41,7 +41,7 @@ class Currency(BotCommand):
         ccTo = ",".join(ccTo)
         ccTo = ccTo.upper()
 
-        url = "https://exchangeratesapi.io/api/latest"
+        url = "https://api.exchangeratesapi.io/latest"
         params = {
             'base': ccFrom,
             'symbols': ccTo,
