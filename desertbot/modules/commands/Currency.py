@@ -48,6 +48,10 @@ class Currency(BotCommand):
             }
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, params=params)
         j = response.json()
+        if j is None:
+            return IRCResponse(ResponseType.Say,
+                               "Sorry, the currency API returned no data. Check your currencies!",
+                               message.replyTo)
         rates = j['rates']
 
         if not rates:
