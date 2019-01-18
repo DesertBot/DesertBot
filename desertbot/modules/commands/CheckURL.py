@@ -37,6 +37,11 @@ class CheckURL(BotCommand):
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, params=params)
 
         if not response:
+            if response.status_code == 500:
+                return IRCResponse(ResponseType.Say,
+                                   "{!r} doesn't contain a valid TLD",
+                                   message.replyTo)
+
             return IRCResponse(ResponseType.Say,
                                "[WebCargo domain checker failed to respond]",
                                message.replyTo)
