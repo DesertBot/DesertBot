@@ -17,6 +17,7 @@ from twisted.words.protocols.irc import assembleFormattedText as colour, attribu
 
 import dateutil.parser
 import dateutil.tz
+import json
 import re
 
 
@@ -119,12 +120,33 @@ class Mastodon(BotCommand):
         lines = [l.strip() for l in text.splitlines() if l.strip()]
         text = graySplitter.join(lines)
 
+        media = toot.find('div', {'data-component': 'MediaGallery'})
+        if media:
+            media = json.loads(media['data-props'])
+            media = media['media']
+            numMedia = len(media)
+            if numMedia == 1:
+                medType = media[0]['type']
+                size = media[0]['meta']['original']['size']
+                description = media[0]['description']
+                description = ': {}'.format(description) if description else ''
+                media = '(attached {medType}{description})'.format(medType=medType,
+                                                                   size=size,
+                                                                   description=description)
+            else:
+                media = '({} media attached)'.format(numMedia)
+
         formatString = str(colour(A.normal[A.fg.gray['[{date}]'],
                                            A.bold[' {user}:'],
                                            A.fg.red[' [{summary}]'] if summary else '',
-                                           ' {text}' if not summary or showContents else '']))
+                                           ' {text}' if not summary or showContents else '',
+                                           A.fg.gray[' {media}'] if media else '']))
 
-        return formatString.format(date=date, user=user, summary=summary, text=text), ''
+        return formatString.format(date=date,
+                                   user=user,
+                                   summary=summary,
+                                   text=text,
+                                   media=media), ''
 
     def translateEmojo(self, tagTree):
         for img in tagTree.find_all('img', class_='emojione'):
