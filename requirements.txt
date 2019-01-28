@@ -8,7 +8,7 @@ jsonpath-ng==1.4.3
 lxml==4.3.0
 numpy==1.16.0
 parsedatetime==2.4
-psutil==5.4.8
+psutil==5.5.0
 pyhedrals==0.1.2
 python-dateutil==2.7.5
 pytimeparse==1.1.8
