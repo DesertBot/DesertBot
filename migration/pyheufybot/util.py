@@ -1,7 +1,6 @@
 from desertbot.config import Config
-from desertbot.datastore import Session
-from sqlalchemy import create_engine
-import argparse, dbm, os, pickle, shelve
+from desertbot.datastore import DataStore
+import argparse, os, shelve
 
 
 class PyHeufyBotUtil(object):
@@ -16,11 +15,12 @@ class PyHeufyBotUtil(object):
         self.config.loadConfig()
 
         with shelve.open(options.storage) as storage:
-            for key in storage.keys():
-                print(key)
             self.data = storage[section][options.network]
             storage.close()
 
-        self.databaseEngine = create_engine(
-            self.config.getWithDefault('database_engine', 'sqlite:///data/{}.db'.format(self.config['server'])))
-        Session.configure(bind=self.databaseEngine)
+        self.rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+        self.dataPath = os.path.join(self.rootDir, 'data', self.server)
+        if not os.path.exists(self.dataPath):
+            os.makedirs(self.dataPath)
+
+        self.storage = DataStore(os.path.join(self.dataPath, 'desertbot.json'))
