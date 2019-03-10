@@ -21,6 +21,7 @@ lib64
 
 # Installer logs
 pip-log.txt
+pip-selfcheck.json
 
 # Unit test / coverage reports
 .coverage
@@ -28,7 +29,7 @@ pip-log.txt
 nosetests.xml
 
 # Translations
-*.mo
+*.mo*.
 
 # Mr Developer
 .mr.developer.cfg
@@ -38,6 +39,7 @@ nosetests.xml
 *.*~
 logs
 data/*.json
+data/manhole.sshkey
 *.suo
 *.user
 .gitattributes
@@ -48,3 +50,7 @@ PTVS/*
 *.db
 manhole.passwd
 dropin.cache
+include/*
+share/*
+configs/*.yaml
+!configs/_defaults.yaml
