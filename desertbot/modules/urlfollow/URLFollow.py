@@ -87,10 +87,14 @@ class URLFollow(BotCommand):
         if response.url != url:
             return self.bot.moduleHandler.runActionUntilValue('urlfollow', message, response.url)
 
+        short = self.bot.moduleHandler.runActionUntilValue('shorten-url', url)
+
         title = self.bot.moduleHandler.runActionUntilValue('get-html-title', response.content)
         if title is not None:
             domain = urlparse(response.url).netloc
-            return '{} (at {})'.format(title, domain), url
+            return ('{title} (at {domain}) {short}'
+                    .format(title=title, domain=domain, short=short),
+                    url)
 
         return
 
