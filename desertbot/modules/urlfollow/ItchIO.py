@@ -86,19 +86,29 @@ class ItchIO(BotCommand):
 
         # build the output
         output = []
+
         output.append(colour(A.normal[title, A.fg.gray[' by '], author]))
+
         if genre:
             output.append(colour(A.normal['Genre: ', genre]))
-        output.append(colour(A.normal[status,
-                                      ', last updated: ', updated]))  # todo: publish date
-        output.append(colour(A.normal['Rating: ', rating_stars,
-                                      A.fg.gray['/5 (', rating_count, ' ratings)']]))
+
+        outStatus = status
+        # todo: publish date
+        if updated:
+            outStatus += ', last updated: ' + updated
+        output.append(colour(A.normal[outStatus]))
+        if rating:
+            output.append(colour(A.normal['Rating: ', rating_stars, '/5',
+                                          A.fg.gray[' (', rating_count, ' ratings)']]))
         if price:
             output.append(colour(A.normal[price, ' ', currency]))  # todo: sale stuff
         else:
             output.append('Free')
-        output.append(platforms)
-        output.append(description)
+
+        if platforms:
+            output.append(platforms)
+        if description:
+            output.append(description)
 
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
         response = graySplitter.join(output)
