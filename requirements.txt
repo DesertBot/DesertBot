@@ -1,5 +1,5 @@
 beautifulsoup4==4.7.1
-croniter==0.3.27
+croniter==0.3.28
 Cython==0.29.6
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
 google-api-python-client==1.7.8
