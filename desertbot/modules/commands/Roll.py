@@ -51,22 +51,21 @@ class Roll(BotCommand):
                                message.replyTo)
 
         if verbose:
-            rollStrings = self.roller.getRollStrings()
-            rollString = ' | '.join(rollStrings)
+            rollString = ' | '.join(result.strings())
 
             if len(rollString) > 200:
                 rollString = "LOTS O' DICE"
 
-            response = '{} rolled: [{}] {}'.format(message.user.nick, rollString, result)
+            response = '{} rolled: [{}] {}'.format(message.user.nick, rollString, result.result)
 
         else:
-            response = '{} rolled: {}'.format(message.user.nick, result)
+            response = '{} rolled: {}'.format(message.user.nick, result.result)
 
-        if self.roller.description:
-            response += ' {}'.format(self.roller.description)
+        if result.description:
+            response += ' {}'.format(result.description)
 
         return IRCResponse(ResponseType.Say, response, message.replyTo,
-                           {'rollTotal': result})
+                           {'rollTotal': result.result})
 
 
 roll = Roll()

@@ -9,7 +9,7 @@ lxml==4.3.3
 numpy==1.16.2
 parsedatetime==2.4
 psutil==5.6.1
-pyhedrals==0.1.2
+pyhedrals==0.2.0
 python-dateutil==2.8.0
 pytimeparse==1.1.8
 pyxDamerauLevenshtein==1.5.3
