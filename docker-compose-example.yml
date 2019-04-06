@@ -7,8 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        config: configs/server.yaml
+    command: ["-c", "configs/server.yaml"]
     volumes:
       - ./configs:/app/configs
       - ./data:/app/data

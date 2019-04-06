@@ -24,6 +24,8 @@ RUN pip install --no-cache-dir Cython && \
 #COPY --from=build /app /app
 #WORKDIR /app
 
-ARG config
-ENV config=$config PYTHONUNBUFFERED=1
-ENTRYPOINT python -u start.py -c $config
+ENV PYTHONUNBUFFERED=1
+
+ENTRYPOINT ["python", "-u", "start.py"]
+
+CMD ["-h"]
