@@ -12,17 +12,18 @@ RUN apk --update add \
     openssl-dev \
     re2-dev
 WORKDIR /app
+ADD https://api.github.com/repos/DesertBot/DesertBot/compare/master...HEAD /dev/null
 RUN git clone --depth 1 https://github.com/DesertBot/DesertBot.git /app
 RUN pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r requirements.txt
 
-# Uncomment these 5 lines for an even smaller image
-# You'll lose the ability to do live requirements updates, though
-#FROM base
-#RUN apk --update add git libffi libxml2 libxslt musl openssl re2
-#COPY --from=build /usr/local /usr/local
-#COPY --from=build /app /app
-#WORKDIR /app
+# Comment out these 5 lines if you want !update to be able to do requirements.txt upgrades
+# The image will be larger to support this
+FROM base
+RUN apk --update add git libffi libxml2 libxslt musl openssl re2
+COPY --from=build /usr/local /usr/local
+COPY --from=build /app /app
+WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 
