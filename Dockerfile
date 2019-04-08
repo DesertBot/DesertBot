@@ -12,8 +12,7 @@ RUN apk --update add \
     openssl-dev \
     re2-dev
 WORKDIR /app
-ADD https://api.github.com/repos/DesertBot/DesertBot/compare/master...HEAD /dev/null
-RUN git clone --depth 1 https://github.com/DesertBot/DesertBot.git /app
+COPY . /app
 RUN pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r requirements.txt
 
