@@ -11,10 +11,11 @@ RUN apk --update add \
     musl-dev \
     openssl-dev \
     re2-dev
+COPY requirements.txt /
+RUN pip install --no-cache-dir Cython && \
+    pip install --no-cache-dir -r /requirements.txt
 WORKDIR /app
 COPY . /app
-RUN pip install --no-cache-dir Cython && \
-    pip install --no-cache-dir -r requirements.txt
 
 # Comment out these 5 lines if you want !update to be able to do requirements.txt upgrades
 # The image will be larger to support this
