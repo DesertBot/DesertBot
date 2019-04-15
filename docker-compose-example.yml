@@ -2,7 +2,7 @@ version: '3'
 
 services:
   desertbot-server:
-    restart: unless-stopped
+    image: starlitghost/desertbot
     container_name: desertbot-server
     build:
       context: .
@@ -12,5 +12,10 @@ services:
       - ./configs:/app/configs
       - ./data:/app/data
       - ./logs:/app/logs
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "10"
+    restart: unless-stopped
 
 # vim: tabstop=2 shiftwidth=2 expandtab
