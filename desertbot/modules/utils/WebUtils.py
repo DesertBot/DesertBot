@@ -16,6 +16,7 @@ import ipaddress
 import socket
 from urllib.parse import urlparse
 import re
+import json
 
 from typing import Any, Dict, Optional
 
@@ -143,7 +144,11 @@ class WebUtils(BotModule):
             responseJson = response.json()
             return responseJson['url']
         except requests.exceptions.RequestException:
-            self.logger.exception("dbco.link url error")
+            self.logger.exception("dbco.link POST url error {}"
+                                  .format(url))
+        except json.decoder.JSONDecodeError:
+            self.logger.exception("dbco.link json response decode error, {} (at {})"
+                                  .format(response.content, url))
 
     def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
         googleKey = load_key('Google')

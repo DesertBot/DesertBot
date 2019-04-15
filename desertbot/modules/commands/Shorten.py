@@ -24,6 +24,12 @@ class Shorten(BotCommand):
         url = self.bot.moduleHandler.runActionUntilValue('shorten-url',
                                                          message.parameters)
 
+        if not url:
+            return IRCResponse(ResponseType.Say,
+                               "No url returned from dbco.link, "
+                               "are both pb and mongodb running?",
+                               message.replyTo)
+
         return IRCResponse(ResponseType.Say, url, message.replyTo)
 
 
