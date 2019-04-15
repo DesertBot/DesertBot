@@ -38,6 +38,7 @@ nosetests.xml
 
 *.*~
 logs
+data/*/
 data/*.json
 data/manhole.sshkey
 *.suo
@@ -54,3 +55,5 @@ include/*
 share/*
 configs/*.yaml
 !configs/_defaults.yaml
+docker-compose.yml
+.venv
