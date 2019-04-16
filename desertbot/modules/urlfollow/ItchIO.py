@@ -93,9 +93,10 @@ class ItchIO(BotCommand):
             output.append(colour(A.normal['Genre: ', genre]))
 
         outStatus = status
-        # todo: publish date
+        if published:
+            outStatus += ', published ' + published
         if updated:
-            outStatus += ', last updated: ' + updated
+            outStatus += ', last updated ' + updated
         output.append(colour(A.normal[outStatus]))
         if rating:
             output.append(colour(A.normal['Rating: ', rating_stars, '/5',
