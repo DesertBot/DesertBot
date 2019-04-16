@@ -64,11 +64,6 @@ class Mastodon(BotCommand):
             return IRCResponse(ResponseType.Say, toot, message.replyTo)
 
     def followURL(self, _: IRCMessage, url: str, showContents: bool=False) -> [str, None]:
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
-
-        if not response:
-            return
-
         # check this is actually a Mastodon instance we're looking at
         hostname = urlparse(url).hostname
         endpoint = 'https://{domain}/api/v1/instance'.format(domain=hostname)
@@ -79,9 +74,14 @@ class Mastodon(BotCommand):
         if 'uri' not in endpointJSON:
             return
 
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url',
+                                                              '{}/embed'.format(url))
+        if not response:
+            return
+
         soup = BeautifulSoup(response.content, 'lxml')
 
-        toot = soup.find(class_='entry-center')
+        toot = soup.find(class_='entry')
         if not toot:
             # presumably not a toot, ignore
             return
