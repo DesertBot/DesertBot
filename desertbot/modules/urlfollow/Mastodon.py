@@ -19,6 +19,7 @@ import dateutil.parser
 import dateutil.tz
 import json
 import re
+from urllib.parse import urlparse
 
 
 @implementer(IPlugin, IModule)
@@ -68,11 +69,14 @@ class Mastodon(BotCommand):
         if not response:
             return
 
-        # we'd check Server: Mastodon here but it seems that not every server
-        # sets that correctly
-        if 'Set-Cookie' not in response.headers:
+        # check this is actually a Mastodon instance we're looking at
+        hostname = urlparse(url).hostname
+        endpoint = 'https://{domain}/api/v1/instance'.format(domain=hostname)
+        endpointResponse = self.bot.moduleHandler.runActionUntilValue('fetch-url', endpoint)
+        if not endpointResponse:
             return
-        if '_mastodon_session' not in response.headers['Set-Cookie']:
+        endpointJSON = endpointResponse.json()
+        if 'uri' not in endpointJSON:
             return
 
         soup = BeautifulSoup(response.content, 'lxml')
