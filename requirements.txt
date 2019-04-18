@@ -8,6 +8,7 @@ isodate==0.6.0
 jsonpath-ng==1.4.3
 lxml==4.3.3
 numpy==1.16.2
+Pillow==6.0.0
 parsedatetime==2.4
 psutil==5.6.1
 pyhedrals==0.2.0
