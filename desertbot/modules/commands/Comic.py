@@ -33,7 +33,10 @@ class Comic(BotCommand):
         return ['comic']
 
     def shouldExecute(self, message: IRCMessage) -> bool:
-        return True
+        # trigger on PRIVMSG and ACTION, so we can store messages and actions
+        if message.type == "PRIVMSG" or message.type == "ACTION":
+            return True
+        return False
 
     def help(self, query):
         return 'comic - make a comic'
@@ -44,6 +47,7 @@ class Comic(BotCommand):
                 comic = self.make_comic(self.messageStore)
                 return IRCResponse(ResponseType.Say, self.post_comic(comic), message.replyTo)
         else:
+            # otherwise, just store the message
             self.store_message(message)
 
     def store_message(self, message: IRCMessage):
