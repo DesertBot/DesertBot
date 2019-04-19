@@ -22,19 +22,38 @@ from desertbot.response import IRCResponse, ResponseType
 
 @implementer(IPlugin, IModule)
 class Comic(BotCommand):
+    # just hardcode a limit on max messages for now, should limit comic size pretty effecively?
+    messageLimit = 8
+
+    def onLoad(self) -> None:
+        # messages need to be stored for comics to work, store in a list as (nick, message)
+        self.messageStore = []
+
     def triggers(self):
         return ['comic']
+
+    def shouldExecute(self, message: IRCMessage) -> bool:
+        return True
 
     def help(self, query):
         return 'comic - make a comic'
 
     def execute(self, message: IRCMessage):
-        messages = self.get_messages()
-        comic = self.make_comic(messages)
-        return IRCResponse(ResponseType.Say, self.comic(comic), message.replyTo)
+        if message.command == "comic":
+            if len(self.messageStore) != 0:
+                comic = self.make_comic(self.messageStore)
+                return IRCResponse(ResponseType.Say, self.post_comic(comic), message.replyTo)
+        else:
+            self.store_message(message)
 
-    def get_messages(self):
-        return [('U1', 'Message 1'), ('U2', 'Message 2'), ('U1', 'Message 3'), ('U3', 'Message 4')]
+    def store_message(self, message: IRCMessage):
+        """
+        Store the message into the messageStore, and prune it to the limit if needed
+        """
+        # TODO just store the IRCMessage objects, so we can use other things than just the nick and message string
+        self.messageStore.append((message.user.nick, message.messageString))
+        if len(self.messageStore) > self.messageLimit:
+            self.messageStore.pop(0)    # remove the first (oldest) message in the list if we're now above the limit
 
     def make_comic(self, messages):
         chars = set()
