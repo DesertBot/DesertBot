@@ -3,21 +3,22 @@ Created on Apr 18, 2019
 
 @author: lunik1
 """
+import base64
+import glob
+import json
+from io import BytesIO
+from random import shuffle
+
+import requests
+from PIL import Image, ImageDraw, ImageFont
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import base64
-import requests
-import json
-import glob
-from PIL import Image, ImageDraw, ImageFont
-from random import shuffle
-from io import BytesIO
-
 from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
+
 
 @implementer(IPlugin, IModule)
 class Comic(BotCommand):
@@ -51,7 +52,7 @@ class Comic(BotCommand):
         # TODO just store the IRCMessage objects, so we can use other things than just the nick and message string
         self.messageStore.append((message.user.nick, message.messageString))
         if len(self.messageStore) > self.messageLimit:
-            self.messageStore.pop(0)    # remove the first (oldest) message in the list if we're now above the limit
+            self.messageStore.pop(0)  # remove the first (oldest) message in the list if we're now above the limit
 
     def make_comic(self, messages):
         # chars is a set of the "characters" involved, at this point these are message.user.nick
@@ -123,8 +124,7 @@ class Comic(BotCommand):
                 # call the wrap function again to get the second string (again with 2/3rds panel width as "max width")
                 (string2, (string2width, string2height)) = self.wrap(panel[1][1], font, draw, 2 * panelwidth / 3.0)
                 # then draw that string onto the image as close to the right edge as it can fit, 10 below the 1st string
-                self.rendertext(string2, font, draw,
-                                (panelwidth - 10 - string2width, string1height + 10))
+                self.rendertext(string2, font, draw, (panelwidth - 10 - string2width, string1height + 10))
 
             # calculate the "height" of the text, with some spacing (used for scaling character images?)
             text_height = string1height + 10
@@ -133,17 +133,20 @@ class Comic(BotCommand):
 
             # scale the character image for the 1st message and paste it into the panel Image object
             maxch = panelheight - text_height
-            char1image = self.fitimg(charmap[panel[0][0]], 2*panelwidth/5.0-10, maxch)
-            panelImage.paste(char1image, (10, panelheight-char1image.size[1]), char1image)
+            char1image = self.fitimg(charmap[panel[0][0]], 2 * panelwidth / 5.0 - 10, maxch)
+            panelImage.paste(char1image, (10, panelheight - char1image.size[1]), char1image)
 
             # if there is a second character, also scale and paste that into the panel Image object
             if len(panel) == 2:
-                char2image = self.fitimg(charmap[panel[1][0]], 2*panelwidth/5.0-10, maxch)
-                char2image = char2image.transpose(Image.FLIP_LEFT_RIGHT)    # flip the character image, so it "faces" the first character image
-                panelImage.paste(char2image, (panelwidth-char2image.size[0]-10, panelheight-char2image.size[1]), char2image)
+                char2image = self.fitimg(charmap[panel[1][0]], 2 * panelwidth / 5.0 - 10, maxch)
+                char2image = char2image.transpose(
+                    Image.FLIP_LEFT_RIGHT)  # flip the character image, so it "faces" the first character image
+                panelImage.paste(char2image, (panelwidth - char2image.size[0] - 10, panelheight - char2image.size[1]),
+                                 char2image)
 
             # draw a small black line at the top? of the panel Image
-            draw.line([(0, 0), (0, panelheight-1), (panelwidth-1, panelheight-1), (panelwidth-1, 0), (0, 0)], (0, 0, 0, 0xff))
+            draw.line([(0, 0), (0, panelheight - 1), (panelwidth - 1, panelheight - 1), (panelwidth - 1, 0), (0, 0)],
+                      (0, 0, 0, 0xff))
             del draw
 
             # paste the panel Image object onto our comic Image object, using the index i to offset height
@@ -163,11 +166,10 @@ class Comic(BotCommand):
             responseJson = response.json()
             return responseJson['url']
         except requests.exceptions.RequestException:
-            self.logger.exception("dbco.link POST url error {}"
-                                  .format(comicObject))
+            self.logger.exception("dbco.link POST url error {}".format(comicObject))
         except json.decoder.JSONDecodeError:
-            self.logger.exception("dbco.link json response decode error, {} (at {})"
-                                  .format(response.content, comicObject))
+            self.logger.exception("dbco.link json response decode error, {} (at {})".format(
+                response.content, comicObject))
 
     def wrap(self, message, font, draw, maxWidth):
         """
@@ -197,11 +199,11 @@ class Comic(BotCommand):
             # How big is this line?
             lineWidth, lineHeight = draw.textsize(" ".join(messageWords[:numWords]), font=font)
 
-            wrappedWidth = max(wrappedWidth, lineWidth) # wrappedWidth should be the length of the longest line
+            wrappedWidth = max(wrappedWidth, lineWidth)  # wrappedWidth should be the length of the longest line
             wrappedHeight += lineHeight
 
             lines.append(" ".join(messageWords[:numWords]))
-            messageWords = messageWords[numWords:] # drop the words wrapped so far and continue
+            messageWords = messageWords[numWords:]  # drop the words wrapped so far and continue
 
         return lines, (wrappedWidth, wrappedHeight)
 
