@@ -25,6 +25,11 @@ class Comic(BotCommand):
     # just hardcode a limit on max messages for now, should limit comic size pretty effecively?
     messageLimit = 8
 
+    def actions(self):
+        # define additional actions so all PRIVMSGs and ACTIONs in the channel get handled by storeMessage
+        return super(Comic, self).actions() + [("message-channel", 1, self.storeMessage),
+                                               ("action-channel", 1, self.storeMessage)]
+
     def onLoad(self) -> None:
         # messages need to be stored for comics to work, store in a list as (nick, message)
         self.messageStore = []
@@ -32,25 +37,15 @@ class Comic(BotCommand):
     def triggers(self):
         return ['comic']
 
-    def shouldExecute(self, message: IRCMessage) -> bool:
-        # trigger on PRIVMSG and ACTION, so we can store messages and actions
-        if message.type == "PRIVMSG" or message.type == "ACTION":
-            return True
-        return False
-
     def help(self, query):
         return 'comic - make a comic'
 
     def execute(self, message: IRCMessage):
-        if message.command == "comic":
-            if len(self.messageStore) != 0:
-                comic = self.make_comic(self.messageStore)
-                return IRCResponse(ResponseType.Say, self.post_comic(comic), message.replyTo)
-        else:
-            # otherwise, just store the message
-            self.store_message(message)
+        if len(self.messageStore) != 0:
+            comic = self.make_comic(self.messageStore)
+            return IRCResponse(ResponseType.Say, self.post_comic(comic), message.replyTo)
 
-    def store_message(self, message: IRCMessage):
+    def storeMessage(self, message: IRCMessage):
         """
         Store the message into the messageStore, and prune it to the limit if needed
         """
