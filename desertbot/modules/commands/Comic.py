@@ -19,7 +19,6 @@ from io import BytesIO
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-
 @implementer(IPlugin, IModule)
 class Comic(BotCommand):
     # just hardcode a limit on max messages for now, should limit comic size pretty effecively?
@@ -115,9 +114,9 @@ class Comic(BotCommand):
 
             # call the wrap function to get a formatted string to be drawn onto the image
             # use 2/3rds panel width as the "max width" for the text
-            (string1, (string1width, string1height)) = self.wrap(panel[0][1], font, draw, 2*panelwidth/3.0)
+            (lines, (string1width, string1height)) = self.wrap(panel[0][1], font, draw, 2 * panelwidth / 3)
             # then draw that string onto the image at 10 from the top, 10 from the left edge
-            self.rendertext(string1, font, draw, (10, 10))
+            self.rendertext(lines, font, draw, (10, 10))
 
             if len(panel) == 2:
                 # if there is a second message in this panel, draw it differently from the first
@@ -170,59 +169,65 @@ class Comic(BotCommand):
             self.logger.exception("dbco.link json response decode error, {} (at {})"
                                   .format(response.content, comicObject))
 
-    def wrap(self, messageString, font, draw, maxWidth):
+    def wrap(self, message, font, draw, maxWidth):
         """
-        This function does Weird Shit to wrap/format the string so that it fits in the given width (pixels?)
-        It uses the given "draw" object to do this - ImageDraw.Draw()
+        Work out how much space `message` will take up on the image. Returns a list of strings representing each line
+        of the message split into lines after wrapping and the wrapped width and height as a tuple
         """
-        messageString = messageString.split()
+        messageWords = message.split()
         wrappedWidth = 0
         wrappedHeight = 0
-        ret = []
+        lines = []
 
-        while len(messageString) > 0:
-            s = 1
-            while True and s < len(messageString):
-                w, h = draw.textsize(" ".join(messageString[:s]), font=font)
-                if w > maxWidth:
-                    s -= 1
+        while messageWords:
+            numWords = 1
+            while numWords < len(messageWords):
+                # Try fitting the next numWords words on the line
+                width, _ = draw.textsize(" ".join(messageWords[:numWords]), font=font)
+                if width > maxWidth:
+                    numWords -= 1
                     break
                 else:
-                    s += 1
+                    # There's still space, try another word
+                    numWords += 1
 
-            if s == 0 and len(messageString) > 0:  # we've hit a case where the current line is wider than the screen
-                s = 1
+            if numWords == 0 and messageWords:  # we've hit a case where the current word is wider than the screen
+                numWords = 1
 
-            w, h = draw.textsize(" ".join(messageString[:s]), font=font)
-            wrappedWidth = max(wrappedWidth, w)
-            wrappedHeight += h
-            ret.append(" ".join(messageString[:s]))
-            messageString = messageString[s:]
+            # How big is this line?
+            lineWidth, lineHeight = draw.textsize(" ".join(messageWords[:numWords]), font=font)
 
-        return ret, (wrappedWidth, wrappedHeight)
+            wrappedWidth = max(wrappedWidth, lineWidth) # wrappedWidth should be the length of the longest line
+            wrappedHeight += lineHeight
 
-    def rendertext(self, messageString, font, draw, position):
+            lines.append(" ".join(messageWords[:numWords]))
+            messageWords = messageWords[numWords:] # drop the words wrapped so far and continue
+
+        return lines, (wrappedWidth, wrappedHeight)
+
+    def rendertext(self, lines, font, draw, position):
         """
-        This function renders the given messageString at the given position in the given "draw" object - ImageDraw.Draw()
+        This function renders the given `lines` at the given position in the given "draw" object - ImageDraw.Draw()
         """
         ch = position[1]
-        for s in messageString:
-            w, h = draw.textsize(s, font=font)
-            draw.text((position[0], ch), s, font=font, fill=(0xff, 0xff, 0xff, 0xff))
+        for line in lines:
+            _, h = draw.textsize(line, font=font)
+            draw.text((position[0], ch), line, font=font, fill=(0xff, 0xff, 0xff, 0xff))
             ch += h
 
     def fitimg(self, img, width, height):
-        scale1 = float(width) / img.size[0]
-        scale2 = float(height) / img.size[1]
+        """
+        Scale img proprotionally so that it's new width is `width` or height is `height`, whichever comes first.
+        """
 
-        l1 = (img.size[0] * scale1, img.size[1] * scale1)
-        l2 = (img.size[0] * scale2, img.size[1] * scale2)
+        # Calculate required scale factor to match width
+        sf = width / img.size[0]
+        # if this would make the image taller than the desired height, instead use the scale factor to match height
+        if img.size[1] * sf > height:
+            sf = height / img.size[1]
 
-        if l1[0] > width or l1[1] > height:
-            l = l2
-        else:
-            l = l1
+        # Resize image, round pixel count to nearest integer
+        return img.resize((int(sf * img.size[0] + 0.5), int(sf * img.size[1] + 0.5)), Image.LANCZOS)
 
-        return img.resize((int(l[0]), int(l[1])), Image.ANTIALIAS)
 
 comic = Comic()
