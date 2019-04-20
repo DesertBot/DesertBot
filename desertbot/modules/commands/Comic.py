@@ -42,9 +42,9 @@ class Comic(BotCommand):
 
     def execute(self, message: IRCMessage):
         messages = self.getMessages(message.replyTo)
-        if len(messages) != 0:
-            comic = self.makeComic(messages)
-            return IRCResponse(ResponseType.Say, self.post_comic(comic), message.replyTo)
+        if messages:
+            comicBytes = self.makeComic(messages)
+            return IRCResponse(ResponseType.Say, self.post_comic(comicBytes), message.replyTo)
 
     def getMessages(self, channel: str):
         """
