@@ -3,11 +3,10 @@ Created on Apr 18, 2019
 
 @author: lunik1
 """
-import base64
 import glob
 import json
 from io import BytesIO
-from random import shuffle
+from random import sample
 
 import requests
 from PIL import Image, ImageDraw, ImageFont
@@ -42,7 +41,7 @@ class Comic(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(self.messageStore) != 0:
-            comic = self.make_comic(self.messageStore)
+            comic = self.makeComic(self.messageStore)
             return IRCResponse(ResponseType.Say, self.post_comic(comic), message.replyTo)
 
     def storeMessage(self, message: IRCMessage):
@@ -54,107 +53,99 @@ class Comic(BotCommand):
         if len(self.messageStore) > self.messageLimit:
             self.messageStore.pop(0)  # remove the first (oldest) message in the list if we're now above the limit
 
-    def make_comic(self, messages):
-        # chars is a set of the "characters" involved, at this point these are message.user.nick
-        chars = set()
-        # panels is a list of comic "panels", each involving 1-2 "characters", each with a message spoken
-        panels = []
+    def makeComic(self, messages):
+        chars = set()  # chars is a set of the "characters" involved, at this point these are message.user.nick
+        panels = []  # panels is a list of comic "panels", each involving 1-2 "characters", each with a message spoken
+        panelHeight = 300
+        panelWidth = 450
 
         # one "panel" is a list of the (message.user.nick, message.messageString) pairs to be drawn in that panel
         panel = []
-        last_char = None
+        lastChar = None
         for message in messages:
             char = message[0]
             chars.add(char)
 
             # Start a new panel if the panel is full or the same user speaks twice in a row
-            if len(panel) == 2 or len(panel) == 1 and char == last_char:
+            if len(panel) == 2 or len(panel) == 1 and char == lastChar:
                 panels.append(panel)
                 panel = []
 
             panel.append(message)
-            last_char = char
+            lastChar = char
         panels.append(panel)
-
-        panelheight = 300
-        panelwidth = 450
 
         # Randomly associate a character image to each user
         filenames = glob.glob('data/comics/chars/*')
-        shuffle(filenames)
-        charmap = {}
-        # by using zip() with a shuffled list of filenames rather than populating with random.choice()
-        # it should be impossible for two "chars" to be assigned the same image
-        for ch, f in zip(chars, filenames):
-            charmap[ch] = Image.open(f)
-
+        charmap = {ch: Image.open(f) for ch, f in zip(chars, sample(filenames, len(chars)))}
         # charmap is now a dict of message.user.nick to their randomly picked "character" image
 
-        imgwidth = panelwidth
-        imgheight = panelheight * len(panels)
+        # How big is the whole comic?
+        imgWidth = panelWidth
+        imgHeight = panelHeight * len(panels)
 
         # this will be the background image for each separate panel
         background = Image.open('data/comics/backgrounds/beach-paradise-beach-desktop.jpg')
 
         # comicImage is our entire comic, to be filled with our panels
-        comicImage = Image.new("RGBA", (imgwidth, imgheight), (0xff, 0xff, 0xff, 0xff))
+        comicImage = Image.new("RGBA", (imgWidth, imgHeight), (0xff, 0xff, 0xff, 0xff))
         font = ImageFont.truetype('data/comics/fonts/ComicRelief.ttf', 14)
 
         for i, panel in enumerate(panels):
-            # for each panel, create an Image object
-            panelImage = Image.new("RGBA", (panelwidth, panelheight), (0xff, 0xff, 0xff, 0xff))
-
-            # paste the bg image into our panel Image
-            panelImage.paste(background, (0, 0))
-            draw = ImageDraw.Draw(panelImage)
-
-            string1width = 0
-            string1height = 0
-            string2width = 0
-            string2height = 0
-
-            # call the wrap function to get a formatted string to be drawn onto the image
-            # use 2/3rds panel width as the "max width" for the text
-            (lines, (string1width, string1height)) = self.wrap(panel[0][1], font, draw, 2 * panelwidth / 3)
-            # then draw that string onto the image at 10 from the top, 10 from the left edge
-            self.rendertext(lines, font, draw, (10, 10))
-
-            if len(panel) == 2:
-                # if there is a second message in this panel, draw it differently from the first
-                # call the wrap function again to get the second string (again with 2/3rds panel width as "max width")
-                (string2, (string2width, string2height)) = self.wrap(panel[1][1], font, draw, 2 * panelwidth / 3.0)
-                # then draw that string onto the image as close to the right edge as it can fit, 10 below the 1st string
-                self.rendertext(string2, font, draw, (panelwidth - 10 - string2width, string1height + 10))
-
-            # calculate the "height" of the text, with some spacing (used for scaling character images?)
-            text_height = string1height + 10
-            if string2height > 0:
-                text_height += string2height + 10 + 5
-
-            # scale the character image for the 1st message and paste it into the panel Image object
-            maxch = panelheight - text_height
-            char1image = self.fitimg(charmap[panel[0][0]], 2 * panelwidth / 5.0 - 10, maxch)
-            panelImage.paste(char1image, (10, panelheight - char1image.size[1]), char1image)
-
-            # if there is a second character, also scale and paste that into the panel Image object
-            if len(panel) == 2:
-                char2image = self.fitimg(charmap[panel[1][0]], 2 * panelwidth / 5.0 - 10, maxch)
-                char2image = char2image.transpose(
-                    Image.FLIP_LEFT_RIGHT)  # flip the character image, so it "faces" the first character image
-                panelImage.paste(char2image, (panelwidth - char2image.size[0] - 10, panelheight - char2image.size[1]),
-                                 char2image)
-
-            # draw a small black line at the top? of the panel Image
-            draw.line([(0, 0), (0, panelheight - 1), (panelwidth - 1, panelheight - 1), (panelwidth - 1, 0), (0, 0)],
-                      (0, 0, 0, 0xff))
-            del draw
-
             # paste the panel Image object onto our comic Image object, using the index i to offset height
-            comicImage.paste(panelImage, (0, panelheight * i))
+            comicImage.paste(self.makePanel(panel, panelWidth, panelHeight, charmap, background, font),
+                             (0, panelHeight * i))
 
         comicByteArray = BytesIO()
         comicImage.save(comicByteArray, format="PNG", quality=85)
         return comicByteArray.getvalue()
+
+    def makePanel(self, panel, panelWidth, panelHeight, charmap, background, font):
+        # for each panel, create an Image object
+        panelImage = Image.new("RGBA", (panelWidth, panelHeight), (0xff, 0xff, 0xff, 0xff))
+
+        # paste the bg image into our panel Image
+        panelImage.paste(background, (0, 0))
+        draw = ImageDraw.Draw(panelImage)
+
+        # call the wrap function to get a formatted string to be drawn onto the image
+        # use 2/3rds panel width as the "max width" for the text
+        (lines, (_, string1Height)) = self.wrap(panel[0][1], font, draw, 2 * panelWidth / 3)
+        # then draw that string onto the image at 10 from the top, 10 from the left edge
+        self.rendertext(lines, font, draw, (10, 10))
+
+        string2Height = 0
+        if len(panel) == 2:
+            # if there is a second message in this panel, draw it differently from the first
+            # call the wrap function again to get the second string (again with 2/3rds panel width as "max width")
+            (string2, (string2Width, string2Height)) = self.wrap(panel[1][1], font, draw, 2 * panelWidth / 3.0)
+            # then draw that string onto the image as close to the right edge as it can fit, 10 below the 1st string
+            self.rendertext(string2, font, draw, (panelWidth - 10 - string2Width, string1Height + 10))
+
+        # calculate the "height" of the text, with some spacing (used for scaling character images?)
+        textHeight = string1Height + 10
+        if string2Height > 0:
+            textHeight += string2Height + 10 + 5
+
+        # scale the character image for the 1st message and paste it into the panel Image object
+        maxch = panelHeight - textHeight
+        char1Image = self.fitimg(charmap[panel[0][0]], 2 * panelWidth / 5.0 - 10, maxch)
+        panelImage.paste(char1Image, (10, panelHeight - char1Image.size[1]), char1Image)
+
+        # if there is a second character, also scale and paste that into the panel Image object
+        if len(panel) == 2:
+            char2Image = self.fitimg(charmap[panel[1][0]], 2 * panelWidth / 5.0 - 10, maxch)
+            char2Image = char2Image.transpose(
+                Image.FLIP_LEFT_RIGHT)  # flip the character image, so it "faces" the first character image
+            panelImage.paste(char2Image, (panelWidth - char2Image.size[0] - 10, panelHeight - char2Image.size[1]),
+                             char2Image)
+
+        # draw a small black line at the top? of the panel Image
+        draw.line([(0, 0), (0, panelHeight - 1), (panelWidth - 1, panelHeight - 1), (panelWidth - 1, 0), (0, 0)],
+                  (0, 0, 0, 0xff))
+
+        return panelImage
+
 
     def post_comic(self, comicObject):
         apiUrl = 'https://dbco.link/'
