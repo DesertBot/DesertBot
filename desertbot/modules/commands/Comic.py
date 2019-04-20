@@ -44,7 +44,7 @@ class Comic(BotCommand):
         messages = self.getMessages(message.replyTo)
         if messages:
             comicBytes = self.makeComic(messages)
-            return IRCResponse(ResponseType.Say, self.post_comic(comicBytes), message.replyTo)
+            return IRCResponse(ResponseType.Say, self.postComic(comicBytes), message.replyTo)
 
     def getMessages(self, channel: str):
         """
@@ -75,7 +75,7 @@ class Comic(BotCommand):
         # store the new message list into the messageStore
         self.messageStore[message.replyTo] = messages
 
-    def post_comic(self, comicObject):
+    def postComic(self, comicObject):
         apiUrl = 'https://dbco.link/'
         postData = {'c': ('comic.png', comicObject, 'application/octet-stream')}
         headers = {'Accept': 'application/json'}
