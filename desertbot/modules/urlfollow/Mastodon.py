@@ -70,7 +70,10 @@ class Mastodon(BotCommand):
         endpointResponse = self.bot.moduleHandler.runActionUntilValue('fetch-url', endpoint)
         if not endpointResponse:
             return
-        endpointJSON = endpointResponse.json()
+        try:
+            endpointJSON = endpointResponse.json()
+        except json.decoder.JSONDecodeError:
+            return
         if 'uri' not in endpointJSON:
             return
 
