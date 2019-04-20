@@ -31,7 +31,8 @@ class Comic(BotCommand):
 
     def onLoad(self) -> None:
         # messages need to be stored for comics to work, store in a list as (nick, message)
-        self.messageStore = []
+        # keys are channel names, as each channel kinda should have its own messages
+        self.messageStore = {}
 
     def triggers(self):
         return ['comic']
@@ -40,18 +41,36 @@ class Comic(BotCommand):
         return 'comic - make a comic'
 
     def execute(self, message: IRCMessage):
-        if len(self.messageStore) != 0:
-            comic = self.makeComic(self.messageStore)
+        messages = self.getMessages(message.replyTo)
+        if len(messages) != 0:
+            comic = self.makeComic(messages)
             return IRCResponse(ResponseType.Say, self.post_comic(comic), message.replyTo)
+
+    def getMessages(self, channel: str):
+        """
+        Get the messages for the given channel
+        Returns [] if there are no messages for that channel yet
+        """
+        return self.messageStore.get(channel, [])
 
     def storeMessage(self, message: IRCMessage):
         """
         Store the message into the messageStore, and prune it to the limit if needed
         """
         # TODO just store the IRCMessage objects, so we can use other things than just the nick and message string
-        self.messageStore.append((message.user.nick, message.messageString))
-        if len(self.messageStore) > self.messageLimit:
-            self.messageStore.pop(0)  # remove the first (oldest) message in the list if we're now above the limit
+        if message.command.lower() == "comic":
+            # don't store the command that triggers a comic to be made
+            return
+
+        # fetch the message list for the channel this message belongs to and append the message data
+        messages = self.getMessages(message.replyTo)
+        messages.append((message.user.nick, message.messageString))
+
+        if len(messages) > self.messageLimit:
+            messages.pop(0)     # remove the first (oldest) message in the list if we're now above the limit
+
+        # store the new message list into the messageStore
+        self.messageStore[message.replyTo] = messages
 
     def post_comic(self, comicObject):
         apiUrl = 'https://dbco.link/'
