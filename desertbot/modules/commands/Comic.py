@@ -53,7 +53,23 @@ class Comic(BotCommand):
         if len(self.messageStore) > self.messageLimit:
             self.messageStore.pop(0)  # remove the first (oldest) message in the list if we're now above the limit
 
-    def makeComic(self, messages):
+    def post_comic(self, comicObject):
+        apiUrl = 'https://dbco.link/'
+        postData = {'c': ('comic.png', comicObject, 'application/octet-stream')}
+        headers = {'Accept': 'application/json'}
+
+        try:
+            response = requests.post(apiUrl, files=postData, headers=headers)
+            responseJson = response.json()
+            return responseJson['url']
+        except requests.exceptions.RequestException:
+            self.logger.exception("dbco.link POST url error {}".format(comicObject))
+        except json.decoder.JSONDecodeError:
+            self.logger.exception("dbco.link json response decode error, {} (at {})".format(
+                response.content, comicObject))
+
+    @staticmethod
+    def makeComic(messages):
         chars = set()  # chars is a set of the "characters" involved, at this point these are message.user.nick
         panels = []  # panels is a list of comic "panels", each involving 1-2 "characters", each with a message spoken
         panelHeight = 300
@@ -93,14 +109,15 @@ class Comic(BotCommand):
 
         for i, panel in enumerate(panels):
             # paste the panel Image object onto our comic Image object, using the index i to offset height
-            comicImage.paste(self.makePanel(panel, panelWidth, panelHeight, charmap, background, font),
+            comicImage.paste(Comic.makePanel(panel, panelWidth, panelHeight, charmap, background, font),
                              (0, panelHeight * i))
 
         comicByteArray = BytesIO()
         comicImage.save(comicByteArray, format="PNG", quality=85)
         return comicByteArray.getvalue()
 
-    def makePanel(self, panel, panelWidth, panelHeight, charmap, background, font):
+    @staticmethod
+    def makePanel(panel, panelWidth, panelHeight, charmap, background, font):
         # for each panel, create an Image object
         panelImage = Image.new("RGBA", (panelWidth, panelHeight), (0xff, 0xff, 0xff, 0xff))
 
@@ -110,17 +127,17 @@ class Comic(BotCommand):
 
         # call the wrap function to get a formatted string to be drawn onto the image
         # use 2/3rds panel width as the "max width" for the text
-        (lines, (_, string1Height)) = self.wrap(panel[0][1], font, draw, 2 * panelWidth / 3)
+        (lines, (_, string1Height)) = Comic.wrap(panel[0][1], font, draw, 2 * panelWidth / 3)
         # then draw that string onto the image at 10 from the top, 10 from the left edge
-        self.rendertext(lines, font, draw, (10, 10))
+        Comic.rendertext(lines, font, draw, (10, 10))
 
         string2Height = 0
         if len(panel) == 2:
             # if there is a second message in this panel, draw it differently from the first
             # call the wrap function again to get the second string (again with 2/3rds panel width as "max width")
-            (string2, (string2Width, string2Height)) = self.wrap(panel[1][1], font, draw, 2 * panelWidth / 3.0)
+            (string2, (string2Width, string2Height)) = Comic.wrap(panel[1][1], font, draw, 2 * panelWidth / 3.0)
             # then draw that string onto the image as close to the right edge as it can fit, 10 below the 1st string
-            self.rendertext(string2, font, draw, (panelWidth - 10 - string2Width, string1Height + 10))
+            Comic.rendertext(string2, font, draw, (panelWidth - 10 - string2Width, string1Height + 10))
 
         # calculate the "height" of the text, with some spacing (used for scaling character images?)
         textHeight = string1Height + 10
@@ -129,12 +146,12 @@ class Comic(BotCommand):
 
         # scale the character image for the 1st message and paste it into the panel Image object
         maxch = panelHeight - textHeight
-        char1Image = self.fitimg(charmap[panel[0][0]], 2 * panelWidth / 5.0 - 10, maxch)
+        char1Image = Comic.fitimg(charmap[panel[0][0]], 2 * panelWidth / 5.0 - 10, maxch)
         panelImage.paste(char1Image, (10, panelHeight - char1Image.size[1]), char1Image)
 
         # if there is a second character, also scale and paste that into the panel Image object
         if len(panel) == 2:
-            char2Image = self.fitimg(charmap[panel[1][0]], 2 * panelWidth / 5.0 - 10, maxch)
+            char2Image = Comic.fitimg(charmap[panel[1][0]], 2 * panelWidth / 5.0 - 10, maxch)
             char2Image = char2Image.transpose(
                 Image.FLIP_LEFT_RIGHT)  # flip the character image, so it "faces" the first character image
             panelImage.paste(char2Image, (panelWidth - char2Image.size[0] - 10, panelHeight - char2Image.size[1]),
@@ -146,23 +163,8 @@ class Comic(BotCommand):
 
         return panelImage
 
-
-    def post_comic(self, comicObject):
-        apiUrl = 'https://dbco.link/'
-        postData = {'c': ('comic.png', comicObject, 'application/octet-stream')}
-        headers = {'Accept': 'application/json'}
-
-        try:
-            response = requests.post(apiUrl, files=postData, headers=headers)
-            responseJson = response.json()
-            return responseJson['url']
-        except requests.exceptions.RequestException:
-            self.logger.exception("dbco.link POST url error {}".format(comicObject))
-        except json.decoder.JSONDecodeError:
-            self.logger.exception("dbco.link json response decode error, {} (at {})".format(
-                response.content, comicObject))
-
-    def wrap(self, message, font, draw, maxWidth):
+    @staticmethod
+    def wrap(message, font, draw, maxWidth):
         """
         Work out how much space `message` will take up on the image. Returns a list of strings representing each line
         of the message split into lines after wrapping and the wrapped width and height as a tuple
@@ -198,7 +200,8 @@ class Comic(BotCommand):
 
         return lines, (wrappedWidth, wrappedHeight)
 
-    def rendertext(self, lines, font, draw, position):
+    @staticmethod
+    def rendertext(lines, font, draw, position):
         """
         This function renders the given `lines` at the given position in the given "draw" object - ImageDraw.Draw()
         """
@@ -208,7 +211,8 @@ class Comic(BotCommand):
             draw.text((position[0], ch), line, font=font, fill=(0xff, 0xff, 0xff, 0xff))
             ch += h
 
-    def fitimg(self, img, width, height):
+    @staticmethod
+    def fitimg(img, width, height):
         """
         Scale img proprotionally so that it's new width is `width` or height is `height`, whichever comes first.
         """
