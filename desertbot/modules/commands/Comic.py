@@ -58,8 +58,7 @@ class Comic(BotCommand):
         Store the message into the messageStore, and prune it to the limit if needed
         """
         # TODO just store the IRCMessage objects, so we can use other things than just the nick and message string
-        if message.command:
-            # don't store the command that triggers a comic to be made
+        if message.command:  # don't store messages containing bot commands
             return
 
         # fetch the message list for the channel this message belongs to and append the message data
