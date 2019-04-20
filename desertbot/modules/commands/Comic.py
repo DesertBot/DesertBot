@@ -64,7 +64,10 @@ class Comic(BotCommand):
 
         # fetch the message list for the channel this message belongs to and append the message data
         messages = self.getMessages(message.replyTo)
-        messages.append((message.user.nick, message.messageString))
+        if message.type == "ACTION":
+            messages.append((message.user.nick, "*{}*".format(message.messageString)))
+        else:
+            messages.append((message.user.nick, message.messageString))
 
         if len(messages) > self.messageLimit:
             messages.pop(0)     # remove the first (oldest) message in the list if we're now above the limit
