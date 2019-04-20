@@ -115,7 +115,7 @@ class Comic(BotCommand):
 
         # Randomly associate a character image to each user
         filenames = glob.glob('data/comics/chars/*')
-        charmap = {ch: Image.open(f) for ch, f in zip(chars, sample(filenames, len(chars)))}
+        charmap = {ch: Image.open(f).convert("RGBA") for ch, f in zip(chars, sample(filenames, len(chars)))}
         # charmap is now a dict of message.user.nick to their randomly picked "character" image
 
         # How big is the whole comic?
@@ -123,7 +123,7 @@ class Comic(BotCommand):
         imgHeight = panelHeight * len(panels)
 
         # this will be the background image for each separate panel
-        background = Image.open('data/comics/backgrounds/beach-paradise-beach-desktop.jpg')
+        background = Image.open('data/comics/backgrounds/beach-paradise-beach-desktop.jpg').convert("RGBA")
 
         # comicImage is our entire comic, to be filled with our panels
         comicImage = Image.new("RGBA", (imgWidth, imgHeight), (0xff, 0xff, 0xff, 0xff))
