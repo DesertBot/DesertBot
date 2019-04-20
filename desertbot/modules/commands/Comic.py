@@ -58,7 +58,7 @@ class Comic(BotCommand):
         Store the message into the messageStore, and prune it to the limit if needed
         """
         # TODO just store the IRCMessage objects, so we can use other things than just the nick and message string
-        if message.command.lower() == "comic":
+        if message.command:
             # don't store the command that triggers a comic to be made
             return
 
