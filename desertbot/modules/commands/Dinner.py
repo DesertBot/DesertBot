@@ -38,12 +38,13 @@ class Dinner(BotCommand):
 
             soup = BeautifulSoup(response.content, 'lxml')
 
-            phrase = soup.find('dl').text
+            phrase = soup.find('dl').text.strip()
             item = soup.find('a')
             link = self.bot.moduleHandler.runActionUntilValue('shorten-url', item['href'])
+            item = item.text.strip()
 
             return IRCResponse(ResponseType.Say,
-                               "{}... {} {}".format(phrase, item.text, link),
+                               "{}... {} {}".format(phrase, item, link),
                                message.replyTo)
 
         else:
