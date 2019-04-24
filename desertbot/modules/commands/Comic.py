@@ -226,11 +226,12 @@ class Comic(BotCommand):
         """
         This function renders the given `lines` at the given position in the given "draw" object - ImageDraw.Draw()
         """
-        ch = position[1]
-        for line in lines:
-            _, h = draw.textsize(line, font=font)
-            draw.text((position[0], ch), line, font=font, fill=(0xff, 0xff, 0xff, 0xff))
-            ch += h
+        # draw black outline first
+        for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            draw.text((position[0] + offset[0], position[1] + offset[1]), '\n'.join(lines),
+                      font=font, fill=(0x00, 0x00, 0x00, 0xff))
+
+        draw.text(position, '\n'.join(lines), font=font, fill=(0xff, 0xff, 0xff, 0xff))
 
     @staticmethod
     def fitimg(img, width, height):
