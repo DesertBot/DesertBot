@@ -122,7 +122,7 @@ class Comic(BotCommand):
         imgHeight = panelHeight * len(panels)
 
         # this will be the background image for each separate panel
-        background = Image.open(random.choice(glob.glob('data/comics/backgrounds/*'))).convert("RGBA")
+        background = Image.open(choice(glob.glob('data/comics/backgrounds/*'))).convert("RGBA")
 
         # comicImage is our entire comic, to be filled with our panels
         comicImage = Image.new("RGBA", (imgWidth, imgHeight), (0xff, 0xff, 0xff, 0xff))
