@@ -12,10 +12,11 @@ RUN pip install --no-cache-dir Cython && \
 WORKDIR /app
 COPY . /app
 
-# Comment out these 5 lines if you want !update to work
+# Comment out these 6 lines if you want !update to work with requirements.txt updates
 # The image will be larger to support this
 FROM base
 RUN apt-get update && apt-get install -y libre2-3
+RUN apt-get install -y git
 COPY --from=build /usr/local /usr/local
 COPY --from=build /app /app
 WORKDIR /app
