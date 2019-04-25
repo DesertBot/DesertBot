@@ -13,6 +13,7 @@ cache:
   - pip
 script:
   - pyflakes start.py desertbot/
+  - python test/comics.py
   - python weercd/weercd.py --file test/test_commands.txt -w 10.1 &
   - python start.py -c test/test_config.yaml -l DEBUG
 notifications:
