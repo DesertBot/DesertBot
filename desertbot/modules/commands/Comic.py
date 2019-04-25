@@ -227,7 +227,7 @@ class Comic(BotCommand):
         This function renders the given `lines` at the given position in the given "draw" object - ImageDraw.Draw()
         """
         # draw black outline first
-        for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+        for offset in [(-2, -2), (-2, 2), (2, -2), (2, 2)]:
             draw.text((position[0] + offset[0], position[1] + offset[1]), '\n'.join(lines),
                       font=font, fill=(0x00, 0x00, 0x00, 0xff))
 
