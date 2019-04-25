@@ -6,7 +6,7 @@ Created on Apr 18, 2019
 import glob
 import json
 from io import BytesIO
-from random import sample
+from random import choice, sample
 
 import requests
 from PIL import Image, ImageDraw, ImageFont
@@ -122,7 +122,7 @@ class Comic(BotCommand):
         imgHeight = panelHeight * len(panels)
 
         # this will be the background image for each separate panel
-        background = Image.open('data/comics/backgrounds/beach-paradise-beach-desktop.jpg').convert("RGBA")
+        background = Image.open(random.choice(glob.glob('data/comics/backgrounds/*')).convert("RGBA")
 
         # comicImage is our entire comic, to be filled with our panels
         comicImage = Image.new("RGBA", (imgWidth, imgHeight), (0xff, 0xff, 0xff, 0xff))
