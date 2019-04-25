@@ -17,7 +17,7 @@ for filename in glob.glob('data/comics/backgrounds/*'):
         failures.append(filename)
         
 if len(failures) > 0:
-    print("Following images failed to open: {}".format(", ".join(failures)))
+    print("Following images failed to open:\n{}".format("\n".join(failures)))
     sys.exit(1)
 else:
     sys.exit(0)
