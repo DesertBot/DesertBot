@@ -124,6 +124,7 @@ class Comic(BotCommand):
 
         # this will be the background image for each separate panel
         background = Image.open(choice(glob.glob('data/comics/backgrounds/*'))).convert("RGBA")
+        background = Comic.fitbkg(background, panelWidth, panelHeight)
 
         # comicImage is our entire comic, to be filled with our panels
         comicImage = Image.new("RGBA", (imgWidth, imgHeight), (0xff, 0xff, 0xff, 0xff))
@@ -248,6 +249,32 @@ class Comic(BotCommand):
 
         # Resize image, round pixel count to nearest integer
         return img.resize((int(sf * img.size[0] + 0.5), int(sf * img.size[1] + 0.5)), Image.LANCZOS)
+
+    @staticmethod
+    def fitbkg(img, width, height):
+        """
+        Scale img to (`width`, `height`), cropping to the correct aspect ratio beforehand
+        """
+
+        targetAspectRatio = width / height
+        imgAspectRatio = img.size[0] / img.size[1]
+
+        if targetAspectRatio > imgAspectRatio:  # img too tall
+            # How tall should it be?
+            h = img.size[0] / targetAspectRatio
+
+            # crop from top and bottom
+            crop = img.size[1] - h / 2
+            img = img.crop((0, crop, 0, crop))
+        elif targetAspectRatio < imgAspectRatio:  # img too wide
+            # How wide should it be?
+            w = img.size[1] * targetAspectRatio
+
+            # crop from left and right
+            crop = img.size[1] - w / 2
+            img = img.crop((crop, 0, crop, 0))
+
+        return img.resize((width, height), Image.LANCZOS)
 
 
 comic = Comic()
