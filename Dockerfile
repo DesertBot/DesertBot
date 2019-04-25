@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r /requirements.txt
 WORKDIR /app
 COPY . /app
+RUN git remote set-url origin https://github.com/DesertBot/DesertBot.git
 
 # Comment out these 6 lines if you want !update to work with requirements.txt updates
 # The image will be larger to support this
