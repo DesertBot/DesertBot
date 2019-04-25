@@ -17,6 +17,7 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
+from desertbot.utils import string
 
 
 @implementer(IPlugin, IModule)
@@ -64,9 +65,9 @@ class Comic(BotCommand):
         # fetch the message list for the channel this message belongs to and append the message data
         messages = self.getMessages(message.replyTo)
         if message.type == "ACTION":
-            messages.append((message.user.nick, "*{}*".format(message.messageString)))
+            messages.append((message.user.nick, "*{}*".format(string.stripFormatting(message.messageString))))
         else:
-            messages.append((message.user.nick, message.messageString))
+            messages.append((message.user.nick, string.stripFormatting(message.messageString)))
 
         if len(messages) > self.messageLimit:
             messages.pop(0)     # remove the first (oldest) message in the list if we're now above the limit
