@@ -45,7 +45,7 @@ class IRCMessage(object):
 
         if len(self.messageList) == 1 and self.messageList[0] == bot.commandChar:
             self.command = ''
-        elif self.messageList[0].startswith(self.commandChar) and self.messageList[0][:3].count(bot.commandChar) == 1:
+        elif self.messageList[0].startswith(bot.commandChar) and self.messageList[0][:3].count(bot.commandChar) == 1:
             self.command = self.messageList[0][len(bot.commandChar):]
             if self.command == '':
                 self.command = self.messageList[1]
