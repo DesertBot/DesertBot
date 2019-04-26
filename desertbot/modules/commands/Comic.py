@@ -90,8 +90,7 @@ class Comic(BotCommand):
             self.logger.exception("dbco.link json response decode error, {} (at {})".format(
                 response.content, comicObject))
 
-    @staticmethod
-    def makeComic(messages):
+    def makeComic(self, messages):
         chars = set()  # chars is a set of the "characters" involved, at this point these are message.user.nick
         panels = []  # panels is a list of comic "panels", each involving 1-2 "characters", each with a message spoken
         panelHeight = 300
@@ -116,6 +115,7 @@ class Comic(BotCommand):
         # Randomly associate a character image to each user
         filenames = glob.glob('data/comics/chars/*')
         charmap = {ch: Image.open(f).convert("RGBA") for ch, f in zip(chars, sample(filenames, len(chars)))}
+        self.logger.debug("Character images used for comic: {}".format([im.filename for im in charmap.values()]))
         # charmap is now a dict of message.user.nick to their randomly picked "character" image
 
         # How big is the whole comic?
@@ -124,6 +124,7 @@ class Comic(BotCommand):
 
         # this will be the background image for each separate panel
         background = Image.open(choice(glob.glob('data/comics/backgrounds/*'))).convert("RGBA")
+        self.logger.debug("Background image used for comic: {}".format(background.filename))
         background = Comic.fitbkg(background, panelWidth, panelHeight)
 
         # comicImage is our entire comic, to be filled with our panels
