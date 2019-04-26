@@ -132,7 +132,7 @@ class Comic(BotCommand):
 
         # comicImage is our entire comic, to be filled with our panels
         comicImage = Image.new("RGBA", (imgWidth, imgHeight), (0xff, 0xff, 0xff, 0xff))
-        font = ImageFont.truetype('data/comics/fonts/ComicRelief.ttf', 14)
+        font = ImageFont.truetype('data/comics/fonts/ComicNeue-Bold.ttf', 16)
 
         for i, panel in enumerate(panels):
             # paste the panel Image object onto our comic Image object, using the index i to offset height
