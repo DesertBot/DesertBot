@@ -114,8 +114,10 @@ class Comic(BotCommand):
 
         # Randomly associate a character image to each user
         filenames = glob.glob('data/comics/chars/*')
-        charmap = {ch: Image.open(f).convert("RGBA") for ch, f in zip(chars, sample(filenames, len(chars)))}
-        self.logger.debug("Character images used for comic: {}".format([im.filename for im in charmap.values()]))
+        charmap_filenames = zip(chars, sample(filenames, len(chars)))
+        charmap = {ch: Image.open(f).convert("RGBA") for ch, f in charmap_filenames}
+
+        self.logger.debug("Character images used for comic: {}".format(", ".join([f for ch, f in charmap_filenames])))
         # charmap is now a dict of message.user.nick to their randomly picked "character" image
 
         # How big is the whole comic?
@@ -123,8 +125,9 @@ class Comic(BotCommand):
         imgHeight = panelHeight * len(panels)
 
         # this will be the background image for each separate panel
-        background = Image.open(choice(glob.glob('data/comics/backgrounds/*'))).convert("RGBA")
-        self.logger.debug("Background image used for comic: {}".format(background.filename))
+        background_file = choice(glob.glob('data/comics/backgrounds/*'))
+        background = Image.open(background_file).convert("RGBA")
+        self.logger.debug("Background image used for comic: {}".format(background_file))
         background = Comic.fitbkg(background, panelWidth, panelHeight)
 
         # comicImage is our entire comic, to be filled with our panels
