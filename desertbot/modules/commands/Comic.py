@@ -120,6 +120,29 @@ class Comic(BotCommand):
         self.logger.debug("Character images used for comic: {}".format(", ".join([f for ch, f in charmap_filenames])))
         # charmap is now a dict of message.user.nick to their randomly picked "character" image
 
+        # Randomly associate a text colour to each user
+        colours = [
+            #   R     G     B     A
+            (0xff, 0xff, 0xff, 0xff),  # white
+            (0xcc, 0x99, 0xff, 0xff),  # purple
+            (0xa9, 0xd1, 0xf7, 0xff),  # blue
+            (0xb4, 0xf0, 0xa7, 0xff),  # green
+            (0xff, 0xff, 0xbf, 0xff),  # yellow
+            (0xff, 0xdf, 0xbe, 0xff),  # orange
+            (0xff, 0xb1, 0xb0, 0xff),  # red
+            (0xff, 0x97, 0xcc, 0xff),  # pink
+            # duplicates because we could have up to 16 characters
+            (0xff, 0xff, 0xff, 0xff),  # white
+            (0xcc, 0x99, 0xff, 0xff),  # purple
+            (0xa9, 0xd1, 0xf7, 0xff),  # blue
+            (0xb4, 0xf0, 0xa7, 0xff),  # green
+            (0xff, 0xff, 0xbf, 0xff),  # yellow
+            (0xff, 0xdf, 0xbe, 0xff),  # orange
+            (0xff, 0xb1, 0xb0, 0xff),  # red
+            (0xff, 0x97, 0xcc, 0xff),  # pink
+        ]
+        colmap = {ch: col for ch, col in zip(chars, sample(colours, len(chars)))}
+
         # How big is the whole comic?
         imgWidth = panelWidth
         imgHeight = panelHeight * len(panels)
@@ -136,7 +159,8 @@ class Comic(BotCommand):
 
         for i, panel in enumerate(panels):
             # paste the panel Image object onto our comic Image object, using the index i to offset height
-            comicImage.paste(Comic.makePanel(panel, panelWidth, panelHeight, charmap, background, font),
+            comicImage.paste(Comic.makePanel(panel, panelWidth, panelHeight,
+                                             charmap, background, font, colmap),
                              (0, panelHeight * i))
 
         comicByteArray = BytesIO()
@@ -144,7 +168,7 @@ class Comic(BotCommand):
         return comicByteArray.getvalue()
 
     @staticmethod
-    def makePanel(panel, panelWidth, panelHeight, charmap, background, font):
+    def makePanel(panel, panelWidth, panelHeight, charmap, background, font, colmap):
         # for each panel, create an Image object
         panelImage = Image.new("RGBA", (panelWidth, panelHeight), (0xff, 0xff, 0xff, 0xff))
 
@@ -156,7 +180,7 @@ class Comic(BotCommand):
         # use 2/3rds panel width as the "max width" for the text
         (lines, (_, string1Height)) = Comic.wrap(panel[0][1], font, draw, 2 * panelWidth / 3)
         # then draw that string onto the image at 10 from the top, 10 from the left edge
-        panelImage = Comic.rendertext(lines, font, panelImage, (10, 10))
+        panelImage = Comic.rendertext(lines, font, panelImage, colmap[panel[0][0]], (10, 10))
 
         string2Height = 0
         if len(panel) == 2:
@@ -164,7 +188,7 @@ class Comic(BotCommand):
             # call the wrap function again to get the second string (again with 2/3rds panel width as "max width")
             (string2, (string2Width, string2Height)) = Comic.wrap(panel[1][1], font, draw, 2 * panelWidth / 3.0)
             # then draw that string onto the image as close to the right edge as it can fit, 10 below the 1st string
-            panelImage = Comic.rendertext(string2, font, panelImage,
+            panelImage = Comic.rendertext(string2, font, panelImage, colmap[panel[1][0]],
                                           (panelWidth - 10 - string2Width, string1Height + 10))
 
         # calculate the "height" of the text, with some spacing (used for scaling character images?)
@@ -222,7 +246,9 @@ class Comic(BotCommand):
                 numWords = 1
 
             # How big is this line?
-            lineWidth, lineHeight = draw.textsize(" ".join(messageWords[:numWords]), font=font)
+            lineWidth, lineHeight = draw.multiline_textsize(" ".join(messageWords[:numWords]),
+                                                            font=font,
+                                                            spacing=-2)
 
             wrappedWidth = max(wrappedWidth, lineWidth)  # wrappedWidth should be the length of the longest line
             wrappedHeight += lineHeight
@@ -233,7 +259,7 @@ class Comic(BotCommand):
         return lines, (wrappedWidth, wrappedHeight)
 
     @staticmethod
-    def rendertext(lines, font, panel, position):
+    def rendertext(lines, font, panel, colour, position):
         """
         This function renders the given `lines` at the given position in the given "draw" object - ImageDraw.Draw()
         """
@@ -242,14 +268,24 @@ class Comic(BotCommand):
 
         # draw black outline first, by drawing the text in black, blurring it,
         # then boosting the contrast
-        textDraw.text(position, '\n'.join(lines), font=font, fill=(0x00, 0x00, 0x00, 0xff))
+        textDraw.multiline_text(xy=position,
+                                text='\n'.join(lines),
+                                font=font,
+                                fill=(0x00, 0x00, 0x00, 0xff),
+                                spacing=-2,
+                                align='left')
         textImage = textImage.filter(ImageFilter.GaussianBlur(1.0))
         textImage = ImageEnhance.Contrast(textImage).enhance(10.0)
         panel = ImageChops.multiply(panel, textImage)
 
         # draw our text again in white on top
         panelDraw = ImageDraw.Draw(panel)
-        panelDraw.text(position, '\n'.join(lines), font=font, fill=(0xff, 0xff, 0xff, 0xff))
+        panelDraw.text(xy=position,
+                       text='\n'.join(lines),
+                       font=font,
+                       fill=colour,
+                       spacing=-2,
+                       align='left')
 
         return panel
 
