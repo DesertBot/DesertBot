@@ -32,6 +32,10 @@ def admin(func=None, msg=''):
 
 
 class BotCommand(BotModule):
+    def __init__(self):
+        BotModule.__init__(self)
+        self.triggerHelp = {}
+
     def triggers(self):
         return []
 
@@ -39,7 +43,7 @@ class BotCommand(BotModule):
         return super(BotCommand, self).actions() + [('botmessage', 1, self.handleCommand)]
 
     def onLoad(self) -> None:
-        self.triggerHelp = {}
+        pass
 
     def displayHelp(self, query: str) -> str:
         lowQuery = query[0].lower()
