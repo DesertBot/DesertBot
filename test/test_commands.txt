@@ -20,4 +20,5 @@
 :server PRIVMSG DesertBot :!weather antarctica
 
 :server PRIVMSG DesertBot :!help
+:server PRIVMSG DesertBot :!commands
 :server PRIVMSG DesertBot :!shutdown
