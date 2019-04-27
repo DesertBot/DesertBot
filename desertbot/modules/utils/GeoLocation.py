@@ -5,8 +5,6 @@ from zope.interface import implementer
 
 @implementer(IPlugin, IModule)
 class GeoLocation(BotModule):
-    name = "GeoLocation"
-
     def actions(self):
         return [ ("geolocation-latlon", 1, self.geolocationForLatLon),
                  ("geolocation-place", 1, self.geolocationForPlace) ]
