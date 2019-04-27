@@ -16,6 +16,11 @@ class OpenWeatherMap(BotCommand):
     def triggers(self):
         return ["forecast", "weather"]
 
+    def help(self, arg):
+        return "Commands: weather/forecast (<latlon/user/place>) - Uses the OpenWeatherMap API to request the weather " \
+               "for a given set of coordinates, username or place. Requests the users own weather or forecast when no " \
+               "paramters are givne."
+
     def onLoad(self):
         self.apiKey = load_key("OpenWeatherMap")
 
