@@ -23,6 +23,7 @@ class GeoLocation(BotModule):
         url = "https://nominatim.openstreetmap.org/search/{}".format(place.replace(" ", "%20"))
         params = {
             "format": "json",
+            "addressdetails": 1,
             "limit": 1
         }
         return self._sendLocationRequest(url, params)
@@ -56,7 +57,16 @@ class GeoLocation(BotModule):
 
         data["latitude"] = float(json["lat"])
         data["longitude"] = float(json["lon"])
-        data["locality"] = json["display_name"] if "display_name" in json else "Unknown"
+
+        locationInfo = []
+        for addressPart, value in json["address"].items():
+            if addressPart in ["city", "state", "country", "town", "continent", "aerodrome", "park", "attraction"]:
+                locationInfo.append(addressPart)
+
+        if len(locationInfo) == 0:
+            locationInfo.append("Unknown")
+
+        data["locality"] = ", ".join(locationInfo)
         return data
 
 
