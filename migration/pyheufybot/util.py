@@ -18,8 +18,8 @@ class PyHeufyBotUtil(object):
             self.data = storage[section][options.network]
             storage.close()
 
-        self.rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-        self.dataPath = os.path.join(self.rootDir, 'data', self.network)
+        self.rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
+        self.dataPath = os.path.join(self.rootDir, 'data', self.config['server'])
         if not os.path.exists(self.dataPath):
             os.makedirs(self.dataPath)
 
