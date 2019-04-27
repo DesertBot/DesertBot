@@ -1,13 +1,35 @@
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import BotModule, IModule
+from desertbot.message import IRCMessage
+from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 
 @implementer(IPlugin, IModule)
-class GeoLocation(BotModule):
+class GeoLocation(BotCommand):
+    def triggers(self):
+        return ["geolocation"]
+
+    def help(self, query):
+        return ("geolocation <address> - Uses the OpenStreetMap geocoding API to lookup GPS coordinates "
+                "for the given address")
+
     def actions(self):
-        return [ ("geolocation-latlon", 1, self.geolocationForLatLon),
-                 ("geolocation-place", 1, self.geolocationForPlace) ]
+        return super(GeoLocation, self).actions() + [ ("geolocation-latlon", 1, self.geolocationForLatLon),
+                                                      ("geolocation-place", 1, self.geolocationForPlace) ]
+
+    def execute(self, message: IRCMessage):
+        if len(message.parameterList) == 0:
+            return IRCResponse(ResponseType.Say, "You didn't give an address to look up", message.replyTo)
+
+        result = self.geolocationForPlace(message.parameters)
+        if not result["success"]:
+            return IRCResponse(ResponseType.Say,"I don't think that's even a location in this multiverse...",
+                               message.replyTo)
+
+        return IRCResponse(ResponseType.Say, "GPS coords for '{}' are: {},{}" .format(message.parameters,
+                           result["latitude"], result["longitude"]), message.replyTo)
 
     def geolocationForLatLon(self, lat, lon):
         url = "https://nominatim.openstreetmap.org/reverse"
