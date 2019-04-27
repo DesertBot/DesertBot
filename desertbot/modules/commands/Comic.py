@@ -269,14 +269,14 @@ class Comic(BotCommand):
 
             # crop from top and bottom
             crop = (img.size[1] - h) / 2
-            img = img.crop((0, crop, 0, crop))
+            img = img.crop((0, crop, img.size[0], crop + h))
         elif targetAspectRatio < imgAspectRatio:  # img too wide
             # How wide should it be?
             w = img.size[1] * targetAspectRatio
 
             # crop from left and right
             crop = (img.size[0] - w) / 2
-            img = img.crop((crop, 0, crop, 0))
+            img = img.crop((crop, 0, crop + w, img.size[1]))
 
         return img.resize((width, height), Image.LANCZOS)
 
