@@ -14,5 +14,10 @@
 :server PRIVMSG DesertBot :!setpron they/them
 :server PRIVMSG DesertBot :!pronouns
 
+:server PRIVMSG DesertBot :!addloc new york
+:server PRIVMSG DesertBot :!weather
+:server PRIVMSG DesertBot :!forecast
+:server PRIVMSG DesertBot :!weather antarctica
+
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!shutdown
