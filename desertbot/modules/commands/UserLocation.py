@@ -29,7 +29,7 @@ class UserLocation(BotCommand):
                 return IRCResponse(ResponseType.Say, "No location was specified.", message.replyTo)
             self.locationStorage[message.user.nick.lower()] = message.parameters
             self.bot.storage["userlocations"] = self.locationStorage
-            self.bot.moduleHandler.runGenericAction('userlocation-updated', message.user)
+            self.bot.moduleHandler.runGenericAction('userlocation-updated', message.user.nick, message.parameters)
             return IRCResponse(ResponseType.Say, "Your location has been updated.".format(message.parameters),
                                message.replyTo)
         elif message.command == "remloc":
@@ -38,7 +38,7 @@ class UserLocation(BotCommand):
             else:
                 del self.locationStorage[message.user.nick.lower()]
                 self.bot.storage["userlocations"] = self.locationStorage
-                self.bot.moduleHandler.runGenericAction('userlocation-removed', message.user)
+                self.bot.moduleHandler.runGenericAction('userlocation-removed', message.user.nick)
                 return IRCResponse(ResponseType.Say, "Your location has been removed.", message.replyTo)
 
     def lookUpLocation(self, nick: str):
