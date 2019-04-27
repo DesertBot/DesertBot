@@ -83,7 +83,7 @@ class GeoLocation(BotCommand):
         locationInfo = []
         for addressPart, value in json["address"].items():
             if addressPart in ["city", "state", "country", "town", "continent", "aerodrome", "park", "attraction"]:
-                locationInfo.append(addressPart)
+                locationInfo.append(value)
 
         if len(locationInfo) == 0:
             locationInfo.append("Unknown")
