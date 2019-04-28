@@ -1,53 +1,129 @@
-"""
-Created on Jan 20, 2017
-
-@author: StarlitGhost
-"""
 from twisted.plugin import IPlugin
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
-from zope.interface import implementer
-from typing import List
-
-from collections import OrderedDict
-
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
-
-import parsedatetime
+from desertbot.utils.api_keys import load_key
+from desertbot.utils.timeutils import now, timestamp
+from zope.interface import implementer
+from datetime import datetime
+from typing import Union
 
 
 @implementer(IPlugin, IModule)
 class Time(BotCommand):
+    timeBaseURL = "https://maps.googleapis.com/maps/api/timezone/json?"
+
     def triggers(self):
-        return ['time', 'date']
+        return ["time"]
 
-    def onLoad(self):
-        self.cal = parsedatetime.Calendar()
+    def help(self, query: Union[str, None]) -> str:
+        return "Commands: time <lat> <lon>, time <place>, time <nickname> | Get the current local time for " \
+               "the given latlon, place or user."
 
-    def _time(self, query):
-        """time <natural language time query> - returns time from natural language queries
-        (eg: in 100 minutes (at 18:00) => 19:40:00)"""
-        (date, _) = self.cal.parseDT(query)
-        return "{:%H:%M:%S%z}".format(date)
-
-    def _date(self, query):
-        """date <natural language date query> - returns dates from natural language queries
-        (eg: friday next week => 2017-02-03)"""
-        (date, _) = self.cal.parseDT(query)
-        return "{:%Y-%m-%d}".format(date)
-
-    _commands = OrderedDict([
-        ('time', _time),
-        ('date', _date),
-        ])
-
-    def help(self, query: List[str]):
-        return self._commands[query[0].lower()].__doc__
+    def onLoad(self) -> None:
+        self.apiKey = load_key("Google")
 
     def execute(self, message: IRCMessage):
-        response = self._commands[message.command](self, message.parameters)
-        return IRCResponse(ResponseType.Say, response, message.replyTo)
+        if not self.apiKey:
+            return IRCResponse(ResponseType.Say, "No API key found.", message.replyTo)
+
+        params = message.parameterList
+
+        # Use the user's nickname as a parameter if none were given
+        if len(params) == 0:
+            params.append(message.user.nick)
+            selfSearch = True
+        else:
+            selfSearch = False
+
+        # Try using latlon to get the location
+        try:
+            lat = float(params[0])
+            lon = float(params[1])
+            location = self.bot.moduleHandler.runActionUntilValue("geolocation-latlon", lat, lon)
+            if not location:
+                return IRCResponse(ResponseType.Say,
+                                   "I can't determine locations at the moment. Try again later.",
+                                   message.replyTo)
+            if not location["success"]:
+                return IRCResponse(ResponseType.Say,
+                                   "I don't think that's even a location in this multiverse...",
+                                   message.replyTo)
+            return self._handleCommandWithLocation(message, location)
+        except (IndexError, ValueError):
+            pass  # The user did not give a latlon, so continue using other methods
+
+        # Try to determine the user's location from a nickname
+        userLoc = self.bot.moduleHandler.runActionUntilValue("userlocation", params[0])
+        if selfSearch:
+            if not userLoc:
+                return IRCResponse(ResponseType.Say,
+                                   "I can't determine locations at the moment. Try again later.",
+                                   message.replyTo)
+            elif not userLoc["success"]:
+                return IRCResponse(ResponseType.Say, userLoc["error"], message.replyTo)
+        if userLoc and userLoc["success"]:
+            if "lat" in userLoc:
+                location = self.bot.moduleHandler.runActionUntilValue("geolocation-latlon", userLoc["lat"],
+                                                                      userLoc["lon"])
+            else:
+                location = self.bot.moduleHandler.runActionUntilValue("geolocation-place", userLoc["place"])
+            if not location:
+                return IRCResponse(ResponseType.Say, "I can't determine locations at the moment. Try again later.",
+                                   message.replyTo)
+            if not location["success"]:
+                return IRCResponse(ResponseType.Say, "I don't think that's even a location in this multiverse...",
+                                   message.replyTo)
+            return self._handleCommandWithLocation(message, location)
+
+        # Try to determine the location by the name of the place
+        place = " ".join(params)
+        location = self.bot.moduleHandler.runActionUntilValue("geolocation-place", place)
+        if not location:
+            return IRCResponse(ResponseType.Say, "I can't determine locations at the moment. Try again later.",
+                               message.replyTo)
+        if not location["success"]:
+            return IRCResponse(ResponseType.Say, "I don't think that's even a location in this multiverse...",
+                               message.replyTo)
+        return self._handleCommandWithLocation(message, location)
+
+    def _handleCommandWithLocation(self, message, location):
+        formattedTime = self._getTime(location["latitude"], location["longitude"])
+        return IRCResponse(ResponseType.Say,
+                           "Location: {} | {}".format(location["locality"], formattedTime),
+                           message.replyTo)
+
+    def _getTime(self, lat, lon):
+        currentTime = timestamp(now())
+        params = {
+            "location": "{},{}".format(lat, lon),
+            "timestamp": currentTime,
+            "key": self.apiKey
+        }
+        result = self.bot.moduleHandler.runActionUntilValue("fetch-url", self.timeBaseURL, params)
+        if not result:
+            return "No time for this location could be found at this moment. Try again later."
+        timeJSON = result.json()
+        if timeJSON["status"] != "OK":
+            if "error_message" in timeJSON:
+                return timeJSON["error_message"]
+            else:
+                return "An unknown error occurred while requesting the time."
+        resultDate = datetime.fromtimestamp(currentTime + int(timeJSON["dstOffset"]) + int(timeJSON["rawOffset"]))
+        properDay = self._getProperDay(resultDate.day)
+        formattedTime = resultDate.strftime("%H:%M (%I:%M %p) on %A, " + properDay + " of %B, %Y")
+        return "Timezone: {} | Local time is {}".format(timeJSON["timeZoneName"], formattedTime)
+
+    def _getProperDay(self, day):
+        if day in [1, 21, 31]:
+            return "{}st".format(day)
+        elif day in [2, 22]:
+            return "{}nd".format(day)
+        elif day in [3, 23]:
+            return "{}rd".format(day)
+        else:
+            return "{}th".format(day)
 
 
-time = Time()
+timeZoneCommand = Time()

@@ -18,6 +18,7 @@
 :server PRIVMSG DesertBot :!weather
 :server PRIVMSG DesertBot :!forecast
 :server PRIVMSG DesertBot :!weather antarctica
+:server PRIVMSG DesertBot :!time antarctica
 
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
