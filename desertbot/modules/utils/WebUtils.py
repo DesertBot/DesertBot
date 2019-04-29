@@ -67,6 +67,7 @@ class WebUtils(BotModule):
             headers.update(extraHeaders)
         try:
             response = requests.get(url, params=params, headers=headers, timeout=10)
+            self.logger.debug(response.url)
             if 'content-type' in response.headers:
                 pageType = response.headers["content-type"]
             else:
