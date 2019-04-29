@@ -68,7 +68,7 @@ class Time(BotCommand):
                 location = self.bot.moduleHandler.runActionUntilValue("geolocation-latlon", userLoc["lat"],
                                                                       userLoc["lon"])
             else:
-                location = self.bot.moduleHandler.runActionUntilValue("geolocation-place", userLoc["locality"])
+                location = self.bot.moduleHandler.runActionUntilValue("geolocation-place", userLoc["location"])
             if not location:
                 return IRCResponse(ResponseType.Say, "I can't determine locations at the moment. Try again later.",
                                    message.replyTo)
