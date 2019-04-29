@@ -12,7 +12,7 @@ from typing import Union
 
 @implementer(IPlugin, IModule)
 class Time(BotCommand):
-    timeBaseURL = "https://maps.googleapis.com/maps/api/timezone/json?"
+    timeBaseURL = "http://api.timezonedb.com/v2.1/get-time-zone"
 
     def triggers(self):
         return ["time"]
@@ -22,7 +22,7 @@ class Time(BotCommand):
                "the given latlon, place or user."
 
     def onLoad(self) -> None:
-        self.apiKey = load_key("Google")
+        self.apiKey = load_key("TimeZoneDB")
 
     def execute(self, message: IRCMessage):
         if not self.apiKey:
@@ -97,23 +97,26 @@ class Time(BotCommand):
     def _getTime(self, lat, lon):
         currentTime = timestamp(now())
         params = {
-            "location": "{},{}".format(lat, lon),
-            "timestamp": currentTime,
-            "key": self.apiKey
+            "format": "json",
+            "by": "position",
+            "key": self.apiKey,
+            "lat": lat,
+            "lng": lon
         }
         result = self.bot.moduleHandler.runActionUntilValue("fetch-url", self.timeBaseURL, params)
         if not result:
             return "No time for this location could be found at this moment. Try again later."
         timeJSON = result.json()
         if timeJSON["status"] != "OK":
-            if "error_message" in timeJSON:
-                return timeJSON["error_message"]
+            if "message" in timeJSON:
+                return timeJSON["message"]
             else:
                 return "An unknown error occurred while requesting the time."
-        resultDate = datetime.fromtimestamp(currentTime + int(timeJSON["dstOffset"]) + int(timeJSON["rawOffset"]))
+        resultDate = datetime.fromtimestamp(currentTime + int(timeJSON["gmtOffset"]))
         properDay = self._getProperDay(resultDate.day)
         formattedTime = resultDate.strftime("%H:%M (%I:%M %p) on %A, " + properDay + " of %B, %Y")
-        return "Timezone: {} | Local time is {}".format(timeJSON["timeZoneName"], formattedTime)
+        return "Timezone: {} ({}) | Local time is {} | Daylight Savings Time: {}".format(
+            timeJSON["zoneName"], timeJSON["abbreviation"], formattedTime, "Yes" if timeJSON["dst"] == "1" else "No")
 
     def _getProperDay(self, day):
         if day in [1, 21, 31]:
