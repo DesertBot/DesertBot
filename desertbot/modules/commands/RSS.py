@@ -51,28 +51,6 @@ class RSS(BotCommand):
                 return ("{!r} is not a valid subcommand, use {}help rss for a list of subcommands"
                         .format(query[1], self.bot.commandChar))
 
-    def execute(self, message: IRCMessage):
-        if message.parameterList[0].lower() == "follow":
-            return self._followFeed(message)
-        elif message.parameterList[0].lower() == "unfollow":
-            return self._unfollowFeed(message)
-        elif message.parameterList[0].lower() == "toggle":
-            return self._toggleFeedSuppress(message)
-        elif message.parameterList[0].lower() == "list":
-            return self._listFeeds(message)
-        elif len(message.parameters.strip()) > 0:
-            feed = message.parameters.strip()
-            latest = self._getLatest(feed)
-            if latest is not None:
-                response = 'Latest {}: {} | {}'.format(feed["name"], feed["title"], feed["link"])
-                return IRCResponse(ResponseType.Say, response, message.replyTo)
-            else:
-                return IRCResponse(ResponseType.Say,
-                                   "{} is not an RSS feed I monitor, leave a tell if you'd like it added!".format(message.parameters.strip()),
-                                   message.replyTo)
-        else:
-            return self.help(None)
-
     def _getLatest(self, feedName):
         lowerMap = {name.lower(): name for name in self.feeds}
         if feedName.lower() in lowerMap:
@@ -89,7 +67,28 @@ class RSS(BotCommand):
 
     def checkFeeds(self, message: IRCMessage):
         if message.command in self.triggers():
-            return self.execute(message)
+            if message.parameterList[0].lower() == "follow":
+                return self._followFeed(message)
+            elif message.parameterList[0].lower() == "unfollow":
+                return self._unfollowFeed(message)
+            elif message.parameterList[0].lower() == "toggle":
+                return self._toggleFeedSuppress(message)
+            elif message.parameterList[0].lower() == "list":
+                return self._listFeeds(message)
+            elif len(message.parameters.strip()) > 0:
+                feed = message.parameters.strip()
+                latest = self._getLatest(feed)
+                if latest is not None:
+                    response = 'Latest {}: {} | {}'.format(feed["name"], feed["title"], feed["link"])
+                    return IRCResponse(ResponseType.Say, response, message.replyTo)
+                else:
+                    return IRCResponse(ResponseType.Say,
+                                       "{} is not an RSS feed I monitor, leave a tell if you'd like it added!".format(
+                                           message.parameters.strip()),
+                                       message.replyTo)
+            else:
+                return self.help(None)
+
         responses = []
         for feedName, feedDeets in self.feeds.items():
             if feedDeets["lastCheck"] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
