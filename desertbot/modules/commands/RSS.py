@@ -51,20 +51,6 @@ class RSS(BotCommand):
                 return ("{!r} is not a valid subcommand, use {}help rss for a list of subcommands"
                         .format(query[1], self.bot.commandChar))
 
-    def _getLatest(self, feedName):
-        lowerMap = {name.lower(): name for name in self.feeds}
-        if feedName.lower() in lowerMap:
-            name = lowerMap[feedName.lower()]
-            title = self.feeds[name]["lastTitle"]
-            link = self.feeds[name]["lastLink"]
-            return {
-                "name": name,
-                "title": title,
-                "link": link
-            }
-        else:
-            return None
-
     def checkFeeds(self, message: IRCMessage):
         if message.command in self.triggers():
             if message.parameterList[0].lower() == "follow":
@@ -127,6 +113,20 @@ class RSS(BotCommand):
                 self.bot.storage["rss_feeds"] = self.feeds
 
         return responses
+
+    def _getLatest(self, feedName):
+        lowerMap = {name.lower(): name for name in self.feeds}
+        if feedName.lower() in lowerMap:
+            name = lowerMap[feedName.lower()]
+            title = self.feeds[name]["lastTitle"]
+            link = self.feeds[name]["lastLink"]
+            return {
+                "name": name,
+                "title": title,
+                "link": link
+            }
+        else:
+            return None
 
     @admin("[RSS] Only my admins may follow new RSS feeds!")
     def _followFeed(self, message: IRCMessage):
