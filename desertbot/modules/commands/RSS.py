@@ -183,3 +183,6 @@ class RSS(BotCommand):
         return IRCResponse(ResponseType.Say,
                            "Currently followed feeds are: {}".format(", ".join(self.feeds.keys())),
                            message.replyTo)
+
+
+rss = RSS()
