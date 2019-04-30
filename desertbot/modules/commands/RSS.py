@@ -77,10 +77,10 @@ class RSS(BotCommand):
 
         responses = []
         for feedName, feedDeets in self.feeds.items():
-            if feedDeets["lastCheck"] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
+            if feedDeets["lastCheck"] > (datetime.datetime.utcnow() - datetime.timedelta(minutes=10)).isoformat():
                 continue
 
-            self.feeds[feedName]["lastCheck"] = datetime.datetime.utcnow()
+            self.feeds[feedName]["lastCheck"] = datetime.datetime.utcnow().isoformat()
 
             response = self.bot.moduleHandler.runActionUntilValue("fetch-url", feedDeets["url"])
 
@@ -98,7 +98,7 @@ class RSS(BotCommand):
                 continue
 
             itemDate = item.find("pubdate").text
-            newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True)
+            newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True).isoformat()
 
             if newestDate > feedDeets["lastUpdate"]:
                 self.feeds[feedName]["lastUpdate"] = newestDate
@@ -135,10 +135,10 @@ class RSS(BotCommand):
             name = " ".join(message.parameterList[2:])
             feed_object = {
                 "url": url,
-                "lastUpdate": datetime.datetime.utcnow() - datetime.timedelta(days=365),
+                "lastUpdate": (datetime.datetime.utcnow() - datetime.timedelta(days=365)).isoformat(),
                 "lastTitle": "",
                 "lastLink": "",
-                "lastCheck": datetime.datetime.utcnow() - datetime.timedelta(minutes=10),
+                "lastCheck": (datetime.datetime.utcnow() - datetime.timedelta(minutes=10)).isoformat(),
                 "suppress": False
             }
             self.feeds[name] = feed_object
