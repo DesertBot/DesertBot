@@ -55,8 +55,8 @@ class RSS(BotCommand):
         lowerMap = {name.lower(): name for name in self.feeds}
         if feedName.lower() in lowerMap:
             name = lowerMap[feedName.lower()]
-            title = self.feeds[name]["latestTitle"]
-            link = self.feeds[name]["latestLink"]
+            title = self.feeds[name]["lastTitle"]
+            link = self.feeds[name]["lastLink"]
             return {
                 "name": name,
                 "title": title,
