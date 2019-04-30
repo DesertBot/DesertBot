@@ -9,7 +9,7 @@ from io import BytesIO
 from random import choice, sample
 
 import requests
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance, ImageChops
 from twisted.plugin import IPlugin
 from zope.interface import implementer
 
@@ -156,7 +156,7 @@ class Comic(BotCommand):
         # use 2/3rds panel width as the "max width" for the text
         (lines, (_, string1Height)) = Comic.wrap(panel[0][1], font, draw, 2 * panelWidth / 3)
         # then draw that string onto the image at 10 from the top, 10 from the left edge
-        Comic.rendertext(lines, font, draw, (10, 10))
+        panelImage = Comic.rendertext(lines, font, panelImage, (10, 10))
 
         string2Height = 0
         if len(panel) == 2:
@@ -164,7 +164,8 @@ class Comic(BotCommand):
             # call the wrap function again to get the second string (again with 2/3rds panel width as "max width")
             (string2, (string2Width, string2Height)) = Comic.wrap(panel[1][1], font, draw, 2 * panelWidth / 3.0)
             # then draw that string onto the image as close to the right edge as it can fit, 10 below the 1st string
-            Comic.rendertext(string2, font, draw, (panelWidth - 10 - string2Width, string1Height + 10))
+            panelImage = Comic.rendertext(string2, font, panelImage,
+                                          (panelWidth - 10 - string2Width, string1Height + 10))
 
         # calculate the "height" of the text, with some spacing (used for scaling character images?)
         textHeight = string1Height + 10
@@ -184,8 +185,12 @@ class Comic(BotCommand):
             panelImage.paste(char2Image, (panelWidth - char2Image.size[0] - 10, panelHeight - char2Image.size[1]),
                              char2Image)
 
-        # draw a small black line at the top? of the panel Image
-        draw.line([(0, 0), (0, panelHeight - 1), (panelWidth - 1, panelHeight - 1), (panelWidth - 1, 0), (0, 0)],
+        # draw a small black line from corner to corner around the whole panel Image
+        draw.line([(0, 0),
+                   (0, panelHeight - 1),
+                   (panelWidth - 1, panelHeight - 1),
+                   (panelWidth - 1, 0),
+                   (0, 0)],
                   (0, 0, 0, 0xff))
 
         return panelImage
@@ -228,16 +233,25 @@ class Comic(BotCommand):
         return lines, (wrappedWidth, wrappedHeight)
 
     @staticmethod
-    def rendertext(lines, font, draw, position):
+    def rendertext(lines, font, panel, position):
         """
         This function renders the given `lines` at the given position in the given "draw" object - ImageDraw.Draw()
         """
-        # draw black outline first
-        for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-            draw.text((position[0] + offset[0], position[1] + offset[1]), '\n'.join(lines),
-                      font=font, fill=(0x00, 0x00, 0x00, 0xff))
+        textImage = Image.new("RGBA", panel.size, (0xff, 0xff, 0xff, 0xff))
+        textDraw = ImageDraw.Draw(textImage)
 
-        draw.text(position, '\n'.join(lines), font=font, fill=(0xff, 0xff, 0xff, 0xff))
+        # draw black outline first, by drawing the text in black, blurring it,
+        # then boosting the contrast
+        textDraw.text(position, '\n'.join(lines), font=font, fill=(0x00, 0x00, 0x00, 0xff))
+        textImage = textImage.filter(ImageFilter.GaussianBlur(1.0))
+        textImage = ImageEnhance.Contrast(textImage).enhance(10.0)
+        panel = ImageChops.multiply(panel, textImage)
+
+        # draw our text again in white on top
+        panelDraw = ImageDraw.Draw(panel)
+        panelDraw.text(position, '\n'.join(lines), font=font, fill=(0xff, 0xff, 0xff, 0xff))
+
+        return panel
 
     @staticmethod
     def fitimg(img, width, height):
