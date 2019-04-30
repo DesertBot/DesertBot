@@ -140,7 +140,7 @@ class RSS(BotCommand):
                 "lastCheck": datetime.datetime.utcnow() - datetime.timedelta(minutes=10),
                 "suppress": False
             }
-            self.feeds.append({name: feed_object})
+            self.feeds[name] = feed_object
             self.bot.storage["rss_feeds"] = self.feeds
             return IRCResponse(ResponseType.Say,
                                "Successfully followed {} at URL {}".format(name, url),
