@@ -88,6 +88,8 @@ class RSS(BotCommand):
             return None
 
     def checkFeeds(self, message: IRCMessage):
+        if message.command in self.triggers():
+            return self.execute(message)
         responses = []
         for feedName, feedDeets in self.feeds.items():
             if feedDeets["lastCheck"] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
