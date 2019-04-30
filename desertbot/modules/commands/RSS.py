@@ -79,7 +79,7 @@ class RSS(BotCommand):
                 feed = message.parameters.strip()
                 latest = self._getLatest(feed)
                 if latest is not None:
-                    response = 'Latest {}: {} | {}'.format(feed["name"], feed["title"], feed["link"])
+                    response = 'Latest {}: {} | {}'.format(latest["name"], latest["title"], latest["link"])
                     return IRCResponse(ResponseType.Say, response, message.replyTo)
                 else:
                     return IRCResponse(ResponseType.Say,
