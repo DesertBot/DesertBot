@@ -123,6 +123,7 @@ class RSS(BotCommand):
                 if not feedDeets["suppress"]:
                     response = "New {}! Title: {} | {}".format(feedName, title, link)
                     responses.append(IRCResponse(ResponseType.Say, response, message.replyTo))
+                self.bot.storage["rss_feeds"] = self.feeds
 
         return responses
 
