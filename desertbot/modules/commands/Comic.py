@@ -135,7 +135,15 @@ class Comic(BotCommand):
         panel = []
         lastChar = None
         for message in messages:
+            msgTxt = message[1]
+            urls = re2.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', msgTxt)
+            for url in urls:
+                shortenedUrl = self.bot.moduleHandler.runActionUntilValue("shorten-url", url)
+                if shortenedUrl:
+                    msgTxt = msgTxt.replace(url, shortenedUrl)
+
             char = message[0]
+            message = (char, msgTxt)
             chars.add(char)
 
             # Start a new panel if the panel is full or the same user speaks twice in a row
