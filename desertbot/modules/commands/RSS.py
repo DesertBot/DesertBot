@@ -79,16 +79,19 @@ class RSS(BotCommand):
         else:
             responses = []
             for feedName, feedDeets in self.feeds.items():
-                self._updateFeed(feedName)
-                if not feedDeets["suppress"]:
+                newPost = self._updateFeed(feedName)
+                if newPost and not feedDeets["suppress"]:
                     response = "New {}! Title: {} | {}".format(feedName, feedDeets["lastTitle"], feedDeets["lastLink"])
                     responses.append(IRCResponse(ResponseType.Say, response, message.replyTo))
             return responses
 
-    def _updateFeed(self, feedName):
+    def _updateFeed(self, feedName: str) -> bool:
+        """
+        Returns True if feed has a new post, otherwise False
+        """
         feedDeets = self.feeds[feedName]
         if feedDeets["lastCheck"] > (datetime.datetime.utcnow() - datetime.timedelta(minutes=10)).isoformat():
-            return
+            return False
 
         self.feeds[feedName]["lastCheck"] = datetime.datetime.utcnow().isoformat()
 
@@ -97,7 +100,7 @@ class RSS(BotCommand):
         if not response:
             self.logger.warning("failed to fetch {!r}, either a server hiccup "
                                 "or the feed no longer exists".format(feedDeets["url"]))
-            return
+            return False
 
         soup = BeautifulSoup(response.content, "xml")
         item = soup.find("item")
@@ -105,7 +108,7 @@ class RSS(BotCommand):
         if item is None:
             self.logger.warning("the feed at {!r} doesn't have any items, has it shut down?"
                                 .format(feedDeets["url"]))
-            return
+            return False
 
         itemDate = item.pubDate.text
         newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True).isoformat()
@@ -125,6 +128,8 @@ class RSS(BotCommand):
             self.feeds[feedName]["lastTitle"] = title
             self.feeds[feedName]["lastLink"] = link
             self.bot.storage["rss_feeds"] = self.feeds
+            return True
+        return False
 
     def _getLatest(self, feedName):
         lowerMap = {name.lower(): name for name in self.feeds}
