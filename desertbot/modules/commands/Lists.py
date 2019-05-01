@@ -65,7 +65,7 @@ class Lists(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
+            return IRCResponse(ResponseType.Say, self.help(["lists"]), message.replyTo)
         elif len(message.parameterList) == 1:
             if message.parameterList[0].lower() in self.lists:
                 return IRCResponse(ResponseType.Say,
@@ -112,11 +112,11 @@ class Lists(BotCommand):
                     desiredNumber = int(subcommand)
                     text = self._getEntryByID(listName, desiredNumber)
                 except ValueError:
-                    text = self.help("")
+                    text = self.help(["lists"])
 
             return IRCResponse(ResponseType.Say, text, message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, self.help(""), message.replyTo)
+            return IRCResponse(ResponseType.Say, self.help(["lists"]), message.replyTo)
 
     def _getRandomEntry(self, listName):
         """

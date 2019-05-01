@@ -45,13 +45,13 @@ class BotCommand(BotModule):
     def onLoad(self) -> None:
         pass
 
-    def displayHelp(self, query: str) -> str:
+    def displayHelp(self, query: List[str]) -> str:
         lowQuery = query[0].lower()
         if lowQuery in self.triggers() or lowQuery == self.__class__.__name__.lower():
             return self.help(query)
 
-    def help(self, query: Union[str, None]) -> str:
-        if query[0].lower() in self.triggerHelp:
+    def help(self, query: Union[List[str], None]) -> str:
+        if query is not None and query[0].lower() in self.triggerHelp:
             return self.triggerHelp[query[0].lower()]
         return super(BotCommand, self).help(query)
 

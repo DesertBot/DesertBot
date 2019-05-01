@@ -1,7 +1,7 @@
 from zope.interface import Interface
 from functools import wraps
 from fnmatch import fnmatch
-from typing import Any, Callable, List, Tuple, TYPE_CHECKING
+from typing import Any, Callable, List, Tuple, Union, TYPE_CHECKING
 import logging
 
 from desertbot.message import IRCMessage
@@ -72,11 +72,11 @@ class BotModule(object):
     def hookBot(self, bot: 'DesertBot') -> None:
         self.bot = bot
 
-    def displayHelp(self, query: str) -> str:
-        if query[0].lower() == self.__class__.__name__.lower():
+    def displayHelp(self, query: Union[List[str], None]) -> str:
+        if query is not None and query[0].lower() == self.__class__.__name__.lower():
             return self.help(query)
 
-    def help(self, query: str) -> str:
+    def help(self, query: Union[List[str], None]) -> str:
         return "This module has no help text"
 
     def onUnload(self) -> None:
