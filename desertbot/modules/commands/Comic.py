@@ -56,7 +56,7 @@ class Comic(BotCommand):
 
         messages = self.getMessages(message.replyTo)
         if len(params) > 0:
-            regex = re2.compile(re2.escape(" ".join(params)), re2.IGNORECASE)
+            regex = re2.compile(" ".join(params), re2.IGNORECASE)
             matches = list(filter(regex.search, [msg[1] for msg in messages]))
             if len(matches) == 0:
                 return IRCResponse(ResponseType.Say,
