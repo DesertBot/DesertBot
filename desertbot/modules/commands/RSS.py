@@ -18,7 +18,7 @@ class RSS(BotCommand):
         return ["rss"]
 
     def actions(self):
-        return super(RSS, self).actions() + [("message-user", 1, self.checkFeeds)]
+        return super(RSS, self).actions() + [("message-channel", 1, self.checkFeeds)]
 
     def onLoad(self) -> None:
         if "rss_feeds" not in self.bot.storage:
