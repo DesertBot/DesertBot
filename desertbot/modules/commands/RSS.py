@@ -123,6 +123,11 @@ class RSS(BotCommand):
             self.feeds[feedName]["lastUpdate"] = newestDate
             title = item.title.text
             link = item.link.text
+            if link == "":
+                try:
+                    link = item.link.attrib["href"]
+                except Exception:
+                    link = "Failed to find link for item in feed!"
             try:
                 shortLink = self.bot.moduleHandler.runActionUntilValue("shorten-url", link)
                 if shortLink is None:
