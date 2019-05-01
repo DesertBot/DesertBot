@@ -1,6 +1,6 @@
-from bs4 import BeautifulSoup
 import datetime
 import dateutil.parser as dparser
+import feedparser
 from zope.interface import implementer
 from twisted.plugin import IPlugin
 
@@ -98,36 +98,25 @@ class RSS(BotCommand):
         response = self.bot.moduleHandler.runActionUntilValue("fetch-url", feedDeets["url"])
 
         if not response:
-            self.logger.warning("failed to fetch {!r}, either a server hiccup "
+            self.logger.warning("Failed to fetch {!r}, either a server hiccuped "
                                 "or the feed no longer exists".format(feedDeets["url"]))
             return False
 
-        soup = BeautifulSoup(response.content, "xml")
-        item = soup.find("item")
+        feed = feedparser.parse(response.content)
 
-        if item is None:
-            item = soup.find("entry")
-
-        if item is None:
-            self.logger.warning("the feed at {!r} doesn't have any items, has it shut down?"
-                                .format(feedDeets["url"]))
+        if len(feed["entries"]) > 0:
+            item = feed["entries"][0]
+        else:
+            self.logger.warning("The feed at {!r} doesn't have any entries, has it shut down?".format(feedDeets["url"]))
             return False
 
-        try:
-            itemDate = item.pubDate.text
-        except AttributeError:
-            itemDate = item.published.text
+        itemDate = item["published"]
         newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True).isoformat()
 
         if newestDate > feedDeets["lastUpdate"]:
             self.feeds[feedName]["lastUpdate"] = newestDate
-            title = item.title.text
-            link = item.link.text
-            if link == "":
-                try:
-                    link = item.link.attrib["href"]
-                except Exception:
-                    link = "Failed to find link for item in feed!"
+            title = item["title"]
+            link = item["link"]
             try:
                 shortLink = self.bot.moduleHandler.runActionUntilValue("shorten-url", link)
                 if shortLink is None:
@@ -136,6 +125,8 @@ class RSS(BotCommand):
                 self.logger.exception("Exception when trying to shorten URL {}".format(link))
             else:
                 link = shortLink
+            if link == "":
+                link = "Failed to find link for latest entry in feed!"
             self.feeds[feedName]["lastTitle"] = title
             self.feeds[feedName]["lastLink"] = link
             self.bot.storage["rss_feeds"] = self.feeds
