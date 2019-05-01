@@ -18,7 +18,7 @@ class RSS(BotCommand):
         return ["rss"]
 
     def actions(self):
-        return super(RSS, self).actions() + [("message-channel", 1, self.checkFeeds)]
+        return super(RSS, self).actions() + [("message-user", 1, self.checkFeeds)]
 
     def onLoad(self) -> None:
         if "rss_feeds" not in self.bot.storage:
@@ -34,6 +34,7 @@ class RSS(BotCommand):
         .rss toggle <feed_name> - toggle automatic posting of new RSS posts to channels
         .rss list - list followed feeds
         """
+        self.logger.info(query)
         helpDict = {
             "follow": "{}rss follow <url> <feed_name> - Start following the RSS feed at <url> as <feed_name>",
             "unfollow": "{}rss unfollow <feed_name> - Stop following the RSS feed at <url>",
@@ -51,29 +52,33 @@ class RSS(BotCommand):
                 return ("{!r} is not a valid subcommand, use {}help rss for a list of subcommands"
                         .format(query[1], self.bot.commandChar))
 
+    def execute(self, message: IRCMessage):
+        if len(message.parameterList) == 0:
+            return IRCResponse(ResponseType.Say, self.help(["rss"]), message.replyTo)
+        if message.parameterList[0].lower() == "follow":
+            return self._followFeed(message)
+        elif message.parameterList[0].lower() == "unfollow":
+            return self._unfollowFeed(message)
+        elif message.parameterList[0].lower() == "toggle":
+            return self._toggleFeedSuppress(message)
+        elif message.parameterList[0].lower() == "list":
+            return self._listFeeds(message)
+        else:
+            feed = message.parameters.strip()
+            latest = self._getLatest(feed)
+            if latest is not None:
+                response = 'Latest {}: {} | {}'.format(latest["name"], latest["title"], latest["link"])
+                return IRCResponse(ResponseType.Say, response, message.replyTo)
+            else:
+                return IRCResponse(ResponseType.Say,
+                                   "{} is not an RSS feed I monitor, leave a tell if you'd like it added!".format(
+                                       message.parameters.strip()),
+                                   message.replyTo)
+
     def checkFeeds(self, message: IRCMessage):
         if message.command in self.triggers():
-            if message.parameterList[0].lower() == "follow":
-                return self._followFeed(message)
-            elif message.parameterList[0].lower() == "unfollow":
-                return self._unfollowFeed(message)
-            elif message.parameterList[0].lower() == "toggle":
-                return self._toggleFeedSuppress(message)
-            elif message.parameterList[0].lower() == "list":
-                return self._listFeeds(message)
-            elif len(message.parameters.strip()) > 0:
-                feed = message.parameters.strip()
-                latest = self._getLatest(feed)
-                if latest is not None:
-                    response = 'Latest {}: {} | {}'.format(latest["name"], latest["title"], latest["link"])
-                    return IRCResponse(ResponseType.Say, response, message.replyTo)
-                else:
-                    return IRCResponse(ResponseType.Say,
-                                       "{} is not an RSS feed I monitor, leave a tell if you'd like it added!".format(
-                                           message.parameters.strip()),
-                                       message.replyTo)
-            else:
-                return self.help(None)
+            # this is handled by .execute() instead
+            return
 
         responses = []
         for feedName, feedDeets in self.feeds.items():
@@ -89,7 +94,7 @@ class RSS(BotCommand):
                                     "or the feed no longer exists".format(feedDeets["url"]))
                 continue
 
-            soup = BeautifulSoup(response.content, "lxml")
+            soup = BeautifulSoup(response.content, "xml")
             item = soup.find("item")
 
             if item is None:
@@ -97,14 +102,21 @@ class RSS(BotCommand):
                                     .format(feedDeets["url"]))
                 continue
 
-            itemDate = item.find("pubdate").text
+            itemDate = item.pubDate.text
             newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True).isoformat()
 
             if newestDate > feedDeets["lastUpdate"]:
                 self.feeds[feedName]["lastUpdate"] = newestDate
-                title = item.find("title").text
-                link = item.find("link").text
-                link = self.bot.moduleHandler.runActionUntilValue("shorten-url", link)
+                title = item.title.text
+                link = item.link.text
+                try:
+                    shortLink = self.bot.moduleHandler.runActionUntilValue("shorten-url", link)
+                    if shortLink is None:
+                        self.logger.error("Failed to shorten {}".format(link))
+                except Exception:
+                    self.logger.exception("Exception when trying to shorten URL {}".format(link))
+                else:
+                    link = shortLink
                 self.feeds[feedName]["lastTitle"] = title
                 self.feeds[feedName]["lastLink"] = link
                 if not feedDeets["suppress"]:
