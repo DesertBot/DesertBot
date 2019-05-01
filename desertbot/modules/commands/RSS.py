@@ -1,15 +1,13 @@
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import admin, BotCommand
-from zope.interface import implementer
-
+from bs4 import BeautifulSoup
 import datetime
+import dateutil.parser as dparser
+from zope.interface import implementer
+from twisted.plugin import IPlugin
 
 from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import admin, BotCommand
 from desertbot.response import IRCResponse, ResponseType
-
-import dateutil.parser as dparser
-from bs4 import BeautifulSoup
 
 
 @implementer(IPlugin, IModule)
@@ -78,57 +76,61 @@ class RSS(BotCommand):
         if message.command in self.triggers():
             # this is handled by .execute() instead
             return
-
-        responses = []
-        for feedName, feedDeets in self.feeds.items():
-            if feedDeets["lastCheck"] > (datetime.datetime.utcnow() - datetime.timedelta(minutes=10)).isoformat():
-                continue
-
-            self.feeds[feedName]["lastCheck"] = datetime.datetime.utcnow().isoformat()
-
-            response = self.bot.moduleHandler.runActionUntilValue("fetch-url", feedDeets["url"])
-
-            if not response:
-                self.logger.warning("failed to fetch {!r}, either a server hiccup "
-                                    "or the feed no longer exists".format(feedDeets["url"]))
-                continue
-
-            soup = BeautifulSoup(response.content, "xml")
-            item = soup.find("item")
-
-            if item is None:
-                self.logger.warning("the feed at {!r} doesn't have any items, has it shut down?"
-                                    .format(feedDeets["url"]))
-                continue
-
-            itemDate = item.pubDate.text
-            newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True).isoformat()
-
-            if newestDate > feedDeets["lastUpdate"]:
-                self.feeds[feedName]["lastUpdate"] = newestDate
-                title = item.title.text
-                link = item.link.text
-                try:
-                    shortLink = self.bot.moduleHandler.runActionUntilValue("shorten-url", link)
-                    if shortLink is None:
-                        self.logger.error("Failed to shorten {}".format(link))
-                except Exception:
-                    self.logger.exception("Exception when trying to shorten URL {}".format(link))
-                else:
-                    link = shortLink
-                self.feeds[feedName]["lastTitle"] = title
-                self.feeds[feedName]["lastLink"] = link
+        else:
+            responses = []
+            for feedName, feedDeets in self.feeds.items():
+                self._updateFeed(feedName)
                 if not feedDeets["suppress"]:
-                    response = "New {}! Title: {} | {}".format(feedName, title, link)
+                    response = "New {}! Title: {} | {}".format(feedName, feedDeets["lastTitle"], feedDeets["lastLink"])
                     responses.append(IRCResponse(ResponseType.Say, response, message.replyTo))
-                self.bot.storage["rss_feeds"] = self.feeds
+            return responses
 
-        return responses
+    def _updateFeed(self, feedName):
+        feedDeets = self.feeds[feedName]
+        if feedDeets["lastCheck"] > (datetime.datetime.utcnow() - datetime.timedelta(minutes=10)).isoformat():
+            return
+
+        self.feeds[feedName]["lastCheck"] = datetime.datetime.utcnow().isoformat()
+
+        response = self.bot.moduleHandler.runActionUntilValue("fetch-url", feedDeets["url"])
+
+        if not response:
+            self.logger.warning("failed to fetch {!r}, either a server hiccup "
+                                "or the feed no longer exists".format(feedDeets["url"]))
+            return
+
+        soup = BeautifulSoup(response.content, "xml")
+        item = soup.find("item")
+
+        if item is None:
+            self.logger.warning("the feed at {!r} doesn't have any items, has it shut down?"
+                                .format(feedDeets["url"]))
+            return
+
+        itemDate = item.pubDate.text
+        newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True).isoformat()
+
+        if newestDate > feedDeets["lastUpdate"]:
+            self.feeds[feedName]["lastUpdate"] = newestDate
+            title = item.title.text
+            link = item.link.text
+            try:
+                shortLink = self.bot.moduleHandler.runActionUntilValue("shorten-url", link)
+                if shortLink is None:
+                    self.logger.error("Failed to shorten {}".format(link))
+            except Exception:
+                self.logger.exception("Exception when trying to shorten URL {}".format(link))
+            else:
+                link = shortLink
+            self.feeds[feedName]["lastTitle"] = title
+            self.feeds[feedName]["lastLink"] = link
+            self.bot.storage["rss_feeds"] = self.feeds
 
     def _getLatest(self, feedName):
         lowerMap = {name.lower(): name for name in self.feeds}
         if feedName.lower() in lowerMap:
             name = lowerMap[feedName.lower()]
+            self._updateFeed(name)
             title = self.feeds[name]["lastTitle"]
             link = self.feeds[name]["lastLink"]
             return {
@@ -154,6 +156,7 @@ class RSS(BotCommand):
             }
             self.feeds[name] = feed_object
             self.bot.storage["rss_feeds"] = self.feeds
+            self._updateFeed(name)
             return IRCResponse(ResponseType.Say,
                                "Successfully followed {} at URL {}".format(name, url),
                                message.replyTo)
