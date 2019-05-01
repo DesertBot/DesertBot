@@ -113,7 +113,10 @@ class RSS(BotCommand):
                                 .format(feedDeets["url"]))
             return False
 
-        itemDate = item.pubDate.text
+        try:
+            itemDate = item.pubDate.text
+        except AttributeError:
+            itemDate = item.published.text
         newestDate = dparser.parse(itemDate, fuzzy=True, ignoretz=True).isoformat()
 
         if newestDate > feedDeets["lastUpdate"]:
