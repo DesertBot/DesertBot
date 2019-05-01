@@ -143,10 +143,9 @@ class Steam(BotCommand):
             data.append('/'.join(platformArray))
 
         # description
-        if 'about_the_game' in appData and appData['about_the_game'] is not None:
+        if 'short_description' in appData and appData['short_description'] is not None:
             limit = 100
-            description = re.sub(r'(<[^>]+>|[\r\n\t])+', colour(A.normal[' ', A.fg.gray['>'], ' ']),
-                                 appData['about_the_game'])
+            description = appData['short_description']
             if len(description) > limit:
                 description = '{} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
