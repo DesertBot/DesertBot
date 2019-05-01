@@ -1,6 +1,7 @@
 from enum import Enum
 from twisted.protocols.basic import LineOnlyReceiver
 from typing import Any, Dict, List, Optional, Tuple, Union
+import unicodedata
 
 
 class ModeType(Enum):
@@ -18,6 +19,7 @@ class IRCBase(LineOnlyReceiver):
     def lineReceived(self, data: bytes) -> None:
         for lineRaw in data.split(b"\r"):
             line = lineRaw.decode("utf-8", "replace")
+            line = unicodedata.normalize("NFC", line)
             command, params, prefix, tags = self._parseLine(line)
             if command:
                 self.handleCommand(command, params, prefix, tags)
