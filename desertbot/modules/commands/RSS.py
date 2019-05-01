@@ -34,7 +34,6 @@ class RSS(BotCommand):
         .rss toggle <feed_name> - toggle automatic posting of new RSS posts to channels
         .rss list - list followed feeds
         """
-        self.logger.info(query)
         helpDict = {
             "follow": "{}rss follow <url> <feed_name> - Start following the RSS feed at <url> as <feed_name>",
             "unfollow": "{}rss unfollow <feed_name> - Stop following the RSS feed at <url>",
