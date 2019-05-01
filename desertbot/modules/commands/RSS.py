@@ -106,6 +106,9 @@ class RSS(BotCommand):
         item = soup.find("item")
 
         if item is None:
+            item = soup.find("entry")
+
+        if item is None:
             self.logger.warning("the feed at {!r} doesn't have any items, has it shut down?"
                                 .format(feedDeets["url"]))
             return False
