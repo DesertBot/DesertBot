@@ -19,11 +19,16 @@ from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
 from desertbot.utils import string
 
+try:
+    import re2
+except ImportError:
+    import re as re2
+
 
 @implementer(IPlugin, IModule)
 class Comic(BotCommand):
     # just hardcode a limit on max messages for now, should limit comic size pretty effecively?
-    messageLimit = 8
+    messageLimit = 50
 
     def actions(self):
         # define additional actions so all PRIVMSGs and ACTIONs in the channel get handled by storeMessage
@@ -39,13 +44,43 @@ class Comic(BotCommand):
         return ['comic']
 
     def help(self, query):
-        return 'comic - make a comic'
+        return 'comic (<length>) (<firstmessage>) - Make a comic. If given a length x it will use the last x number of ' \
+               'messages. If also given a first message it will use x number of messages starting from the given first ' \
+               'message.'
 
     def execute(self, message: IRCMessage):
+        comicLimit = 8
+        params = list(message.parameterList)
+        if len(params) > 0 and string.isNumber(params[0]):
+            comicLimit = int(params.pop(0))
+
         messages = self.getMessages(message.replyTo)
+        if len(params) > 0:
+            regex = re2.compile(re2.escape(" ".join(params)), re2.IGNORECASE)
+            matches = list(filter(regex.search, [msg[1] for msg in messages]))
+            if len(matches) == 0:
+                return IRCResponse(ResponseType.Say,
+                                   "Sorry, that didn't match anything in my message buffer.",
+                                   message.replyTo)
+            elif len(matches) > 1:
+                return IRCResponse(ResponseType.Say,
+                                   "Sorry, that matches too many lines in my message buffer.",
+                                   message.replyTo)
+
+            index = [msg[1] for msg in messages].index(matches[0])
+            lastIndex = index + comicLimit
+            if lastIndex > len(messages):
+                lastIndex = len(messages)
+            messages = messages[index:lastIndex]
+        else:
+            messages = messages[comicLimit * -1:]
         if messages:
             comicBytes = self.makeComic(messages)
             return IRCResponse(ResponseType.Say, self.postComic(comicBytes), message.replyTo)
+        else:
+            return IRCResponse(ResponseType.Say,
+                               "There are no messages in the buffer to create a comic with.",
+                               message.replyTo)
 
     def getMessages(self, channel: str):
         """
