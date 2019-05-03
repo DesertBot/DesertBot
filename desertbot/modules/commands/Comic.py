@@ -6,7 +6,8 @@ Created on Apr 18, 2019
 import glob
 import json
 from io import BytesIO
-from random import choice, sample
+from random import choice, sample, uniform
+import colorsys
 
 import requests
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance, ImageChops
@@ -156,26 +157,13 @@ class Comic(BotCommand):
         # charmap is now a dict of message.user.nick to their randomly picked "character" image
 
         # Randomly associate a text colour to each user
-        colours = [
-            #   R     G     B     A
-            (0xff, 0xff, 0xff, 0xff),  # white
-            (0xcc, 0x99, 0xff, 0xff),  # purple
-            (0xa9, 0xd1, 0xf7, 0xff),  # blue
-            (0xb4, 0xf0, 0xa7, 0xff),  # green
-            (0xff, 0xff, 0xbf, 0xff),  # yellow
-            (0xff, 0xdf, 0xbe, 0xff),  # orange
-            (0xff, 0xb1, 0xb0, 0xff),  # red
-            (0xff, 0x97, 0xcc, 0xff),  # pink
-            # duplicates because we could have up to 16 characters
-            (0xff, 0xff, 0xff, 0xff),  # white
-            (0xcc, 0x99, 0xff, 0xff),  # purple
-            (0xa9, 0xd1, 0xf7, 0xff),  # blue
-            (0xb4, 0xf0, 0xa7, 0xff),  # green
-            (0xff, 0xff, 0xbf, 0xff),  # yellow
-            (0xff, 0xdf, 0xbe, 0xff),  # orange
-            (0xff, 0xb1, 0xb0, 0xff),  # red
-            (0xff, 0x97, 0xcc, 0xff),  # pink
-        ]
+        # get lightness and saturation from our baseline purple #cc99ff
+        (_, light, sat) = colorsys.rgb_to_hls(0xcc / 255.0, 0x99 / 255.0, 0xff / 255.0)
+        # generate a random hue of the same lightness and saturation
+        startColour = colorsys.hls_to_rgb(uniform(0, 1), light, sat)
+        # generate as many colours from this random hue as there are characters in the comic
+        colours = self.genTextColours(startColour, 0xff, len(chars))
+        # map our generated colours to characters
         colmap = {ch: col for ch, col in zip(chars, sample(colours, len(chars)))}
 
         # How big is the whole comic?
@@ -364,6 +352,20 @@ class Comic(BotCommand):
             img = img.crop((crop, 0, crop + w, img.size[1]))
 
         return img.resize((width, height), Image.LANCZOS)
+
+    @staticmethod
+    def genTextColours(startColour, alpha, numColours):
+        """
+        Generates a list of text colours of numColours different hues that all have
+        the same lightness and saturation as startColour, and are equally separated from each other
+        """
+        (r, g, b) = startColour
+        (h, l, s) = colorsys.rgb_to_hls(r, g, b)
+        textColours = (colorsys.hls_to_rgb(h + ((1.0 / numColours) * offset), l, s)
+                       for offset in range(0, numColours))
+        textColours = [(int(r * 255), int(g * 255), int(b * 255), alpha)
+                       for (r, g, b) in textColours]
+        return textColours
 
 
 comic = Comic()
