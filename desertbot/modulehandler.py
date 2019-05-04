@@ -121,6 +121,12 @@ class ModuleHandler(object):
     def sendPRIVMSG(self, message: str, destination: str) -> None:
         self.bot.output.cmdPRIVMSG(destination, message)
 
+    def handlePing(self) -> None:
+        action = (lambda: "ping")()
+        d = threads.deferToThread(self.runGatheringAction, action)
+        d.addCallback(self.sendResponses)
+        d.addErrback(self._deferredError)
+
     def handleMessage(self, message: IRCMessage) -> None:
         isChannel = message.targetType == TargetTypes.CHANNEL
         typeActionMap = {
