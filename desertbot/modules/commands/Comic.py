@@ -137,8 +137,8 @@ class Comic(BotCommand):
         lastChar = None
         for message in messages:
             msgTxt = message[1]
-            urls = re2.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', msgTxt)
-            for url in urls:
+            regex = re2.compile(r"(https?://|www\.)[^\s]+", re2.IGNORECASE)
+            for url in filter(regex.match, msgTxt.split(" ")):
                 shortenedUrl = self.bot.moduleHandler.runActionUntilValue("shorten-url", url)
                 if shortenedUrl:
                     msgTxt = msgTxt.replace(url, shortenedUrl)
