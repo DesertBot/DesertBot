@@ -271,6 +271,7 @@ class InputHandler(object):
             del channel.ranks[nick]
 
     def _handlePING(self, nick, ident, host, params):
+        self.bot.moduleHandler.handlePing()
         self.bot.output.cmdPONG(' '.join(params))
 
     def _handlePRIVMSG(self, nick, ident, host, params):
