@@ -16,23 +16,28 @@ class RSS(BotCommand):
         return ["rss"]
 
     def actions(self):
-        return super(RSS, self).actions() + [("message-channel", 1, self.checkFeeds)]
+        return super(RSS, self).actions() + [("ping", 1, self.checkFeeds)]
 
     def onLoad(self) -> None:
         if "rss_feeds" not in self.bot.storage:
             self.bot.storage["rss_feeds"] = {}
         self.feeds = self.bot.storage["rss_feeds"]
+        if "rss_channels" not in self.bot.storage:
+            self.bot.storage["rss_channels"] = []
+        self.channels = self.bot.storage["rss_channels"]
 
     def help(self, query):
         """
         RSS command syntax:
         .rss <feed_name> - fetch latest for feed name
+        .rss channels <channel_name> [<channel_name>]- send notifications to <channel_name> whenever a feed is updated
         .rss follow <url> <feed_name> - start following <url> as <feed_name>
         .rss unfollow <feed_name> - stop following <feed_name>
         .rss toggle <feed_name> - toggle automatic posting of new RSS posts to channels
         .rss list - list followed feeds
         """
         helpDict = {
+            "channels": "{}rss channels <channel_name> [<channel_name>]- send notifications to <channel_name> whenever a feed is updated",
             "follow": "{}rss follow <url> <feed_name> - Start following the RSS feed at <url> as <feed_name>",
             "unfollow": "{}rss unfollow <feed_name> - Stop following the RSS feed at <url>",
             "toggle": "{}rss toggle <feed_name> - Toggle displaying of new posts of the given RSS feed as chat messages",
@@ -40,7 +45,7 @@ class RSS(BotCommand):
             "": "{}rss <feed_name> - Display the latest post in the given RSS feed."
         }
         if len(query) == 1:
-            return ("{0}rss <feed_name>/follow/unfollow/toggle/list - Manages RSS feeds and automatic updates of them"
+            return ("{0}rss <feed_name>/channels/follow/unfollow/toggle/list - Manages RSS feeds and automatic updates of them"
                     " Use {0}help rss <subcommand> for more help.".format(self.bot.commandChar))
         else:
             if query[1].lower() in helpDict:
@@ -52,7 +57,9 @@ class RSS(BotCommand):
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say, self.help(["rss"]), message.replyTo)
-        if message.parameterList[0].lower() == "follow":
+        if message.parameterList[0].lower() == "channels":
+            return self._setChannels(message)
+        elif message.parameterList[0].lower() == "follow":
             return self._followFeed(message)
         elif message.parameterList[0].lower() == "unfollow":
             return self._unfollowFeed(message)
@@ -72,18 +79,15 @@ class RSS(BotCommand):
                                        message.parameters.strip()),
                                    message.replyTo)
 
-    def checkFeeds(self, message: IRCMessage):
-        if message.command in self.triggers():
-            # this is handled by .execute() instead
-            return
-        else:
-            responses = []
-            for feedName, feedDeets in self.feeds.items():
-                newPost = self._updateFeed(feedName)
-                if newPost and not feedDeets["suppress"]:
+    def checkFeeds(self):
+        responses = []
+        for feedName, feedDeets in self.feeds.items():
+            newPost = self._updateFeed(feedName)
+            if newPost and not feedDeets["suppress"]:
+                for channel in self.channels:
                     response = "New {}! Title: {} | {}".format(feedName, feedDeets["lastTitle"], feedDeets["lastLink"])
-                    responses.append(IRCResponse(ResponseType.Say, response, message.replyTo))
-            return responses
+                    responses.append(IRCResponse(ResponseType.Say, response, channel))
+        return responses
 
     def _updateFeed(self, feedName: str) -> bool:
         """
@@ -147,6 +151,14 @@ class RSS(BotCommand):
             }
         else:
             return None
+
+    @admin("[RSS] Only my admins may tell me what channels to send notifications to!")
+    def _setChannels(self, message: IRCMessage):
+        self.channels = message.parameterList[1:]
+        self.bot.storage["rss_channels"] = self.channels
+        return IRCResponse(ResponseType.Say,
+                           "RSS notifications will now be sent to: {}".format(self.channels),
+                           message.replyTo)
 
     @admin("[RSS] Only my admins may follow new RSS feeds!")
     def _followFeed(self, message: IRCMessage):
