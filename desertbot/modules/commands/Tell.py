@@ -23,10 +23,10 @@ class Tell(BotCommand):
         return ["tell", "tellafter", "stells", "rtell"]
 
     def actions(self):
-        return super(Tell, self).actions() + [('action-channel', 1, self._processTells),
-                                              ('action-user', 1, self._processTells),
-                                              ('message-channel', 1, self._processTells),
-                                              ('message-user', 1, self._processTells)]
+        return super(Tell, self).actions() + [('action-channel', 5, self._processTells),
+                                              ('action-user', 5, self._processTells),
+                                              ('message-channel', 5, self._processTells),
+                                              ('message-user', 5, self._processTells)]
 
     def onLoad(self):
         if "tells" not in self.bot.storage:
