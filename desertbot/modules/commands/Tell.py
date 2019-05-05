@@ -57,7 +57,10 @@ class Tell(BotCommand):
                 return IRCResponse(ResponseType.Say, "Tell {} what?".format(params[0]), message.replyTo)
             sentTells = []
             if message.command == "tellafter":
-                date = now() + timedelta(seconds=timeparse(params[1]))
+                try:
+                    date = now() + timedelta(seconds=timeparse(params[1]))
+                except TypeError:
+                    return IRCResponse(ResponseType.Say, "The given duration is invalid.", message.replyTo)
             else:
                 date = now()
             for recep in params[0].split("&"):
