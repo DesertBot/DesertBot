@@ -1,6 +1,8 @@
+from base64 import b64decode, b64encode
 from collections import OrderedDict
 from html.entities import name2codepoint
 from datetime import timedelta
+from dateutil.parser import parse
 import re
 
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
@@ -74,6 +76,26 @@ def deltaTimeToString(timeDelta: timedelta, resolution: str='m') -> str:
     return deltaString if len(deltaString) > 0 else 'seconds'
 
 
+# Taken from PyHeufyBot.
+def timeDeltaString(date1, date2):
+    delta = date1 - date2
+    dayString = "{} day{}".format(delta.days, "" if delta.days == 1 else "s")
+    hours = delta.seconds // 3600
+    hourString = "{} hour{}".format(hours, "" if hours == 1 else "s")
+    minutes = (delta.seconds // 60) % 60
+    minuteString = "{} minute{}".format(minutes, "" if minutes == 1 else "s")
+    if delta.days == 0 and hours == 0 and minutes == 0:
+        return "less than a minute"
+    return "{}, {} and {}".format(dayString, hourString, minuteString)
+
+
+def strftimeWithTimezone(date):
+    if isinstance(date, str):
+        date = parse(date)
+
+    return date.strftime("%Y-%m-%d %H:%M UTC")
+
+
 # Removes HTML or XML character references and entities from a text string.
 #
 # @param text The HTML (or XML) source text.
@@ -98,3 +120,11 @@ def unescapeXHTML(text: str) -> str:
                 pass
         return escapeText  # leave as is
     return re.sub('&#?\w+;', fixup, text)
+
+
+def strToB64(text: str):
+    return b64encode(text.encode('utf-8', 'ignore')).decode('utf-8')
+
+
+def b64ToStr(text: bytes):
+    return b64decode(text).decode('utf-8')
