@@ -30,7 +30,7 @@ class Tell(BotCommand):
 
     def onLoad(self):
         if "tells" not in self.bot.storage:
-            self.bot.storage["tells"] = {}
+            self.bot.storage["tells"] = []
         self.tells = self.bot.storage["tells"]
 
     def help(self, query):
