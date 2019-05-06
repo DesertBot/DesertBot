@@ -19,7 +19,7 @@ import re
 @implementer(IPlugin, IModule)
 class Mixer(BotCommand):
     def actions(self):
-        return super(Twitch, self).actions() + [('urlfollow', 2, self.follow)]
+        return super(Mixer, self).actions() + [('urlfollow', 2, self.follow)]
 
     def help(self, query):
         return 'Automatic module that follows Mixer URLs'
@@ -30,12 +30,12 @@ class Mixer(BotCommand):
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         # Heavily based on Didero's DideRobot code for the same
         # https://github.com/Didero/DideRobot/blob/06629fc3c8bddf8f729ce2d27742ff999dfdd1f6/commands/urlTitleFinder.py#L37
-        match = re.search(r'twitch\.tv/(?P<mixerChannel>[^/]+)/?(\s|$)', url)
+        match = re.search(r'mixer\.com/(?P<mixerChannel>[^/]+)/?(\s|$)', url)
         if not match:
             return
         channel = match.group('mixerChannel')
 
-        if self.twitchClientID is None:
+        if self.mixerClientID is None:
             return '[Mixer Client ID not found]'
 
         chanData = {}
