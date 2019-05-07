@@ -22,8 +22,6 @@ from typing import Any, Dict, Optional
 
 from apiclient.discovery import build
 
-from desertbot.utils.api_keys import load_key
-
 
 @implementer(IPlugin, IModule)
 class WebUtils(BotModule):
@@ -151,7 +149,7 @@ class WebUtils(BotModule):
                                   .format(response.content, url))
 
     def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
-        googleKey = load_key('Google')
+        googleKey = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'Google')
         if not googleKey:
             return None
 

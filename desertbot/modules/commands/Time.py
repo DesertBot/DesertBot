@@ -3,7 +3,6 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
-from desertbot.utils.api_keys import load_key
 from desertbot.utils.timeutils import now, timestamp
 from zope.interface import implementer
 from datetime import datetime
@@ -22,7 +21,7 @@ class Time(BotCommand):
                "the given latlon, place or user."
 
     def onLoad(self) -> None:
-        self.apiKey = load_key("TimeZoneDB")
+        self.apiKey = self.bot.moduleHandler.runActionUntilValue("apikeys-getkey", "TimeZoneDB")
 
     def execute(self, message: IRCMessage):
         if not self.apiKey:

@@ -3,7 +3,6 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
-from desertbot.utils.api_keys import load_key
 from zope.interface import implementer
 from datetime import datetime
 import time
@@ -22,7 +21,7 @@ class OpenWeatherMap(BotCommand):
                "paramters are given."
 
     def onLoad(self):
-        self.apiKey = load_key("OpenWeatherMap")
+        self.apiKey = self.bot.moduleHandler.runActionUntilValue("apikeys-getkey", "OpenWeatherMap")
 
     def execute(self, message: IRCMessage):
         if not self.apiKey:

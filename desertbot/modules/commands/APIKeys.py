@@ -8,7 +8,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import admin, BotCommand
 from desertbot.response import IRCResponse, ResponseType
 
-from desertbot.utils.api_keys import path as api_key_path
+API_KEY_PATH = 'data/api_keys.json'
 
 
 @implementer(IPlugin, IModule)
@@ -17,11 +17,11 @@ class APIKeys(BotCommand):
         return ["apikey"]
 
     def onLoad(self):
-        with open(api_key_path) as f:
+        with open(API_KEY_PATH) as f:
             self.keys = json.load(f)
 
     def saveKeys(self):
-        with open(api_key_path, "w") as f:
+        with open(API_KEY_PATH, "w") as f:
             json.dump(self.keys, f)
 
     def actions(self):

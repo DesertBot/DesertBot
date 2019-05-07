@@ -3,7 +3,6 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
-from desertbot.utils.api_keys import load_key
 from typing import Union
 from zope.interface import implementer
 
@@ -24,7 +23,7 @@ class Chatmap(BotCommand):
                                                   ("userlocation-deleted", 1, self.deleteLocation) ]
 
     def onLoad(self) -> None:
-        self.apiKey = load_key("DBChatmap")
+        self.apiKey = self.bot.moduleHandler.runActionUntilValue("apikeys-getkey", "DBChatmap")
 
     def execute(self, message: IRCMessage):
         if message.command == "chatmap":
