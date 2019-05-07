@@ -41,7 +41,7 @@ class Mixer(BotCommand):
         chanData = {}
         channelOnline = False
         mixerHeaders = {'Accept': 'application/json',
-                         'Client-ID': self.mixerClientID}
+                        'Client-ID': self.mixerClientID}
         url = 'https://mixer.com/api/v1/channels/{}'.format(channel)
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
                                                               extraHeaders=mixerHeaders)
