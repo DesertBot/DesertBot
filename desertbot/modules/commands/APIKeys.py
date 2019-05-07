@@ -18,7 +18,7 @@ class APIKeys(BotCommand):
 
     def onLoad(self):
         with open(api_key_path) as f:
-            self.keys = json.load(f.read())
+            self.keys = json.load(f)
 
     def saveKeys(self):
         with open(api_key_path, "w") as f:
