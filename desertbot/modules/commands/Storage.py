@@ -20,12 +20,12 @@ class Storage(BotCommand):
         helpDict = {
             "storage": f"{self.bot.commandChar}storage stopsync/startsync/load/save - Manage bot storage file.",
             "stopsync": f"{self.bot.commandChar}storage stopsync - Halts the periodic autosave for the bot's storage file.",
-            "startsync": f"{self.bot.commandChar}storage startsync - Start period autosave for the bot's storage file.",
+            "startsync": f"{self.bot.commandChar}storage startsync - Start periodic autosave for the bot's storage file.",
             "load": f"{self.bot.commandChar}storage load - Manually load the bot's storage from file.",
             "save": f"{self.bot.commandChar}storage save - Manually save the bot's storage to file."
         }
-        if query[0].lower() in helpDict:
-            return helpDict[query[0].lower()]
+        if len(query) > 1 and query[1].lower() in helpDict:
+            return helpDict[query[1].lower()]
         else:
             return f"{self.bot.commandChar}storage stopsync/startsync/load/save - Manage bot storage file."
 
