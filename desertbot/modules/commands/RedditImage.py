@@ -14,8 +14,6 @@ import random
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-from desertbot.utils.api_keys import load_key
-
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
@@ -35,7 +33,7 @@ class RedditImage(BotCommand):
                 " of the specified subreddit")
 
     def onLoad(self):
-        self.imgurClientID = load_key('imgur Client ID')
+        self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'imgur Client ID')
         self.headers = [('Authorization', 'Client-ID {}'.format(self.imgurClientID))]
 
     def execute(self, message: IRCMessage):

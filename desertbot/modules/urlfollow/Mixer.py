@@ -9,7 +9,6 @@ from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
-from desertbot.utils.api_keys import load_key
 
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
@@ -25,7 +24,7 @@ class Mixer(BotCommand):
         return 'Automatic module that follows Mixer URLs'
 
     def onLoad(self):
-        self.mixerClientID = load_key('Mixer Client ID')
+        self.mixerClientID = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'Mixer Client ID')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         # Heavily based on Didero's DideRobot code for the same

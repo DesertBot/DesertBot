@@ -11,8 +11,6 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-from desertbot.utils.api_keys import load_key
-
 
 @implementer(IPlugin, IModule)
 class CheckURL(BotCommand):
@@ -27,7 +25,7 @@ class CheckURL(BotCommand):
             return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
         urlToCheck = message.parameterList[0]
-        apiKey = load_key("WebCargo")
+        apiKey = self.bot.moduleHandler.runActionUntilValue("apikeys-getkey", "WebCargo")
         url = "https://api.webcargo.io/availability"
         params = {
             'key': apiKey,
