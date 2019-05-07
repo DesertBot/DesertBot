@@ -1,5 +1,6 @@
 import json
 from twisted.plugin import IPlugin
+from typing import Union
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
@@ -15,26 +16,32 @@ class APIKeys(BotCommand):
     def triggers(self):
         return ["apikey"]
 
+    def onLoad(self):
+        with open(api_key_path) as f:
+            self.keys = json.load(f.read())
+
+    def saveKeys(self):
+        with open(api_key_path, "w") as f:
+            json.dump(self.keys, f)
+
+    def actions(self):
+        return super(APIKeys, self).actions() + [("apikeys-getkey", 1, self.getKey)]
+
     def help(self, query):
         return f"{self.bot.commandChar}apikey add/remove <name> <apikey> -- Add or remove the specified API key to the bot."
 
     @admin("[APIKey] Only my admins may manage API keys!")
     def execute(self, message: IRCMessage):
-        if len(message.parameterList) != 3:
+        if len(message.parameterList) < 3:
             return self.help(None)
         command = message.parameterList[0].lower()
-        keyname = message.parameterList[1]
-        key = message.parameterList[2]
+        key = message.parameterList.pop()
+        keyname = " ".join(message.parameterList[1:])
 
         if command == "add":
             try:
-                with open(api_key_path) as f:
-                    keys = json.load(f.read())
-
-                keys[keyname] = key
-                with open(api_key_path, "w") as f:
-                    json.dump(keys, f)
-
+                self.keys[keyname] = key
+                self.saveKeys()
             except Exception:
                 self.logger.exception(f"Failed to add API key {keyname}!")
                 return IRCResponse(ResponseType.Say, f"Failed to add API key {keyname} to the bot!", message.replyTo)
@@ -42,16 +49,11 @@ class APIKeys(BotCommand):
                 return IRCResponse(ResponseType.Say, f"Added the API key {keyname} to the bot.", message.replyTo)
         elif command == "remove":
             try:
-                with open(api_key_path) as f:
-                    keys = json.load(f.read())
-
-                if keyname in keys:
-                    del keys[keyname]
+                if keyname in self.keys:
+                    del self.keys[keyname]
+                    self.saveKeys()
                 else:
                     return IRCResponse(ResponseType.Say, f"There is no API key named {keyname}!", message.replyTo)
-
-                with open(api_key_path, "w") as f:
-                    json.dump(keys, f)
             except Exception:
                 self.logger.exception(f"Failed to remove API key {keyname}!")
                 return IRCResponse(ResponseType.Say, f"Failed to remove API key {keyname} from the bot!", message.replyTo)
@@ -59,6 +61,12 @@ class APIKeys(BotCommand):
                 return IRCResponse(ResponseType.Say, f"Removed the API key {keyname} from the bot.", message.replyTo)
         else:
             return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+
+    def getKey(self, name: str) -> Union[str, None]:
+        """
+        Returns the API key with the given name, or None if it doesn't exist.
+        """
+        return self.keys.get(name, None)
 
 
 apikeys = APIKeys()
