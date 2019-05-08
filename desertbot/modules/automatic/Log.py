@@ -115,7 +115,7 @@ class Log(BotCommand):
                                              ('channelinvite', 100, self.input),
                                              ('channelpart', 100, self.input),
                                              ('channelkick', 100, self.input),
-                                             ('userquit', 100, self.quit),
+                                             ('userquit', 100, self.input),
                                              ('usernick', 100, self.input),
                                              ('modeschanged-channel', 100, self.input),
                                              ('modeschanged-user', 100, self.input),
