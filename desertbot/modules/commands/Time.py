@@ -20,9 +20,6 @@ class Time(BotCommand):
         return "Commands: time <lat> <lon>, time <place>, time <nickname> | Get the current local time for " \
                "the given latlon, place or user."
 
-    def actions(self):
-        return super(Time, self).actions() + [("apikeys-available", 1, self.onLoad)]
-
     def onLoad(self) -> None:
         self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "TimeZoneDB")
 

@@ -18,8 +18,7 @@ import re
 @implementer(IPlugin, IModule)
 class Imgur(BotCommand):
     def actions(self):
-        return super(Imgur, self).actions() + [('urlfollow', 2, self.follow),
-                                               ("apikeys-available", 1, self.onLoad)]
+        return super(Imgur, self).actions() + [('urlfollow', 2, self.follow)]
 
     def help(self, query):
         return 'Automatic module that follows Imgur URLs'
