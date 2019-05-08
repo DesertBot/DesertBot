@@ -56,7 +56,7 @@ class IRCMessage(object):
             if len(self.messageList) > 1:
                 self.command = self.messageList[1]
                 self.parameters = u' '.join(self.messageList[2:])
-
+        self.command = self.command.lower()
         if self.parameters.strip():
             self.parameterList = self.parameters.split(' ')
 
