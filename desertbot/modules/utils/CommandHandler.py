@@ -11,6 +11,10 @@ from zope.interface import implementer
 
 @implementer(IPlugin, IModule)
 class CommandHandler(BotModule):
+    def __init__(self):
+        BotModule.__init__(self)
+        self.loadingPriority = 10
+
     def actions(self):
         return super(CommandHandler, self).actions() + [('message-channel', 1, self.handleCommand),
                                                         ('message-user', 1, self.handleCommand)]
