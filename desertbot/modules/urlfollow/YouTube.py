@@ -29,7 +29,7 @@ class YouTube(BotCommand):
         return 'Automatic module that follows YouTube URLs'
 
     def onLoad(self):
-        self.youtubeKey = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'YouTube')
+        self.youtubeKey = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'YouTube')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)

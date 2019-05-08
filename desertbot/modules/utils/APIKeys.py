@@ -29,7 +29,7 @@ class APIKeys(BotCommand):
             json.dump(self.keys, f)
 
     def actions(self):
-        return super(APIKeys, self).actions() + [("apikeys-getkey", 1, self.getKey)]
+        return super(APIKeys, self).actions() + [("get-api-key", 1, self.getKey)]
 
     def help(self, query):
         return f"{self.bot.commandChar}apikey add/remove <name> <apikey> -- Add or remove the specified API key to the bot."

@@ -21,7 +21,7 @@ class Time(BotCommand):
                "the given latlon, place or user."
 
     def onLoad(self) -> None:
-        self.apiKey = self.bot.moduleHandler.runActionUntilValue("apikeys-getkey", "TimeZoneDB")
+        self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "TimeZoneDB")
 
     def execute(self, message: IRCMessage):
         if not self.apiKey:

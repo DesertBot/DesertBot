@@ -33,7 +33,7 @@ class RedditImage(BotCommand):
                 " of the specified subreddit")
 
     def onLoad(self):
-        self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'imgur Client ID')
+        self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'imgur Client ID')
         self.headers = [('Authorization', 'Client-ID {}'.format(self.imgurClientID))]
 
     def execute(self, message: IRCMessage):

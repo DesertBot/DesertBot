@@ -25,7 +25,7 @@ class CheckURL(BotCommand):
             return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
         urlToCheck = message.parameterList[0]
-        apiKey = self.bot.moduleHandler.runActionUntilValue("apikeys-getkey", "WebCargo")
+        apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "WebCargo")
         url = "https://api.webcargo.io/availability"
         params = {
             'key': apiKey,

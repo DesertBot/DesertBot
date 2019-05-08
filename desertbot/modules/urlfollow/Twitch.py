@@ -24,7 +24,7 @@ class Twitch(BotCommand):
         return 'Automatic module that follows Twitch URLs'
 
     def onLoad(self):
-        self.twitchClientID = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'Twitch Client ID')
+        self.twitchClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'Twitch Client ID')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         # Heavily based on Didero's DideRobot code for the same

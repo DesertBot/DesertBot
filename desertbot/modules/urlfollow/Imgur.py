@@ -24,7 +24,7 @@ class Imgur(BotCommand):
         return 'Automatic module that follows Imgur URLs'
 
     def onLoad(self):
-        self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'imgur Client ID')
+        self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'imgur Client ID')
 
     def follow(self, _: IRCMessage, origUrl: str) -> [str, None]:
         match = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', origUrl)

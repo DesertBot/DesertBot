@@ -149,7 +149,7 @@ class WebUtils(BotModule):
                                   .format(response.content, url))
 
     def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
-        googleKey = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'Google')
+        googleKey = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'Google')
         if not googleKey:
             return None
 
