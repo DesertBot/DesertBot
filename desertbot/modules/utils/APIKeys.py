@@ -13,6 +13,10 @@ API_KEY_PATH = 'data/api_keys.json'
 
 @implementer(IPlugin, IModule)
 class APIKeys(BotCommand):
+    def __init__(self):
+        BotCommand.__init__(self)
+        self.loadingPriority = 10
+
     def triggers(self):
         return ["apikey"]
 
@@ -23,8 +27,6 @@ class APIKeys(BotCommand):
         except Exception:
             self.logger.exception(f"Failed to load API keys file, {API_KEY_PATH} likely doesn't exist.")
             self.keys = {}
-        finally:
-            self.bot.moduleHandler.runGenericAction("apikeys-available")
 
     def saveKeys(self):
         with open(API_KEY_PATH, "w") as f:

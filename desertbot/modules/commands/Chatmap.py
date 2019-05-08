@@ -20,8 +20,7 @@ class Chatmap(BotCommand):
 
     def actions(self):
         return super(Chatmap, self).actions() + [("userlocation-updated", 1, self.setLocation),
-                                                 ("userlocation-deleted", 1, self.deleteLocation),
-                                                 ("apikeys-available", 1, self.onLoad)]
+                                                 ("userlocation-deleted", 1, self.deleteLocation)]
 
     def onLoad(self) -> None:
         self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "DBChatmap")
