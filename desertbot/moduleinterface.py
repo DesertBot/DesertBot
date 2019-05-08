@@ -63,6 +63,11 @@ class BotModule(object):
     def __init__(self):
         self.logger = logging.getLogger('desertbot.{}'.format(self.__class__.__name__))
 
+        self.loadingPriority = 1
+        """
+        Increase this number in the module's class if the module should be loaded before other modules.
+        """
+
     def actions(self) -> List[Tuple[str, int, Callable]]:
         return [('help', 1, self.displayHelp)]
 
