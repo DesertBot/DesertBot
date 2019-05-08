@@ -24,7 +24,7 @@ class Mixer(BotCommand):
         return 'Automatic module that follows Mixer URLs'
 
     def onLoad(self):
-        self.mixerClientID = self.bot.moduleHandler.runActionUntilValue('apikeys-getkey', 'Mixer Client ID')
+        self.mixerClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'Mixer Client ID')
 
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         # Heavily based on Didero's DideRobot code for the same

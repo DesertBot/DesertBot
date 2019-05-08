@@ -23,7 +23,7 @@ class Chatmap(BotCommand):
                                                   ("userlocation-deleted", 1, self.deleteLocation) ]
 
     def onLoad(self) -> None:
-        self.apiKey = self.bot.moduleHandler.runActionUntilValue("apikeys-getkey", "DBChatmap")
+        self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "DBChatmap")
 
     def execute(self, message: IRCMessage):
         if message.command == "chatmap":
