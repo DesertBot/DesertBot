@@ -12,11 +12,10 @@ from zope.interface import implementer
 import datetime
 import codecs
 import os
+import parsedatetime
 
 from desertbot.message import IRCMessage, TargetTypes
 from desertbot.response import IRCResponse, ResponseType
-
-from pytimeparse.timeparse import timeparse
 
 
 logFuncs = {
@@ -132,6 +131,9 @@ class Log(BotCommand):
     def help(self, arg):
         return 'loglight/logdark (-<numberofmessage>/<interval>) - Returns the log for the current channel.'
 
+    def onLoad(self):
+        self.cal = parsedatetime.Calendar()
+
     def input(self, message: IRCMessage):
         if message.type in logFuncs:
             logString = logFuncs[message.type](message)
@@ -167,7 +169,7 @@ class Log(BotCommand):
                 return IRCResponse(ResponseType.Say, error, message.replyTo)
             logDate = datetime.date.today() - datetime.timedelta(delta)
         else:
-            logDate = timeparse(message.parameterList[0])
+            logDate = self.cal.parseDT(message.parameters)[0]
 
         strLogDate = logDate.strftime("%Y-%m-%d")
         logPath = os.path.join(basePath, network, message.replyTo, f'{strLogDate}.log')
