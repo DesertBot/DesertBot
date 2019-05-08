@@ -36,6 +36,12 @@ logSelfFuncs = {
     ResponseType.Notice: lambda bot, r: f'[{bot.nick}] {r.response}',
 }
 
+targetFuncs = {
+    'NICK': lambda bot, msg: [chan.name for chan in bot.channels if msg.user.nick in chan.users],
+    'QUIT': lambda bot, msg: [chan.name for chan in bot.channels if msg.user.nick in chan.users],
+}
+
+
 def formatSelfPrivmsg(bot, response):
     if bot.nick in bot.users and response.target in bot.channels:
         status = bot.channels[response.target].getHighestStatusOfUser(bot.users[bot.nick])
@@ -44,6 +50,7 @@ def formatSelfPrivmsg(bot, response):
 
     return f'<{status}{bot.nick}> {response.response}'
 
+
 def formatPrivmsg(msg: IRCMessage):
     if msg.targetType == TargetTypes.CHANNEL:
         status = msg.channel.getHighestStatusOfUser(msg.user)
@@ -51,6 +58,7 @@ def formatPrivmsg(msg: IRCMessage):
         status = ''
 
     return f'<{status}{msg.user.nick}> {msg.messageString}'
+
 
 def formatMode(msg: IRCMessage):
     added = msg.metadata['added']
@@ -76,20 +84,22 @@ def formatMode(msg: IRCMessage):
     return f'-- {msg.user.nick} sets mode: {modeStr}'
 
 
-def log(path, target, text):
+def log(path, targets, text):
     now = datetime.datetime.utcnow()
     time = now.strftime("[%H:%M:%S]")
     data = f'{time} {text}'
-    print(target, data)
-
     fileName = f'{now.strftime("%Y-%m-%d")}.log'
-    fileDirs = os.path.join(path, target)
-    if not os.path.exists(fileDirs):
-        os.makedirs(fileDirs)
-    filePath = os.path.join(fileDirs, fileName)
 
-    with codecs.open(filePath, 'a+', 'utf-8') as f:
-        f.write(data + '\n')
+    for target in targets:
+        print(target, data)
+
+        fileDirs = os.path.join(path, target)
+        if not os.path.exists(fileDirs):
+            os.makedirs(fileDirs)
+        filePath = os.path.join(fileDirs, fileName)
+
+        with codecs.open(filePath, 'a+', 'utf-8') as f:
+            f.write(data + '\n')
 
 
 @implementer(IPlugin, IModule)
@@ -105,7 +115,7 @@ class Log(BotCommand):
                                              ('channelinvite', 100, self.input),
                                              ('channelpart', 100, self.input),
                                              ('channelkick', 100, self.input),
-                                             ('userquit', 100, self.input),
+                                             ('userquit', 100, self.quit),
                                              ('usernick', 100, self.input),
                                              ('modeschanged-channel', 100, self.input),
                                              ('modeschanged-user', 100, self.input),
@@ -127,7 +137,11 @@ class Log(BotCommand):
     def input(self, message: IRCMessage):
         if message.type in logFuncs:
             logString = logFuncs[message.type](message)
-            log(os.path.join(self.bot.logPath, self.bot.server), message.replyTo, logString)
+            if message.type in targetFuncs:
+                targets = targetFuncs[message.type](self.bot, message)
+            else:
+                targets = [message.replyTo]
+            log(os.path.join(self.bot.logPath, self.bot.server), targets, logString)
 
     def output(self, response: IRCResponse):
         if response.type in logSelfFuncs:
