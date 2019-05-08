@@ -37,7 +37,7 @@ class APIKeys(BotCommand):
     @admin("[APIKey] Only my admins may manage API keys!")
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 3:
-            return self.help(None)
+            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
         command = message.parameterList[0].lower()
         key = message.parameterList.pop()
         keyname = " ".join(message.parameterList[1:])
