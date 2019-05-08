@@ -23,6 +23,9 @@ class Imgur(BotCommand):
     def help(self, query):
         return 'Automatic module that follows Imgur URLs'
 
+    def actions(self):
+        return super(Imgur, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
+
     def onLoad(self):
         self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'imgur Client ID')
 

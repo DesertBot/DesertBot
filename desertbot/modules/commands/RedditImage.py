@@ -32,6 +32,9 @@ class RedditImage(BotCommand):
                 " - fetches a random image from the top 100 (or given range)"
                 " of the specified subreddit")
 
+    def actions(self):
+        return super(RedditImage, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
+
     def onLoad(self):
         self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'imgur Client ID')
         self.headers = [('Authorization', 'Client-ID {}'.format(self.imgurClientID))]

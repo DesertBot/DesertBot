@@ -19,8 +19,9 @@ class Chatmap(BotCommand):
                "or from it."
 
     def actions(self):
-        return super(Chatmap, self).actions() + [ ("userlocation-updated", 1, self.setLocation),
-                                                  ("userlocation-deleted", 1, self.deleteLocation) ]
+        return super(Chatmap, self).actions() + [("userlocation-updated", 1, self.setLocation),
+                                                 ("userlocation-deleted", 1, self.deleteLocation),
+                                                 ("apikeys-avilable", 1, self.onLoad)]
 
     def onLoad(self) -> None:
         self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "DBChatmap")
@@ -41,12 +42,12 @@ class Chatmap(BotCommand):
         elif message.command == "remmap":
             return IRCResponse(ResponseType.Say, self.deleteLocation(message.user.nick), message.replyTo)
 
-    def setLocation(self, nick, location, checkExists = True):
+    def setLocation(self, nick, location, checkExists=True):
         if not self.apiKey:
             return
 
         url = "{}api/chatizen/{}".format(self.chatmapBaseUrl, nick.lower())
-        extraHeaders = { "Cookie": "password={}".format(self.apiKey) }
+        extraHeaders = {"Cookie": "password={}".format(self.apiKey)}
         if checkExists:
             result = self.bot.moduleHandler.runActionUntilValue("fetch-url", url, None, extraHeaders)
             if not result or result.status_code == 404:
@@ -66,7 +67,7 @@ class Chatmap(BotCommand):
             return
 
         url = "{}api/chatizen/{}".format(self.chatmapBaseUrl, nick.lower())
-        extraHeaders = {"Cookie": "password={}".format(self.apiKey) }
+        extraHeaders = {"Cookie": "password={}".format(self.apiKey)}
         result = self.bot.moduleHandler.runActionUntilValue("fetch-url", url, None, extraHeaders)
         if not result or result.status_code == 404:
             return "Your location on the chatmap could not be determined."

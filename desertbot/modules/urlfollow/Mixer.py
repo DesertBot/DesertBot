@@ -23,6 +23,9 @@ class Mixer(BotCommand):
     def help(self, query):
         return 'Automatic module that follows Mixer URLs'
 
+    def actions(self):
+        return super(Mixer, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
+
     def onLoad(self):
         self.mixerClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'Mixer Client ID')
 

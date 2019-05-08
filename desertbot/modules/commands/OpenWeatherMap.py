@@ -20,6 +20,9 @@ class OpenWeatherMap(BotCommand):
                "for a given set of coordinates, username or place. Requests the users own weather or forecast when no " \
                "paramters are given."
 
+    def actions(self):
+        return super(OpenWeatherMap, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
+
     def onLoad(self):
         self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "OpenWeatherMap")
 
