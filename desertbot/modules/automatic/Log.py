@@ -151,7 +151,7 @@ class Log(BotCommand):
         return response
 
     def execute(self, message):
-        if message.target != TargetTypes.CHANNEL:
+        if message.type != TargetTypes.CHANNEL:
             return IRCResponse(ResponseType.Say, "I don't keep logs for private messages.", message.replyTo)
 
         basePath = self.bot.logpath
