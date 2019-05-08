@@ -19,7 +19,7 @@ from desertbot.response import IRCResponse, ResponseType
 
 logFuncs = {
     'PRIVMSG': lambda m: formatPrivmsg(m),
-    'ACTION': lambda m: f'*{m.user.nick} {m.messageString}*',
+    'ACTION': lambda m: f'* {m.user.nick} {m.messageString}',
     'NOTICE': lambda m: f'[{m.user.nick}] {m.messageString}',
     'JOIN': lambda m: f'>> {m.user.nick} ({m.user.ident}@{m.user.host}) joined {m.replyTo}',
     'NICK': lambda m: f'{m.user.nick} is now known as {m.messageString}',
