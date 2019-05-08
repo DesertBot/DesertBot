@@ -147,7 +147,7 @@ class Log(BotCommand):
         if response.type in logSelfFuncs:
             logString = logSelfFuncs[response.type](self.bot, response)
             log(os.path.join(self.bot.logPath, self.bot.server),
-                response.target,
+                [response.target],
                 logString)
 
         return response
