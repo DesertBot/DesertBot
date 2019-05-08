@@ -174,14 +174,14 @@ class Log(BotCommand):
         if not os.path.exists(logPath):
             return IRCResponse(ResponseType.Say, "I don't have that log.", message.replyTo)
 
-        baseUrl = self.bot.config.getWithDefault('logurl', 'irc.example.com')
+        baseUrl = self.bot.config.getWithDefault('logurl', 'http://irc.example.com')
         channel = message.channel.name
         dark = f"{(message.command == 'logdark')}".lower()
         url = f'{baseUrl}?channel={channel[1:]}&network={network}&date={strLogDate}&darkmode={dark}'
         shortUrl = self.bot.moduleHandler.runActionUntilValue('shorten-url', url)
         if not shortUrl:
             shortUrl = url
-        return IRCResponse(ResponseType.Say, f'Log for {channel} on {strLogDate}: {shortUrl}')
+        return IRCResponse(ResponseType.Say, f'Log for {channel} on {strLogDate}: {shortUrl}', message.replyTo)
 
 
 logger = Log()
