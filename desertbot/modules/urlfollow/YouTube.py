@@ -24,7 +24,7 @@ import re
 class YouTube(BotCommand):
     def actions(self):
         return super(YouTube, self).actions() + [('urlfollow', 2, self.follow),
-                                                 ("apikeys-avilable", 1, self.onLoad)]
+                                                 ("apikeys-available", 1, self.onLoad)]
 
     def help(self, query):
         return 'Automatic module that follows YouTube URLs'

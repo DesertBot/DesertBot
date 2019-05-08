@@ -33,7 +33,7 @@ class RedditImage(BotCommand):
                 " of the specified subreddit")
 
     def actions(self):
-        return super(RedditImage, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
+        return super(RedditImage, self).actions() + [("apikeys-available", 1, self.onLoad)]
 
     def onLoad(self):
         self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'imgur Client ID')

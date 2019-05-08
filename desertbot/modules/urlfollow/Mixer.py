@@ -18,13 +18,11 @@ import re
 @implementer(IPlugin, IModule)
 class Mixer(BotCommand):
     def actions(self):
-        return super(Mixer, self).actions() + [('urlfollow', 2, self.follow)]
+        return super(Mixer, self).actions() + [('urlfollow', 2, self.follow),
+                                               ("apikeys-available", 1, self.onLoad)]
 
     def help(self, query):
         return 'Automatic module that follows Mixer URLs'
-
-    def actions(self):
-        return super(Mixer, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
 
     def onLoad(self):
         self.mixerClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'Mixer Client ID')

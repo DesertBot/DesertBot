@@ -21,7 +21,7 @@ class Time(BotCommand):
                "the given latlon, place or user."
 
     def actions(self):
-        return super(Time, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
+        return super(Time, self).actions() + [("apikeys-available", 1, self.onLoad)]
 
     def onLoad(self) -> None:
         self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "TimeZoneDB")

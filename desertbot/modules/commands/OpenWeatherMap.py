@@ -21,7 +21,7 @@ class OpenWeatherMap(BotCommand):
                "paramters are given."
 
     def actions(self):
-        return super(OpenWeatherMap, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
+        return super(OpenWeatherMap, self).actions() + [("apikeys-available", 1, self.onLoad)]
 
     def onLoad(self):
         self.apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "OpenWeatherMap")

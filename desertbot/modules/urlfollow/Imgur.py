@@ -18,13 +18,11 @@ import re
 @implementer(IPlugin, IModule)
 class Imgur(BotCommand):
     def actions(self):
-        return super(Imgur, self).actions() + [('urlfollow', 2, self.follow)]
+        return super(Imgur, self).actions() + [('urlfollow', 2, self.follow),
+                                               ("apikeys-available", 1, self.onLoad)]
 
     def help(self, query):
         return 'Automatic module that follows Imgur URLs'
-
-    def actions(self):
-        return super(Imgur, self).actions() + [("apikeys-avilable", 1, self.onLoad)]
 
     def onLoad(self):
         self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'imgur Client ID')
