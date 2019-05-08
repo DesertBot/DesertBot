@@ -129,7 +129,7 @@ class Log(BotCommand):
         return ['loglight', 'logdark']
 
     def help(self, arg):
-        return 'loglight/logdark (-<numberofmessage>/<interval>) - Returns the log for the current channel.'
+        return 'loglight/logdark (-<numberofdays>/<date>) - Returns the log for the current channel.'
 
     def onLoad(self):
         self.cal = parsedatetime.Calendar()
