@@ -47,16 +47,10 @@ class Mixer(BotCommand):
 
         streamData = response.json()
 
-        if 'stream' in streamData and streamData['online'] == True:
+        if len(streamData) > 0 and 'online' in streamData:
             chanData = streamData
-            channelOnline = True
-        elif 'error' not in streamData:
-            url = 'https://mixer.com/api/v1/channels/{}'.format(channel)
-            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url,
-                                                                  extraHeaders=mixerHeaders)
-            chanData = response.json()
-
-        if len(chanData) == 0:
+            channelOnline = streamData['online']
+        else:
             return
 
         output = []

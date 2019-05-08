@@ -19,12 +19,12 @@ class InputHandler(object):
         ident = parsedPrefix[1]
         host = parsedPrefix[2]
 
-        method = getattr(self, '_handle{}'.format(command), None)
+        method = getattr(self, f'_handle{command}', None)
         if method:
             method(nick, ident, host, params)
 
     def handleNumeric(self, numeric: str, prefix: str, params: List[str]) -> None:
-        method = getattr(self, '_handleNumeric{}'.format(numeric), None)
+        method = getattr(self, f'_handleNumeric{numeric}', None)
         if method:
             method(prefix, params)
 
@@ -33,7 +33,7 @@ class InputHandler(object):
             return
 
         if nick not in self.bot.users:
-            self.bot.logger.warning('Received ACCOUNT message for unknown user {}.'.format(nick))
+            self.bot.logger.warning(f'Received ACCOUNT message for unknown user {nick}.')
             return
 
         user = self.bot.users[nick]
@@ -47,7 +47,7 @@ class InputHandler(object):
             return
 
         if nick not in self.bot.users:
-            self.bot.logger.warning('Received AWAY message for unknown user {}.'.format(nick))
+            self.bot.logger.warning(f'Received AWAY message for unknown user {nick}.')
             return
 
         user = self.bot.users[nick]
@@ -61,14 +61,14 @@ class InputHandler(object):
     def _handleCAP(self, nick, ident, host, params):
         subCommand = params[1]
         if subCommand == 'LS':
-            self.bot.logger.info('Received CAP LS reply, supported caps: {}'.format(params[2]))
+            self.bot.logger.info(f'Received CAP LS reply, supported caps: {params[2]}')
             serverCaps = _parseCapReply(params[2])
             for reqCap in [x for x in self.bot.capabilities['available'] if x in serverCaps]:
                 self.bot.capabilities['requested'].append(reqCap)
             self.checkCAPNegotiationFinished()
             if self.bot.capabilities['init']:
                 toRequest = ' '.join(self.bot.capabilities['requested'])
-                self.bot.logger.info('Requesting capabilities: {}...'.format(toRequest))
+                self.bot.logger.info(f'Requesting capabilities: {toRequest}...')
                 self.bot.output.cmdCAP_REQ(toRequest)
         elif subCommand == 'ACK' or subCommand == 'NAK':
             capList = _parseCapReply(params[2])
@@ -81,9 +81,9 @@ class InputHandler(object):
                     if capName not in self.bot.capabilities['finished']:
                         self.bot.capabilities['finished'].append(capName)
 
-                self.bot.logger.info('Acknowledged capability changes: {}.'.format(params[2]))
+                self.bot.logger.info(f'Acknowledged capability changes: {params[2]}.')
             else:
-                self.bot.logger.info('Rejected capability changes: {}.'.format(params[2]))
+                self.bot.logger.info(f'Rejected capability changes: {params[2]}.')
             self.checkCAPNegotiationFinished()
 
     def _handleCHGHOST(self, nick, ident, host, params):
@@ -91,7 +91,7 @@ class InputHandler(object):
             return
 
         if nick not in self.bot.users:
-            self.bot.logger.warning('Received CHGHOST message for unknown user {}.'.format(nick))
+            self.bot.logger.warning(f'Received CHGHOST message for unknown user {nick}.')
             return
 
         user = self.bot.users[nick]
@@ -99,7 +99,7 @@ class InputHandler(object):
         user.host = params[1]
 
     def _handleERROR(self, nick, ident, host, params):
-        self.bot.logger.info('Connection terminated ({})'.format(params[0]))
+        self.bot.logger.info(f'Connection terminated ({params[0]})')
 
     def _handleINVITE(self, nick, ident, host, params):
         if nick in self.bot.users:
@@ -151,11 +151,11 @@ class InputHandler(object):
 
     def _handleKICK(self, nick, ident, host, params):
         if params[0] not in self.bot.channels:
-            self.bot.logger.warning('Received KICK message for unknown channel {}.'.format(params[0]))
+            self.bot.logger.warning(f'Received KICK message for unknown channel {params[0]}.')
             return
         channel = self.bot.channels[params[0]]
         if params[1] not in channel.users:
-            self.bot.logger.warning('Received KICK message for unknown user {} in channel {}.'.format(nick, params[0]))
+            self.bot.logger.warning(f'Received KICK message for unknown user {nick} in channel {params[0]}.')
             return
         if nick not in self.bot.users:
             # Technically opers could KICK a user despite not being in the channel themselves
@@ -189,7 +189,7 @@ class InputHandler(object):
             modeParams = []
         if params[0][0] in self.bot.supportHelper.chanTypes:
             if params[0] not in self.bot.channels:
-                self.bot.logger.warning('Received MODE message for unknown channel {}.'.format(params[0]))
+                self.bot.logger.warning(f'Received MODE message for unknown channel {params[0]}.')
                 return
             channel = self.bot.channels[params[0]]
             modes = channel.setModes(params[1], modeParams)
@@ -208,7 +208,7 @@ class InputHandler(object):
 
     def _handleNICK(self, nick, ident, host, params):
         if nick not in self.bot.users:
-            self.bot.logger.warning('Received NICK message for unknown user {}.'.format(nick))
+            self.bot.logger.warning(f'Received NICK message for unknown user {nick}.')
             return
         user = self.bot.users[nick]
         newNick = params[0]
@@ -251,11 +251,11 @@ class InputHandler(object):
 
     def _handlePART(self, nick, ident, host, params):
         if params[0] not in self.bot.channels:
-            self.bot.logger.warning('Received PART message for unknown channel {}.'.format(params[0]))
+            self.bot.logger.warning(f'Received PART message for unknown channel {params[0]}.')
             return
         channel = self.bot.channels[params[0]]
         if nick not in channel.users:
-            self.bot.logger.warning('Received PART message for unknown user {} in channel {}.'.format(nick, params[0]))
+            self.bot.logger.warning(f'Received PART message for unknown user {nick} in channel {params[0]}.')
             return
         reason = ''
         if len(params) > 1:
@@ -313,13 +313,14 @@ class InputHandler(object):
 
     def _handleQUIT(self, nick, ident, host, params):
         if nick not in self.bot.users:
-            self.bot.logger.warning('Received a QUIT message for unknown user {}.'.format(nick))
+            self.bot.logger.warning(f'Received a QUIT message for unknown user {nick}.')
             return
         reason = ''
         if len(params) > 0:
             reason = params[0]
         user = self.bot.users[nick]
-        message = IRCMessage('QUIT', user, None, reason, self.bot)
+        quitChannels = [chan for _, chan in self.bot.channels.items() if nick in chan.users]
+        message = IRCMessage('QUIT', user, None, reason, self.bot, {'quitChannels': quitChannels})
         self.handleMessage(message)
         for channel in self.bot.channels.values():
             if nick in channel.users:
@@ -328,7 +329,7 @@ class InputHandler(object):
 
     def _handleTOPIC(self, nick, ident, host, params):
         if params[0] not in self.bot.channels:
-            self.bot.logger.warning('Received TOPIC message for unknown channel {}.'.format(params[0]))
+            self.bot.logger.warning(f'Received TOPIC message for unknown channel {params[0]}.')
             return
         channel = self.bot.channels[params[0]]
         if nick not in self.bot.users:
@@ -426,7 +427,7 @@ class InputHandler(object):
     def _handleNumeric352(self, prefix, params):
         # 352: RPL_WHOREPLY
         if params[5] not in self.bot.users:
-            self.bot.logger.warning('Received WHO reply for unknown user {}.'.format(params[5]))
+            self.bot.logger.warning(f'Received WHO reply for unknown user {params[5]}.')
             return
         user = self.bot.users[params[5]]
         user.ident = params[2]
@@ -487,8 +488,8 @@ class InputHandler(object):
 
     def _handleNumeric433(self, prefix, params):
         # 433: ERR_NICKNAMEINUSE
-        newNick = '{}_'.format(self.bot.nick)
-        self.bot.logger.info('Nickname {} is in use, retrying with {} ...'.format(self.bot.nick, newNick))
+        newNick = '{self.bot.nick}_'
+        self.bot.logger.info('Nickname {self.bot.nick} is in use, retrying with {newNick} ...')
         self.bot.nick = newNick
         self.bot.output.cmdNICK(self.bot.nick)
 
