@@ -82,8 +82,8 @@ def log(path, target, text):
     data = f'{time} {text}'
     print(target, data)
 
-    fileName = f'{target}/{now.strftime("%Y-%m-%d")}.log'
-    fileDirs = path
+    fileName = f'{now.strftime("%Y-%m-%d")}.log'
+    fileDirs = os.path.join(path, target)
     if not os.path.exists(fileDirs):
         os.makedirs(fileDirs)
     filePath = os.path.join(fileDirs, fileName)
