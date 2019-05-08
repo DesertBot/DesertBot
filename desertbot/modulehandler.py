@@ -193,23 +193,25 @@ class ModuleHandler(object):
 
     def loadAll(self) -> None:
         configModulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
-        modulesToLoad = set()
+        moduleNamesToLoad = set()
+        allModules = [module for module in getPlugins(IModule, desertbot.modules)]
+
         if 'all' in configModulesToLoad:
-            modulesToLoad.update(set(
-                [module.__class__.__name__ for module in getPlugins(IModule, desertbot.modules)]
-                ))
+            moduleNamesToLoad.update(set([module.__class__.__name__ for module in allModules]))
 
         for module in configModulesToLoad:
             if module == 'all':
                 continue
             elif module.startswith('-'):
-                modulesToLoad.remove(module[1:])
+                moduleNamesToLoad.remove(module[1:])
             else:
-                modulesToLoad.add(module)
+                moduleNamesToLoad.add(module)
 
+        modulesToLoad = sorted([module for module in allModules if module.__class__.__name__ in moduleNamesToLoad],
+                               key=lambda module: module.loadingPriority, reverse=True)
         for module in modulesToLoad:
             try:
-                self.loadModule(module, rebuild_=False)
+                self.loadModule(module.__class__.__name__, rebuild_=False)
             except Exception as e:
                 # ^ dirty, but we don't want any modules to kill the bot
                 self.logger.exception("Exception when loading module {!r}".format(module))
