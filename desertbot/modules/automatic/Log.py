@@ -37,8 +37,8 @@ logSelfFuncs = {
 }
 
 targetFuncs = {
-    'NICK': lambda bot, msg: [chan.name for chan in bot.channels if msg.user.nick in chan.users],
-    'QUIT': lambda bot, msg: [chan.name for chan in bot.channels if msg.user.nick in chan.users],
+    'NICK': lambda bot, msg: [name for name, chan in bot.channels.items() if msg.user.nick in chan.users],
+    'QUIT': lambda bot, msg: [name for name, chan in bot.channels.items() if msg.user.nick in chan.users],
 }
 
 
