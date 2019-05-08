@@ -154,7 +154,7 @@ class Log(BotCommand):
         if message.targetType != TargetTypes.CHANNEL:
             return IRCResponse(ResponseType.Say, "I don't keep logs for private messages.", message.replyTo)
 
-        basePath = self.bot.logpath
+        basePath = self.bot.logPath
         error = 'The date specified is invalid.'
         network = self.bot.server
 
