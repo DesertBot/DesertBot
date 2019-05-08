@@ -53,10 +53,6 @@ class ModuleHandler(object):
 
         module.hookBot(self.bot)
 
-        # do this before loading actions or triggers, in case the
-        # module wants to do anything to them
-        module.onLoad()
-
         actions = {}
         for action in module.actions():
             if action[0] not in actions:
@@ -74,6 +70,10 @@ class ModuleHandler(object):
                         break
                 else:
                     self.actions[action].append(actionData)
+
+        # do this before loading actions or triggers, in case the
+        # module wants to do anything to them
+        module.onLoad()
 
         # map triggers to modules so we can call them via dict lookup
         if hasattr(module, 'triggers'):
