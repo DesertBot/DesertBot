@@ -25,7 +25,7 @@ logFuncs = {
     'JOIN': lambda m: f'>> {m.user.nick} ({m.user.ident}@{m.user.host}) joined {m.replyTo}',
     'NICK': lambda m: f'{m.user.nick} is now known as {m.messageString}',
     'PART': lambda m: f'<< {m.user.nick} ({m.user.ident}@{m.user.host}) left {m.replyTo}{": " + m.messageString if m.messageString else ""}',
-    'QUIT': lambda m: f'<< {m.user.nick} ({m.user.ident}@{m.user.host}) quit{": " + m.messageString if m.messageString else ""}',
+    'QUIT': lambda m: f'<< {m.user.nick} ({m.user.ident}@{m.user.host}) has quit IRC ({m.messageString if m.messageString else ""})',
     'KICK': lambda m: f'-- {m.metadata["kicked"]} was kicked by {m.user.nick}{": " + m.messageString if m.messageString else ""}',
     'TOPIC': lambda m: f'-- {m.user.nick} set the topic to: {m.messageString}',
     'MODE': lambda m: formatMode(m),
