@@ -33,7 +33,7 @@ logFuncs = {
 
 logSelfFuncs = {
     ResponseType.Say: lambda bot, r: formatSelfPrivmsg(bot, r),
-    ResponseType.Do: lambda bot, r: f'*{bot.nick} {r.response}*',
+    ResponseType.Do: lambda bot, r: f'* {bot.nick} {r.response}',
     ResponseType.Notice: lambda bot, r: f'[{bot.nick}] {r.response}',
 }
 
