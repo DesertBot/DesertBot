@@ -83,7 +83,7 @@ class LogSearch(BotCommand):
         if reverse:
             files.reverse()
         for filename in files:
-            with open(os.path.join(logPath, filename), 'r') as logfile:
+            with open(os.path.join(logPath, filename), 'r', errors='ignore') as logfile:
                 if reverse:
                     lines = reversed(logfile.readlines())
                 else:
