@@ -23,7 +23,7 @@ logFuncs = {
     'ACTION': lambda m: f'* {m.user.nick} {m.messageString}',
     'NOTICE': lambda m: f'[{m.user.nick}] {m.messageString}',
     'JOIN': lambda m: f'>> {m.user.nick} ({m.user.ident}@{m.user.host}) joined {m.replyTo}',
-    'NICK': lambda m: f'{m.user.nick} is now known as {m.messageString}',
+    'NICK': lambda m: f'{m.metadata["oldnick"]} is now known as {m.user.nick}',
     'PART': lambda m: f'<< {m.user.nick} ({m.user.ident}@{m.user.host}) left {m.replyTo}{": " + m.messageString if m.messageString else ""}',
     'QUIT': lambda m: f'<< {m.user.nick} ({m.user.ident}@{m.user.host}) has quit IRC ({m.messageString if m.messageString else ""})',
     'KICK': lambda m: f'-- {m.metadata["kicked"]} was kicked by {m.user.nick}{": " + m.messageString if m.messageString else ""}',
