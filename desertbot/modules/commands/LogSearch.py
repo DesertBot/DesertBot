@@ -59,12 +59,12 @@ class LogSearch(BotCommand):
         return self._search(message.parameters, logPath, logs, True, False, True)
 
     def _firstsaid(self, message: IRCMessage):
-        """firstsaid <nick> | Search for the first time a given thing was said."""
+        """firstsaid <messagepart> | Search for the first time a given thing was said."""
         logPath, logs = self._getLogs(message)
         return self._search(message.parameters, logPath, logs, False, True, False)
 
     def _lastsaid(self, message: IRCMessage):
-        """lastsaid <nick> | Search for the last time a given thing was said."""
+        """lastsaid <messagepart> | Search for the last time a given thing was said."""
         logPath, logs = self._getLogs(message)
         return self._search(message.parameters, logPath, logs, False, True, True)
 
