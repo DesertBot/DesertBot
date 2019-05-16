@@ -135,7 +135,7 @@ class Log(BotCommand):
         self.cal = parsedatetime.Calendar()
 
     def input(self, message: IRCMessage):
-        if message.type == 'MODE' and message.user.nick in [self.bot.nick, self.bot.server]:
+        if message.targetType != TargetTypes.CHANNEL or message.type in ['NICK', 'QUIT']:
             return
         
         if message.type in logFuncs:
