@@ -135,6 +135,9 @@ class Log(BotCommand):
         self.cal = parsedatetime.Calendar()
 
     def input(self, message: IRCMessage):
+        if message.type == 'MODE' and message.user.nick in [self.bot.nick, self.bot.server]:
+            return
+        
         if message.type in logFuncs:
             logString = logFuncs[message.type](message)
             if message.type in targetFuncs:
