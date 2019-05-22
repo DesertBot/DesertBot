@@ -20,6 +20,8 @@
 :server PRIVMSG DesertBot :!weather antarctica
 :server PRIVMSG DesertBot :!time antarctica
 
+!server PRIVMSG DesertBot :!wolframalpha 20 euros in dollars
+
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
 :server PRIVMSG DesertBot :!shutdown
