@@ -48,7 +48,13 @@ class WolframAlpha(BotCommand):
                 output = 'No results found.'
                 didyoumeans = []
                 if 'didyoumeans' in j:
-                    for didyoumean in j['didyoumeans']:
+                    tmpList = []
+                    if isinstance(j['didyoumeans'], dict):
+                        tmpList.append(j['didyoumeans'])
+                    else:
+                        tmpList = j['didyoumeans']
+
+                    for didyoumean in tmpList:
                         if didyoumean['level'] != 'low':
                             didyoumeans.append(didyoumean['val'])
                 if len(didyoumeans) > 0:
