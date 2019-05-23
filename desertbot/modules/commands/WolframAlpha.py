@@ -61,7 +61,7 @@ class WolframAlpha(BotCommand):
                         if didyoumean['level'] != 'low':
                             didyoumeans.append(didyoumean['val'])
                 if len(didyoumeans) > 0:
-                    output = f"{output} Did you mean {','.join(didyoumeans)}?"
+                    output = f"{output} Did you mean {' or '.join(didyoumeans)}?"
             else:
                 result = None
                 for pod in j['pods'][1:]:
