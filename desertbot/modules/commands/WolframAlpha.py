@@ -42,9 +42,12 @@ class WolframAlpha(BotCommand):
         else:
             j = result.json()['queryresult']
             if 'error' in j and j['error'] != False:
-                output = j['error']['msg'] if 'msg' in j['error'] else 'Wolfram Alpha returned an unknown error'
+                if 'msg' in j['error']:
+                    output = f"Wolfram Alpha returned an error: {j['error']['msg']}"
+                else:
+                    output = 'Wolfram Alpha returned an unknown error'
 
-            if 'success' not in j or j['success'] == False:
+            elif 'success' not in j or j['success'] == False:
                 output = 'No results found.'
                 didyoumeans = []
                 if 'didyoumeans' in j:
