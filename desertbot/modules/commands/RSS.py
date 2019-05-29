@@ -109,7 +109,10 @@ class RSS(BotCommand):
         feed = feedparser.parse(response.content)
 
         if len(feed["entries"]) > 0:
-            item = feed["entries"][0]
+            def datesort(item):
+                return dparser.parse(item["published"], fuzzy=True, ignoretz=True).isoformat()
+            entries = sorted(feed["entries"], key=datesort, reverse=True)
+            item = entries[0]
         else:
             self.logger.warning("The feed at {!r} doesn't have any entries, has it shut down?".format(feedDeets["url"]))
             return False
