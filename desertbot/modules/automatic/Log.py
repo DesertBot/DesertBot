@@ -147,7 +147,7 @@ class Log(BotCommand):
             log(os.path.join(self.bot.logPath, self.bot.server), targets, logString)
 
     def output(self, response: IRCResponse):
-        if response.type in logSelfFuncs:
+        if response.type in logSelfFuncs and response.target[0] in self.bot.supportHelper.chanTypes:
             logString = logSelfFuncs[response.type](self.bot, response)
             log(os.path.join(self.bot.logPath, self.bot.server),
                 [response.target],
