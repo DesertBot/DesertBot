@@ -184,6 +184,10 @@ class RSS(BotCommand):
                                message.replyTo)
         except Exception:
             self.logger.exception("Failed to follow RSS feed - {}".format(message.messageString))
+            # clean up if it already got saved, and the error was in _updateFeed
+            if name in self.feeds:
+                del self.feeds[name]
+                self.bot.storage["rss_feeds"] = self.feeds
             return IRCResponse(ResponseType.Say,
                                "I couldn't quite parse that RSS follow, are you sure you did it right?",
                                message.replyTo)
