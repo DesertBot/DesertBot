@@ -114,7 +114,7 @@ class Tell(BotCommand):
     def _processTells(self, message: IRCMessage):
         chanTells = []
         pmTells = []
-        for tell in [i for i in self.tells]:
+        for tell in [i for i in self.tells]: # Iterate over a copy so we don'rlt modify the list we're iterating over
             if not any(fnmatch(message.user.nick.lower(), r) for r in tell["to"].split("/")):
                 continue
             if now().isoformat() < tell["datetoreceive"]:
