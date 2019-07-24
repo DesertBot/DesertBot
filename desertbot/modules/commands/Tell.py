@@ -82,10 +82,10 @@ class Tell(BotCommand):
             if len(sentTells) > 0:
                 self.bot.storage["tells"] = self.tells
                 if message.command == "tellafter":
-                    m = "Okay, I'll tell {} that when they speak after {}.".format("&".join(sentTells),
+                    m = "Okay, I'll tell {} that when they speak after {}.".format(" and ".join(sentTells),
                                                                                    strftimeWithTimezone(date))
                 else:
-                    m = "Okay, I'll tell {} that next time they speak.".format("&".join(sentTells))
+                    m = "Okay, I'll tell {} that next time they speak.".format(" and ".join(sentTells))
                 responses.append(IRCResponse(ResponseType.Say, m, message.replyTo))
         elif message.command == "stells":
             for tell in self.tells:
