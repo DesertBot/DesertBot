@@ -17,5 +17,5 @@ python-dateutil==2.8.0
 pytimeparse==1.1.8
 pyxDamerauLevenshtein==1.5.3
 requests==2.22.0
-ruamel.yaml==0.16.1
+ruamel.yaml==0.16.5
 Twisted[tls]==19.7.0
