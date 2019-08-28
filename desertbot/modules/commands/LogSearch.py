@@ -49,7 +49,7 @@ class LogSearch(BotCommand):
         return self._search(message.parameters, logPath, logs, True, True, False)
 
     def _lastseen(self, message: IRCMessage):
-        """ lastseen <nick> | Search for the last line someone with the given nick spoke. Includes today."""
+        """lastseen <nick> | Search for the last line someone with the given nick spoke. Includes today."""
         logPath, logs = self._getLogs(message)
         return self._search(message.parameters, logPath, logs, True, True, True)
 
@@ -108,7 +108,7 @@ class LogSearch(BotCommand):
         ('lastseen', _lastseen),
         ('lastsaw', _lastsaw),
         ('firstsaid', _firstsaid),
-        ('lastsaid', _lastsaid)
+        ('lastsaid', _lastsaid),
         ('saidbeforetoday', _saidbeforetoday)
     ])
 
