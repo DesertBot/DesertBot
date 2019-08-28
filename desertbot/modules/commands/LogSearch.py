@@ -18,7 +18,7 @@ except ImportError:
 @implementer(IPlugin, IModule)
 class LogSearch(BotCommand):
     def triggers(self):
-        return ['firstseen', 'lastseen', 'lastsaw', 'firstsaid', 'lastsaid']
+        return ['firstseen', 'lastseen', 'lastsaw', 'firstsaid', 'lastsaid', 'saidbeforetoday']
 
     def help(self, query: Union[str, None]) -> str:
         command = query[0].lower()
@@ -68,6 +68,11 @@ class LogSearch(BotCommand):
         logPath, logs = self._getLogs(message)
         return self._search(message.parameters, logPath, logs, False, True, True)
 
+    def _saidbeforetoday(self, message: IRCMessage):
+        """saidbeforetoday <messagepart> | Search for the last time a given thing was said, before today."""
+        logPath, logs = self._getLogs(message)
+        return self._search(message.parameters, logPath, logs, False, False, True)
+
     def _search(self, searchTerms, logPath, files, searchForNick, includeToday, reverse):
         if searchForNick:
             pattern = re2.compile(fr"^\[[^]]+\]\s+<(.?{searchTerms})>\s+.*", re2.IGNORECASE)
@@ -104,6 +109,7 @@ class LogSearch(BotCommand):
         ('lastsaw', _lastsaw),
         ('firstsaid', _firstsaid),
         ('lastsaid', _lastsaid)
+        ('saidbeforetoday', _saidbeforetoday)
     ])
 
 
