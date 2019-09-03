@@ -52,22 +52,29 @@ class FFXIV(BotCommand):
 
             def formatJL(jobGroup, colour=None):
                 filtered = self._filterJobList(self.jobGroups[jobGroup], jobMap)
-                formatted = self._formatJobList(filtered, jobMap)
-                return f"{formatColour(jobGroup, f=colour)}[{formatted}]"
+                if filtered:
+                    formatted = self._formatJobList(filtered, jobMap)
+                    return f"{formatColour(jobGroup, f=colour)}[{formatted}]"
+                else:
+                    return None
 
-            mDPS = formatJL('mDPS', c.red)
-            rpDPS = formatJL('rpDPS', c.red)
-            rmDPS = formatJL('rmDPS', c.red)
-            Tank = formatJL('Tank', c.blue)
-            Healer = formatJL('Healer', c.green)
-            DoH = formatJL('DoH', c.orange)
-            DoL = formatJL('DoL', c.yellow)
+            outputGroups = [
+                formatJL('mDPS', c.red),
+                formatJL('rpDPS', c.red),
+                formatJL('rmDPS', c.red),
+                formatJL('Tank', c.blue),
+                formatJL('Healer', c.green),
+                formatJL('DoH', c.orange),
+                formatJL('DoL', c.yellow),
+            ]
+            outputGroups = [group for group in outputGroups if group]
             return IRCResponse(ResponseType.Say,
-                               " ".join([mDPS, rpDPS, rmDPS, Tank, Healer, DoH, DoL]),
+                               " ".join(outputGroups),
                                message.replyTo)
 
         elif params[0] == 'job':
-            if params[1] not in self.jobAbrvMap.values():
+            jobAbrv = params[1].upper()
+            if jobAbrv not in self.jobAbrvMap.values():
                 return IRCResponse(ResponseType.Say,
                                    f"'{params[1]}' is not a recognized FFXIV job abbreviation",
                                    message.replyTo)
@@ -81,7 +88,7 @@ class FFXIV(BotCommand):
                                    message.replyTo)
 
             jobMap = self._mapJobAbrvs(char)
-            job = jobMap[params[1]]
+            job = jobMap[jobAbrv]
 
             jobNames = job['Name'].split(' / ')
             if job['Level'] >= 30:
@@ -140,14 +147,15 @@ class FFXIV(BotCommand):
 
     def _filterJobList(self, jobs, jobMap):
         return [job for job in jobs
-                if jobMap[job]['ClassID'] == jobMap[job]['JobID']
-                or (job == self.jobAbrvMap[jobMap[job]['JobID']] and
-                    jobMap[job]['Level'] >= 30)
-                or (job == self.jobAbrvMap[jobMap[job]['ClassID']] and
-                    jobMap[job]['Level'] < 30)]
+                if (jobMap[job]['ClassID'] == jobMap[job]['JobID']
+                    or (job == self.jobAbrvMap[jobMap[job]['JobID']] and
+                        jobMap[job]['Level'] >= 30)
+                    or (job == self.jobAbrvMap[jobMap[job]['ClassID']] and
+                        jobMap[job]['Level'] < 30))
+                and jobMap[job]['Level'] > 0]
 
     def _boldIfMaxLevel(self, job):
-        if job['ExpLevelMax'] == 0 and job['ExpLevel'] == 0:
+        if job['Level'] > 0 and job['ExpLevelMax'] == 0 and job['ExpLevel'] == 0:
             return formatReverse(job['Level'])
         else:
             return job['Level']
@@ -183,7 +191,8 @@ class FFXIV(BotCommand):
         return self._lookupCharacterByID(ID)
 
     def _noCharFound(self, name, server):
-        return f"No character named '{name}' found on FFXIV server '{server}'"
+        return (f"No character named '{name}' found on FFXIV server '{server}'"
+                f" (or the API timed out)")
 
 
 ffxiv = FFXIV()
