@@ -3,6 +3,7 @@ from collections import OrderedDict
 from html.entities import name2codepoint
 from datetime import timedelta
 from dateutil.parser import parse
+from enum import Enum
 import re
 
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
@@ -45,11 +46,77 @@ def splitUTF8(s: str, n: int) -> str:
 format_chars = re.compile(r'[\x02\x1f\x16\x1d\x0f]|\x03([0-9]{1,2}(,[0-9]{1,2})?)?')
 
 
-def stripFormatting(message: str) -> str:
+def stripFormatting(text: str) -> str:
     """
-    Removes IRC formatting from the provided message.
+    Removes IRC formatting from the provided text.
     """
-    return format_chars.sub('', message)
+    return format_chars.sub('', text)
+
+
+class colour(Enum):
+    white = 0
+    black = 1
+    blue = 2
+    green = 3
+    ltred = 4
+    red = 5
+    magenta = 6
+    orange = 7
+    yellow = 8
+    ltgreen = 9
+    cyan = 10
+    ltcyan = 11
+    ltblue = 12
+    ltmagenta = 13
+    grey = 14
+    ltgrey = 15
+
+
+def formatColour(t: str = "",
+                 f: colour = None, b: colour = None,
+                 close: bool = True) -> str:
+    """
+    Applies IRC colour formatting to the provided text (t),
+    optionally resetting formatting at the end of it (True by default).
+    """
+    reset = '\x0f'
+    return f"\x03{f.value if f else ''}{f',{b.value}' if b else ''}{t}{reset if close else ''}"
+
+
+def formatBold(t: str = "", close: bool = True) -> str:
+    """
+    Applies IRC bold formatting to the provided text (t),
+    optionally resetting formatting at the end of it (True by default).
+    """
+    reset = '\x0f'
+    return f"\x02{t}{reset if close else ''}"
+
+
+def formatUnderline(t: str = "", close: bool = True) -> str:
+    """
+    Applies IRC underline formatting to the provided text (t),
+    optionally resetting formatting at the end of it (True by default).
+    """
+    reset = '\x0f'
+    return f"\x1f{t}{reset if close else ''}"
+
+
+def formatReverse(t: str = "", close: bool = True) -> str:
+    """
+    Applies IRC reverse formatting to the provided text (t),
+    optionally resetting formatting at the end of it (True by default).
+    """
+    reset = '\x0f'
+    return f"\x16{t}{reset if close else ''}"
+
+
+def formatItalic(t: str = "", close: bool = True) -> str:
+    """
+    Applies IRC italic formatting to the provided text (t),
+    optionally resetting formatting at the end of it (True by default).
+    """
+    reset = '\x0f'
+    return f"\x1d{t}{reset if close else ''}"
 
 
 # mostly taken from dave_random's UnsafeBot (whose source is not generally accessible)
