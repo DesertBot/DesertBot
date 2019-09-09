@@ -5,7 +5,7 @@ from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 from zope.interface import implementer
 
-from desertbot.utils.string import formatColour, colour as c, formatReverse
+from desertbot.utils.string import formatColour, colour as c, formatBold, formatReverse
 
 import urllib.parse
 
@@ -18,7 +18,7 @@ class FFXIV(BotCommand):
         return ["ffxiv"]
 
     def help(self, arg):
-        return "Commands: ffxiv [job <job abrv>/jobs/portrait] <name> <server>"
+        return "Commands: ffxiv [char/jobs/job <job abrv>/portrait] <name> <server>"
 
     def execute(self, message: IRCMessage):
         params = message.parameterList.copy()
@@ -31,7 +31,9 @@ class FFXIV(BotCommand):
         elif len(params) < 4:
             return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
-        if params[0] == 'portrait':
+        subCommand = params[0].lower()
+
+        if subCommand == 'char':
             name = " ".join(params[1:-1])
             server = params[-1]
             char = self._lookupCharacterByName(name, server)
@@ -39,8 +41,37 @@ class FFXIV(BotCommand):
                 return IRCResponse(ResponseType.Say,
                                    self._noCharFound(name, server),
                                    message.replyTo)
-            return IRCResponse(ResponseType.Say, char['Portrait'], message.replyTo)
-        elif params[0] == 'jobs':
+            name = char['Character']['Name']
+            title = f"<*{char['Character']['Title']['Name']}*>"
+            tPrefix = not char['Character']['TitleTop']
+            nameTitle = f"{title+' ' if tPrefix else ''}{name}{' '+title if not tPrefix else ''}"
+
+            FCName = char['FreeCompany']['Name']
+            FCTag = char['FreeCompany']['Tag']
+            FC = f"FC: {FCName} <{FCTag}>"
+
+            GCName = char['Character']['GrandCompany']['Company']['Name']
+            GCRank = char['Character']['GrandCompany']['Rank']['Name']
+            GC = f"{GCRank}{formatColour(' of the ', f=c.grey)}{GCName}"
+
+            nameday = f"Nameday: {char['Character']['Nameday']}"
+
+            deity = f"Guardian: {char['Character']['GuardianDeity']['Name']}"
+
+            town = f"Start City: {char['Character']['Town']['Name']}"
+
+            race = char['Character']['Race']['Name']
+            tribe = char['Character']['Tribe']['Name']
+            gender = {1: '♂', 2: '♀'}[char['Character']['Gender']]
+            rcg = f"{race} {tribe} {gender}"
+
+            s = f"{formatColour(' | ', f=c.grey)}"
+
+            return IRCResponse(ResponseType.Say,
+                               s.join([nameTitle, rcg, nameday, deity, town, GC, FC]),
+                               message.replyTo)
+
+        elif subCommand == 'portrait':
             name = " ".join(params[1:-1])
             server = params[-1]
             char = self._lookupCharacterByName(name, server)
@@ -48,7 +79,17 @@ class FFXIV(BotCommand):
                 return IRCResponse(ResponseType.Say,
                                    self._noCharFound(name, server),
                                    message.replyTo)
-            jobMap = self._mapJobAbrvs(char)
+            return IRCResponse(ResponseType.Say, char['Character']['Portrait'], message.replyTo)
+
+        elif subCommand == 'jobs':
+            name = " ".join(params[1:-1])
+            server = params[-1]
+            char = self._lookupCharacterByName(name, server)
+            if not char:
+                return IRCResponse(ResponseType.Say,
+                                   self._noCharFound(name, server),
+                                   message.replyTo)
+            jobMap = self._mapJobAbrvs(char['Character'])
 
             def formatJL(jobGroup, colour=None):
                 filtered = self._filterJobList(self.jobGroups[jobGroup], jobMap)
@@ -72,7 +113,7 @@ class FFXIV(BotCommand):
                                " ".join(outputGroups),
                                message.replyTo)
 
-        elif params[0] == 'job':
+        elif subCommand == 'job':
             jobAbrv = params[1].upper()
             if jobAbrv not in self.jobAbrvMap.values():
                 return IRCResponse(ResponseType.Say,
@@ -87,7 +128,7 @@ class FFXIV(BotCommand):
                                    self._noCharFound(name, server),
                                    message.replyTo)
 
-            jobMap = self._mapJobAbrvs(char)
+            jobMap = self._mapJobAbrvs(char['Character'])
             job = jobMap[jobAbrv]
 
             jobNames = job['Name'].split(' / ')
@@ -123,8 +164,8 @@ class FFXIV(BotCommand):
     def _mapJobAbrvs(self, character):
         jobMap = {}
         for job in character['ClassJobs']:
-            jobMap[self.jobAbrvMap[job['JobID']]] = job
-            jobMap[self.jobAbrvMap[job['ClassID']]] = job
+            jobMap[self.jobAbrvMap[job['Job']['ID']]] = job
+            jobMap[self.jobAbrvMap[job['Class']['ID']]] = job
         return jobMap
 
     jobGroups = {
@@ -147,21 +188,28 @@ class FFXIV(BotCommand):
 
     def _filterJobList(self, jobs, jobMap):
         return [job for job in jobs
-                if (jobMap[job]['ClassID'] == jobMap[job]['JobID']
-                    or (job == self.jobAbrvMap[jobMap[job]['JobID']] and
+                if (jobMap[job]['Class']['ID'] == jobMap[job]['Job']['ID']
+                    or (job == self.jobAbrvMap[jobMap[job]['Job']['ID']] and
                         jobMap[job]['Level'] >= 30)
-                    or (job == self.jobAbrvMap[jobMap[job]['ClassID']] and
+                    or (job == self.jobAbrvMap[jobMap[job]['Class']['ID']] and
                         jobMap[job]['Level'] < 30))
                 and jobMap[job]['Level'] > 0]
 
-    def _boldIfMaxLevel(self, job):
+    def _formatJob(self, jobAbrv, job):
+        if job['IsSpecialised']:
+            return formatBold(jobAbrv)
+        else:
+            return jobAbrv
+
+    def _formatLevel(self, job):
         if job['Level'] > 0 and job['ExpLevelMax'] == 0 and job['ExpLevel'] == 0:
             return formatReverse(job['Level'])
         else:
             return job['Level']
 
     def _formatJobList(self, jobs, jobMap):
-        return " ".join([f"{job}:{self._boldIfMaxLevel(jobMap[job])}" for job in jobs])
+        return " ".join([f"{self._formatJob(job, jobMap[job])}:{self._formatLevel(jobMap[job])}"
+                         for job in jobs])
 
     def _lookupCharacterIDByName(self, name, server):
         name = urllib.parse.quote_plus(name)
@@ -176,13 +224,13 @@ class FFXIV(BotCommand):
         return response['Results'][0]['ID']
 
     def _lookupCharacterByID(self, ID):
-        lookupURL = f"{self.apiURL}/character/{ID}"
+        lookupURL = f"{self.apiURL}/character/{ID}?extended=1&data=FC"
         print(lookupURL)
         response = self.bot.moduleHandler.runActionUntilValue("fetch-url", lookupURL)
         if not response:
             return None
         response = response.json()
-        return response['Character']
+        return response
 
     def _lookupCharacterByName(self, name, server):
         ID = self._lookupCharacterIDByName(name, server)
