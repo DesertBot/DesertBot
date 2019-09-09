@@ -42,17 +42,28 @@ class FFXIV(BotCommand):
                                    self._noCharFound(name, server),
                                    message.replyTo)
             name = char['Character']['Name']
-            title = f"<*{char['Character']['Title']['Name']}*>"
+            title = char['Character']['Title']['Name']
             tPrefix = not char['Character']['TitleTop']
-            nameTitle = f"{title+' ' if tPrefix else ''}{name}{' '+title if not tPrefix else ''}"
+            if title:
+                fTitle = f"{' ' if not tPrefix else ''}<*{title}*>{' ' if tPrefix else ''}"
+            else:
+                fTitle = ''
 
-            FCName = char['FreeCompany']['Name']
-            FCTag = char['FreeCompany']['Tag']
-            FC = f"FC: {FCName} <{FCTag}>"
+            nameTitle = f"{fTitle if tPrefix else ''}{name}{fTitle if not tPrefix else ''}"
 
-            GCName = char['Character']['GrandCompany']['Company']['Name']
-            GCRank = char['Character']['GrandCompany']['Rank']['Name']
-            GC = f"{GCRank}{formatColour(' of the ', f=c.grey)}{GCName}"
+            if char['FreeCompany']:
+                FCName = char['FreeCompany']['Name']
+                FCTag = char['FreeCompany']['Tag']
+                FC = f"FC: {FCName} <{FCTag}>"
+            else:
+                FC = None
+
+            if char['Character']['GrandCompany']:
+                GCName = char['Character']['GrandCompany']['Company']['Name']
+                GCRank = char['Character']['GrandCompany']['Rank']['Name']
+                GC = f"{GCRank}{formatColour(' of the ', f=c.grey)}{GCName}"
+            else:
+                GC = None
 
             nameday = f"Nameday: {char['Character']['Nameday']}"
 
@@ -65,11 +76,11 @@ class FFXIV(BotCommand):
             gender = {1: '♂', 2: '♀'}[char['Character']['Gender']]
             rcg = f"{race} {tribe} {gender}"
 
+            details = [d for d in [nameTitle, rcg, nameday, deity, town, GC, FC] if d]
+
             s = f"{formatColour(' | ', f=c.grey)}"
 
-            return IRCResponse(ResponseType.Say,
-                               s.join([nameTitle, rcg, nameday, deity, town, GC, FC]),
-                               message.replyTo)
+            return IRCResponse(ResponseType.Say, s.join(details), message.replyTo)
 
         elif subCommand == 'portrait':
             name = " ".join(params[1:-1])
