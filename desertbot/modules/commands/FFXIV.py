@@ -189,9 +189,9 @@ class FFXIV(BotCommand):
             else:
                 jobName = jobNames[0].title()
 
-            lvl = self._boldIfMaxLevel(job)
+            lvl = self._formatLevel(job)
 
-            groups = self._getJobGroups(params[1])
+            groups = self._getJobGroups(jobAbrv)
 
             response = f"{jobName} | Categories: {','.join(groups)} | Lvl: {lvl}"
 
