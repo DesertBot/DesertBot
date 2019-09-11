@@ -18,29 +18,47 @@ class FFXIV(BotCommand):
         return ["ffxiv"]
 
     def help(self, arg):
-        return "Commands: ffxiv [char/jobs/job <job abrv>/portrait] <name> <server>"
+        return "Commands: ffxiv [iam/forgetme/char/jobs/job <job abrv>/portrait] <name> <server>"
+
+    def onLoad(self):
+        if "ffxiv" not in self.bot.storage or not type(self.bot.storage["ffxiv"] == dict):
+            self.bot.storage["ffxiv"] = {}
+        if "chars" not in self.bot.storage["ffxiv"] or not type(self.bot.storage["ffxiv"] == dict):
+            self.bot.storage["ffxiv"]["chars"] = {}
+
+        self.charLinkStorage = self.bot.storage["ffxiv"]["chars"]
+
+#   subCommands = {
+#       'link': _link,
+#       'char': _char,
+#       'jobs': _jobs,
+#       'job': _job,
+#       'portrait': _portrait,
+#   }
 
     def execute(self, message: IRCMessage):
         params = message.parameterList.copy()
         if not params:
             return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
-        elif len(params) == 1:
-            # Use the user's linked character name and server as parameters if none were given
-            # TODO: lookup user's linked name & server
-            params.append()
-        elif len(params) < 4:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
 
-        subCommand = params[0].lower()
+        subCommand = params.pop(0).lower()
 
         if subCommand == 'char':
-            name = " ".join(params[1:-1])
-            server = params[-1]
-            char = self._lookupCharacterByName(name, server)
-            if not char:
-                return IRCResponse(ResponseType.Say,
-                                   self._noCharFound(name, server),
-                                   message.replyTo)
+            if params:
+                char = self._lookupCharacterByParams(params)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedParamLookup(params),
+                                       message.replyTo)
+            else:
+                if message.user.nick.lower() not in self.charLinkStorage:
+                    return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
+                char = self._lookupCharacterByStorage(message.user.nick)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedLinkLookup(message.user.nick),
+                                       message.replyTo)
+
             name = char['Character']['Name']
             title = char['Character']['Title']['Name']
             tPrefix = not char['Character']['TitleTop']
@@ -83,23 +101,39 @@ class FFXIV(BotCommand):
             return IRCResponse(ResponseType.Say, s.join(details), message.replyTo)
 
         elif subCommand == 'portrait':
-            name = " ".join(params[1:-1])
-            server = params[-1]
-            char = self._lookupCharacterByName(name, server)
-            if not char:
-                return IRCResponse(ResponseType.Say,
-                                   self._noCharFound(name, server),
-                                   message.replyTo)
+            if params:
+                char = self._lookupCharacterByParams(params)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedParamLookup(params),
+                                       message.replyTo)
+            else:
+                if message.user.nick.lower() not in self.charLinkStorage:
+                    return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
+                char = self._lookupCharacterByStorage(message.user.nick)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedLinkLookup(message.user.nick),
+                                       message.replyTo)
+
             return IRCResponse(ResponseType.Say, char['Character']['Portrait'], message.replyTo)
 
         elif subCommand == 'jobs':
-            name = " ".join(params[1:-1])
-            server = params[-1]
-            char = self._lookupCharacterByName(name, server)
-            if not char:
-                return IRCResponse(ResponseType.Say,
-                                   self._noCharFound(name, server),
-                                   message.replyTo)
+            if params:
+                char = self._lookupCharacterByParams(params)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedParamLookup(params),
+                                       message.replyTo)
+            else:
+                if message.user.nick.lower() not in self.charLinkStorage:
+                    return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
+                char = self._lookupCharacterByStorage(message.user.nick)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedLinkLookup(message.user.nick),
+                                       message.replyTo)
+
             jobMap = self._mapJobAbrvs(char['Character'])
 
             def formatJL(jobGroup, colour=None):
@@ -125,19 +159,26 @@ class FFXIV(BotCommand):
                                message.replyTo)
 
         elif subCommand == 'job':
-            jobAbrv = params[1].upper()
+            jobAbrv = params.pop(0).upper()
             if jobAbrv not in self.jobAbrvMap.values():
                 return IRCResponse(ResponseType.Say,
-                                   f"'{params[1]}' is not a recognized FFXIV job abbreviation",
+                                   f"'{jobAbrv}' is not a recognized FFXIV job abbreviation",
                                    message.replyTo)
 
-            name = " ".join(params[2:-1])
-            server = params[-1]
-            char = self._lookupCharacterByName(name, server)
-            if not char:
-                return IRCResponse(ResponseType.Say,
-                                   self._noCharFound(name, server),
-                                   message.replyTo)
+            if params:
+                char = self._lookupCharacterByParams(params)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedParamLookup(params),
+                                       message.replyTo)
+            else:
+                if message.user.nick.lower() not in self.charLinkStorage:
+                    return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
+                char = self._lookupCharacterByStorage(message.user.nick)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedLinkLookup(message.user.nick),
+                                       message.replyTo)
 
             jobMap = self._mapJobAbrvs(char['Character'])
             job = jobMap[jobAbrv]
@@ -162,6 +203,46 @@ class FFXIV(BotCommand):
                 response += f" | Exp: {xpCurr:,}/{xpMax:,} {xpPerc:.2f}% ({xpTogo:,} to go)"
 
             return IRCResponse(ResponseType.Say, response, message.replyTo)
+
+        elif subCommand == 'iam':
+            if len(params) > 1:
+                name = " ".join(params[0:-1])
+                server = params[-1]
+                playerID = self._lookupCharacterIDByName(name, server)
+                if not playerID:
+                    return IRCResponse(ResponseType.Say, self._noCharFound(), message.replyTo)
+                char = self._lookupCharacterByID(playerID)
+            else:
+                playerID = params[0]
+                char = self._lookupCharacterByID(playerID)
+                if not char:
+                    return IRCResponse(ResponseType.Say,
+                                       f"No character found for ID {playerID}, "
+                                       f"perhaps you wanted to add by FirstName LastName Server?",
+                                       message.replyTo)
+
+            self.charLinkStorage[message.user.nick.lower()] = playerID
+            self.bot.storage["ffxiv"]["chars"] = self.charLinkStorage
+            char = char['Character']
+            return IRCResponse(ResponseType.Say,
+                               f"'{char['Name']}' on server '{char['DC']} - {char['Server']}' "
+                               f"is now linked to your IRC nick! "
+                               f"If this is the wrong character, add by lodestone profile ID. "
+                               f"To unlink, use '{self.bot.commandChar}ffxiv forgetme'",
+                               message.replyTo)
+
+        elif subCommand == 'forgetme':
+            if message.user.nick.lower() not in self.charLinkStorage:
+                return IRCResponse(ResponseType.Say,
+                                   "You aren't linked to an FFXIV character right now",
+                                   message.replyTo)
+
+            playerID = self.charLinkStorage[message.user.nick.lower()]
+            del self.charLinkStorage[message.user.nick.lower()]
+            self.bot.storage["ffxiv"]["chars"] = self.charLinkStorage
+            return IRCResponse(ResponseType.Say,
+                               f"You are now unlinked from FFXIV profile ID '{playerID}'",
+                               message.replyTo)
 
     jobAbrvMap = {
         1: "GLA", 2: "PGL", 3: "MRD", 4: "LNC", 5: "ARC", 6: "CNJ", 7: "THM",
@@ -249,9 +330,31 @@ class FFXIV(BotCommand):
             return None
         return self._lookupCharacterByID(ID)
 
-    def _noCharFound(self, name, server):
-        return (f"No character named '{name}' found on FFXIV server '{server}'"
-                f" (or the API timed out)")
+    def _lookupCharacterByParams(self, params):
+        if not params:
+            return None
+        if len(params) >= 3:
+            name = " ".join(params[0:-1])
+            server = params[-1]
+            return self._lookupCharacterByName(name, server)
+        else:
+            return self._lookupCharacterByID(params[0])
+
+    def _lookupCharacterByStorage(self, nick):
+        if nick.lower() not in self.charLinkStorage:
+            return None
+        return self._lookupCharacterByID(self.charLinkStorage[nick.lower()])
+
+    def _noCharLinked(self):
+        return (f"You don't have a FFXIV character linked to your IRC nick. "
+                f"Use '{self.bot.commandChar}iam FirstName LastName Server' to link")
+
+    def _failedLinkLookup(self, nick):
+        return (f"Failed to lookup your linked character ID "
+                f"'{self.charLinkStorage[nick.lower()]}' (maybe the API timed out)")
+
+    def _failedParamLookup(self, params):
+        return f"Failed to find character '{' '.join(params)}' (or the API timed out)"
 
 
 ffxiv = FFXIV()
