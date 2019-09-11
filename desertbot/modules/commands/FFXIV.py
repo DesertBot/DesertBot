@@ -210,7 +210,9 @@ class FFXIV(BotCommand):
                 server = params[-1]
                 playerID = self._lookupCharacterIDByName(name, server)
                 if not playerID:
-                    return IRCResponse(ResponseType.Say, self._noCharFound(), message.replyTo)
+                    return IRCResponse(ResponseType.Say,
+                                       self._failedParamLookup(params),
+                                       message.replyTo)
                 char = self._lookupCharacterByID(playerID)
             else:
                 playerID = params[0]
