@@ -1,5 +1,5 @@
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, BotModule
+from desertbot.moduleinterface import IModule, BotModule, ignore
 from zope.interface import implementer
 
 import random
@@ -33,6 +33,7 @@ class Animals(BotModule):
         for _, animalName in self.animalResponses.items():
             self.animalReactions["animalName"] = dict(defaultReactions)
 
+    @ignore
     def respond(self, message: IRCMessage) -> IRCResponse:
         for match, animal in self.animalResponses.items():
             if re.search(r'^{}([^\s\w]+)?$'.format(match), message.messageString, re.IGNORECASE):
@@ -59,7 +60,7 @@ class Animals(BotModule):
 
                 article = "an" if animal[0] in 'aeiou' else "a"
                 # the reaction has placeholders, fill them out
-                reaction.format(user=message.user.nick, article=article, animal=animal)
+                reaction = reaction.format(user=message.user.nick, article=article, animal=animal)
 
                 return IRCResponse(ResponseType.Say, reaction, message.replyTo)
 
