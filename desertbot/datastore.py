@@ -16,6 +16,17 @@ class DataStore(object):
             return
         with open(self.storagePath) as storageFile:
             self.data = json.load(storageFile)
+        self.checkDefaults()
+
+    def checkDefaults(self):
+        """
+        If data exists, we still wanna make sure we load in things from defaults if there's things in the defaults that aren't in our actual data
+        """
+        with open(os.path.join("desertbot", "datastore_default.json")) as templateFile:
+            defaultData = json.load(templateFile)
+        for key, data in defaultData.items():
+            if key not in self.data:
+                self.data[key] = data
 
     def save(self):
         tmpFile = "{}.tmp".format(self.storagePath)
