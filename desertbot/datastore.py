@@ -10,7 +10,7 @@ class DataStore(object):
 
     def load(self):
         if not os.path.exists(self.storagePath):
-            with open("datastore_default.json") as templateFile:
+            with open(os.path.join("desertbot", "datastore_default.json")) as templateFile:
                 self.data = json.load(templateFile)
             self.save()
             return
