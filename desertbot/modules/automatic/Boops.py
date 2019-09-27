@@ -1,5 +1,5 @@
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, BotModule
+from desertbot.moduleinterface import IModule, BotModule, ignore
 from zope.interface import implementer
 
 import random
@@ -21,6 +21,7 @@ class Boops(BotModule):
     def help(self, arg):
         return 'Responds to boops.'
 
+    @ignore
     def respond(self, message: IRCMessage) -> IRCResponse:
         match = re.search('(^|[^\w])b[o0]{2,}ps?([^\w]|$)', message.messageString, re.IGNORECASE)
         if match:
