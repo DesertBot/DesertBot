@@ -3,7 +3,6 @@ from desertbot.moduleinterface import IModule, ignore
 from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import random
 import datetime
 import re
 
@@ -155,129 +154,6 @@ class Responses(BotCommand):
             ducktape.match = ducktapeMatch
             ducktape.talkwords = ducktapeTalkwords
             self.responses.add(ducktape)
-
-            '''Responds randomly to various animal sounds'''
-            def animalMatch(message):
-                matchDict = {
-                    r'(woo+f|r+u+ff+|arf|ba+r+k)': 'puppeh',
-                    r'(bo+r+k)': 'pupper',
-                    r'nya+n?~?': 'neko ₍˄·͈༝·͈˄₎◞',
-                    r'squeak': 'mouse',
-                    r'moo+': 'cow',
-                    r'(twee+t|ca+w+|chirp)': 'bird',
-                    r'ne+i+gh': 'horse',
-                    r'ri+bb+i+t': 'frog',
-                    r'bloo+p': 'fish',
-                    r'o+i+n+k+': 'piggy',
-                    r'ho+n+k+': 'goose',
-                    r'hi+ss+': 'snake',
-                    r'r+o+a+r+': 'lion',
-                    r'(ho+w+l+|a+w?oo+)': 'wolf',
-                    r'blee+p\s+bloo+p': 'droid',
-                    r'y?arr+': 'pirate',
-                    r'qua+ck': 'duck',
-                    r'(hoo+t|whoo+)': 'owl',
-                    r'br+a+i+n+s+': 'zombie',
-                    r'(ba+w+k|clu+ck)': 'chicken',
-                    r'baa+': 'sheep',
-                    r'(blub(\s+)?)+': 'deep one',
-                    r'bu*zz+': 'bee',
-                    r'(boo+|oooo+)': 'spoopy goast',
-                    r'(noo+t ?)+': 'penguin',
-                    r'too+t': 'mastodon',
-                    r'whee+k': 'guinea pig'
-                }
-
-                self.animal = None
-                for match, animal in matchDict.items():
-                    if re.search(r'^{}([^\s\w]+)?$'.format(match), message, re.IGNORECASE):
-                        self.animal = animal
-                        return True
-
-                return False
-
-            def animalTalkwords(message):
-                # Specific user animals
-                if self.animal == 'cow' and message.user.nick.lower() == 'neo-gabi':
-                    return [IRCResponse(ResponseType.Do,
-                                        'points at {0}, and says "{0} was the cow all along!"'
-                                        .format(message.user.nick),
-                                        message.replyTo)]
-
-                randomChance = random.randint(1, 20)
-
-                # Emily Bonus
-                if message.user.nick == 'Emily':
-                    randomChance = random.randint(1, 25)
-
-                article = 'an' if self.animal[0] in 'aeiou' else 'a'
-
-                # General user animals
-                if randomChance == 1:
-                    ''' User Critically Failed '''
-                    if self.animal == 'droid':
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY NOT the droid you are looking for.'.format(message.user.nick),
-                                            message.replyTo)]
-                    elif self.animal == 'goose':
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is a clown!'.format(message.user.nick),
-                                            message.replyTo)]
-                    else:
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} critically fails at being {} {}.'.format(message.user.nick, article, self.animal),
-                                            message.replyTo)]
-
-                elif randomChance <= 8:
-                    ''' User Is Not A [animal] '''
-                    if self.animal == 'droid':
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is not the droid you are looking for.'.format(message.user.nick),
-                                            message.replyTo)]
-                    else:
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is not {} {}.'.format(message.user.nick, article, self.animal),
-                                            message.replyTo)]
-                elif randomChance <= 14:
-                    '''User Might Be A [animal] '''
-                    if self.animal == 'droid':
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} might be the droid you are looking for.'.format(message.user.nick),
-                                            message.replyTo)]
-                    else:
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} /might/ be {} {}.'.format(message.user.nick, article, self.animal),
-                                            message.replyTo)]
-                elif randomChance <= 19:
-                    ''' User Is A [animal] '''
-                    if self.animal == 'droid':
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is the droid you are looking for.'.format(message.user.nick),
-                                            message.replyTo)]
-                    else:
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY {} {}.'.format(message.user.nick, article, self.animal),
-                                            message.replyTo)]
-                elif randomChance == 20:
-                    ''' User Is A Critical [animal] '''
-                    if self.animal == 'droid':
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY the droid you are looking for.'.format(message.user.nick),
-                                            message.replyTo)]
-                    else:
-                        return [IRCResponse(ResponseType.Say,
-                                            '{} is a CRITICAL {}!'.format(message.user.nick, self.animal),
-                                            message.replyTo)]
-                else:
-                    ''' Roll is outside of bounds, Magic! '''
-                    return [IRCResponse(ResponseType.Say,
-                                        'You are clearly a magician rolling out of bounds like that!',
-                                        message.replyTo)]
-
-            animalResponse = MobroResponse('animal', '', '', seconds=0)
-            animalResponse.match = animalMatch
-            animalResponse.talkwords = animalTalkwords
-            self.responses.add(animalResponse)
 
             ##################################
             #                                #
