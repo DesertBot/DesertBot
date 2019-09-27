@@ -26,7 +26,8 @@
 :server PRIVMSG DesertBot :!wolframalpha 20 euros in dollars
 
 :server PRIVMSG DesertBot :HONK
-:server PRIVMSG DesertBot :Everything is fine
+:server PRIVMSG DesertBot :nyaa~
+:server PRIVMSG DesertBot :Everything is fine.
 :server PRIVMSG DesertBot :As is tradition.
 
 :server PRIVMSG DesertBot :!help
