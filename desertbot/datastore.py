@@ -10,6 +10,8 @@ class DataStore(object):
 
     def load(self):
         if not os.path.exists(self.storagePath):
+            with open("datastore_default.json") as templateFile:
+                self.data = json.load(templateFile)
             self.save()
             return
         with open(self.storagePath) as storageFile:
@@ -32,6 +34,7 @@ class DataStore(object):
 
     def __setitem__(self, key, value):
         self.data[key] = value
+        self.save()
     
     def __contains__(self, key):
         return key in self.data
