@@ -22,11 +22,11 @@ class Animals(BotModule):
 
     def onLoad(self) -> None:
         defaultReactions = {
-            1: "{user} critically fails at being {article} {animal}.",
-            8: "{user} is not {article} {animal}.",
-            14: "{user} /might/ be {article} {animal}.",
-            19: "{user} is DEFINITELY {article} {animal}.",
-            20: "{user} is {article} CRITICAL {animal}!"
+            "1": "{user} critically fails at being {article} {animal}.",
+            "8": "{user} is not {article} {animal}.",
+            "14": "{user} /might/ be {article} {animal}.",
+            "19": "{user} is DEFINITELY {article} {animal}.",
+            "20": "{user} is {article} CRITICAL {animal}!"
         }
         self.animalResponses = self.bot.storage["animals"]
         self.animalReactions = dict(self.bot.storage["animalCustomReactions"])  # copy stored dict so we can extend with defaultReactions
@@ -36,8 +36,31 @@ class Animals(BotModule):
     def respond(self, message: IRCMessage) -> IRCResponse:
         for match, animal in self.animalResponses.items():
             if re.search(r'^{}([^\s\w]+)?$'.format(match), message.messageString, re.IGNORECASE):
+                # roll a d20
                 roll = random.randint(1, 20)
-                reaction = self.animalReactions[animal][roll]
+
+                # construct animal reaction based on roll
+                reactions = self.animalReactions[animal]
+                # toungue-in-cheek default response, in case of Math Weirdness
+                reaction = "{user} broke the animal responder, they're CLEARLY a magician!"
+                # check each roll range and its matching reaction, which one do we want for the current roll?
+                for rollMax, reactionCandidate in reactions.items():
+                    if roll == int(rollMax):
+                        # rolled exactly equal to one of the range maximums, this candidate is our wanted response
+                        reaction = reactionCandidate
+                        break
+                    elif roll > int(rollMax):
+                        # rolled higher than this range maximum, try next one
+                        continue
+                    else:
+                        # rolled lower than this range maximum, but higher than a previous one, this candidate is our wanted response
+                        reaction = reactionCandidate
+                        break
+
+                article = "an" if animal[0] in 'aeiou' else "a"
+                # the reaction has placeholders, fill them out
+                reaction.format(user=message.user.nick, article=article, animal=animal)
+
                 return IRCResponse(ResponseType.Say, reaction, message.replyTo)
 
 
