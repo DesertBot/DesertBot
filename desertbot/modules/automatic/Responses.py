@@ -5,7 +5,7 @@ from zope.interface import implementer
 
 import datetime
 import re
-from typing import Union
+from typing import List, Union
 
 from desertbot.message import IRCMessage
 from desertbot.response import ResponseType, IRCResponse
@@ -85,7 +85,7 @@ class Responses(BotCommand):
 class ResponseObject(object):
     lastTriggered = datetime.datetime.min
 
-    def __init__(self, name: str, responseMessages: list, regexes: list, responseType="Say",
+    def __init__(self, name: str, responseMessages: List[str], regexes: List[str], responseType="Say",
                  enabled=True, cooldown=300, regexMustAllMatch=True):
         self.name = name
         self.responseMessages = responseMessages
@@ -128,7 +128,7 @@ class ResponseObject(object):
                 self.match(messageString))
 
     # trigger this ResponseObject, if it should be triggered
-    def trigger(self, message: IRCMessage) -> Union[list, None]:
+    def trigger(self, message: IRCMessage) -> Union[List[IRCResponse], None]:
         if self.shouldTrigger(message.messageString):
             self.lastTriggered = datetime.datetime.utcnow()
             return self.talkwords(message)
@@ -139,17 +139,26 @@ class ResponseObject(object):
         return IRCResponse(ResponseType.Say, f"Response {self.name!r} {'enabled' if self.enabled else 'disabled'}", message.replyTo)
 
     # construct and return IRCResponse objects for the responseMessages this ResponseObject has
-    def talkwords(self, message: IRCMessage) -> list:
+    def talkwords(self, message: IRCMessage) -> List[IRCResponse]:
         return [IRCResponse(self.responseType, response, message.replyTo) for response in self.responseMessages]
 
 
 class ResponseDict(object):
+    """
+    Wrapper class around a dict, with some basic helper methods
+    """
     dict = {}
 
-    def add(self, mbr):
-        self.dict[mbr.name] = mbr
+    def add(self, r: ResponseObject):
+        """
+        Add a ResponseObject to this ResponseDict
+        """
+        self.dict[r.name] = r
 
     def toggle(self, name: str, chatMessage: IRCMessage):
+        """
+        Toggle a ResponseObject in this ResponseDict by its name, using its ResponseObject.toggle() method
+        """
         if name.lower() in self.dict:
             return self.dict[name.lower()].toggle(chatMessage)
         return
