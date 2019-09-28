@@ -33,7 +33,7 @@ class Responses(BotCommand):
                                                   responseData['regexes'],
                                                   responseData['responseType'],
                                                   responseData['enabledByDefault'],
-                                                  responseData['cooldown'],
+                                                  int(responseData['cooldown']),
                                                   responseData['allRegexesMustMatch']))
 
         except Exception:
