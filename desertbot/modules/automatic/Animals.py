@@ -31,7 +31,7 @@ class Animals(BotModule):
         self.animalResponses = self.bot.storage["animals"]
         self.animalReactions = dict(self.bot.storage["animalCustomReactions"])  # copy stored dict so we can extend with defaultReactions
         for _, animalName in self.animalResponses.items():
-            if aninalName not in self.animalReactions:
+            if animalName not in self.animalReactions:
                 self.animalReactions[animalName] = dict(defaultReactions)
 
     @ignore
