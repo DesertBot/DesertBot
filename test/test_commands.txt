@@ -29,6 +29,9 @@
 :server PRIVMSG DesertBot :nyaa~
 :server PRIVMSG DesertBot :Everything is fine.
 :server PRIVMSG DesertBot :As is tradition.
+:server PRIVMSG DesertBot :!responses
+:server PRIVMSG DesertBot :!responses pokemon
+:server PRIVMSG DesertBot :Pokemon are a thing. This is a sentence about pokemon.
 
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
