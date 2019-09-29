@@ -26,7 +26,7 @@ class Animals(BotModule):
             "8": "{user} is not {article} {animal}.",
             "14": "{user} /might/ be {article} {animal}.",
             "19": "{user} is DEFINITELY {article} {animal}.",
-            "20": "{user} is {article} CRITICAL {animal}!"
+            "20": "{user} is a CRITICAL {animal}!"
         }
         self.animalResponses = self.bot.storage["animals"]
         self.animalReactions = dict(self.bot.storage["animalCustomReactions"])  # copy stored dict so we can extend with defaultReactions
