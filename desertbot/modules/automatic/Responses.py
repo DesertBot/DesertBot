@@ -13,6 +13,9 @@ from desertbot.response import ResponseType, IRCResponse
 
 @implementer(IPlugin, IModule)
 class Responses(BotCommand):
+    def triggers(self):
+        return ["responses"]
+
     def actions(self):
         return super(Responses, self).actions() + [('message-channel', 1, self.respond),
                                                    ('message-user', 1, self.respond),
@@ -44,28 +47,38 @@ class Responses(BotCommand):
         if message.command:
             return
 
-        triggers = []
-        for response in self.responses.dict:
-            trig = self.responses.dict[response].trigger(message)
-            if isinstance(trig, str):
-                trig = [trig]
-            try:
-                triggers.extend(trig)
-            except Exception:
-                triggers = triggers
-        return triggers
+        triggeredResponses = []
+        # each message should only trigger one response really, but there might be future cases where we want multiple
+        for response in self.responses:
+            responseTrigger = response.trigger(message)
+            # responseTrigger will be None if the current message didn't trigger the response in question
+            if responseTrigger is not None:
+                # .trigger() should always return a list of IRCResponse objects, but if there are typos in the datastore it might be a str or IRCResponse object instead
+                # wrap the return in a list if so
+                if not isinstance(responseTrigger, list):
+                    responseTrigger = [responseTrigger]
+                try:
+                    triggeredResponses.extend(responseTrigger)
+                except Exception:
+                    self.logger.exception(f"Exception occurred when trying to trigger response {response.name}")
+                    triggeredResponses = triggeredResponses
+        return triggeredResponses
 
     @ignore
     def execute(self, message: IRCMessage):
         if len(message.parameterList) > 0:
+            # on a !responses command followed by some parameters, assume the parameters are ResponseObject names
+            # try toggling each and return the resulting IRCResponse objects showing the new status of the matching ResponseObjects
+            # .toggle() doesn't return anything if the param given to it is not a valid name for a loaded ResponseObject
             enableds = []
             for param in message.parameterList:
                 enableds.append(self.responses.toggle(param, message))
             return enableds
         else:
+            # on a !responses command, return sorted lists of currently enabled and disabled responses
             enabled = []
             disabled = []
-            for name, response in self.responses.dict.items():
+            for name, response in self.responses.items():
                 if response.enabled:
                     enabled.append(name)
                 else:
@@ -148,6 +161,25 @@ class ResponseDict(object):
     Wrapper class around a dict, with some basic helper methods
     """
     dict = {}
+
+    # methods to let a ResponseDict object just act as a dict, makes some of the code easier
+    def __len__(self):
+        return len(self.dict)
+
+    def __iter__(self):
+        return iter(self.dict)
+
+    def __getitem__(self, item):
+        return self.dict[item]
+
+    def __setitem__(self, key, value):
+        self.dict[key] = value
+
+    def __contains__(self, key):
+        return key in self.dict
+
+    def items(self):
+        return self.dict.items()
 
     def add(self, r: ResponseObject):
         """
