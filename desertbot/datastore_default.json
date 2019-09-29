@@ -139,10 +139,10 @@
     },
     "goose": {
       "1": "{user} is a clown!",
-      "8": "{user} is not {article} {animal}.",
-      "14": "{user} /might/ be {article} {animal}.",
-      "19": "{user} is DEFINITELY {article} {animal}.",
-      "20": "{user} is {article} CRITICAL {animal}!"
+      "8": "{user} is not a goose.",
+      "14": "{user} /might/ be a goose.",
+      "19": "{user} is DEFINITELY a goose.",
+      "20": "It's a lovely day in the chat, and {user} is a horrible goose."
     }
   },
   "responses": {
