@@ -49,3 +49,12 @@ class DataStore(object):
     
     def __contains__(self, key):
         return key in self.data
+
+    def items(self):
+        return self.data.items()
+
+    def values(self):
+        return self.data.values()
+
+    def keys(self):
+        return self.data.keys()

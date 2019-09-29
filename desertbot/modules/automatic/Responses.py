@@ -28,16 +28,16 @@ class Responses(BotCommand):
 
     def onLoad(self):
         try:
-            self.responses = ResponseDict()
+            self.responses = dict()
 
             for responseName, responseData in self.bot.storage['responses'].items():
-                self.responses.add(ResponseObject(responseName,
-                                                  responseData['messages'],
-                                                  responseData['regexes'],
-                                                  responseData['responseType'],
-                                                  responseData['enabledByDefault'],
-                                                  int(responseData['cooldown']),
-                                                  responseData['allRegexesMustMatch']))
+                self.responses[responseName] = ResponseObject(responseName,
+                                                              responseData['messages'],
+                                                              responseData['regexes'],
+                                                              responseData['responseType'],
+                                                              responseData['enabledByDefault'],
+                                                              int(responseData['cooldown']),
+                                                              responseData['allRegexesMustMatch'])
 
         except Exception:
             self.logger.exception("Exception during responses load.")
@@ -49,8 +49,8 @@ class Responses(BotCommand):
 
         triggeredResponses = []
         # each message should only trigger one response really, but there might be future cases where we want multiple
-        for response in self.responses:
-            responseTrigger = response.trigger(message)
+        for responseObject in self.responses.values():
+            responseTrigger = responseObject.trigger(message)
             # responseTrigger will be None if the current message didn't trigger the response in question
             if responseTrigger is not None:
                 # .trigger() should always return a list of IRCResponse objects, but if there are typos in the datastore it might be a str or IRCResponse object instead
@@ -60,7 +60,7 @@ class Responses(BotCommand):
                 try:
                     triggeredResponses.extend(responseTrigger)
                 except Exception:
-                    self.logger.exception(f"Exception occurred when trying to trigger response {response.name}")
+                    self.logger.exception(f"Exception occurred when trying to trigger response {responseObject.name}")
                     triggeredResponses = triggeredResponses
         return triggeredResponses
 
@@ -72,7 +72,9 @@ class Responses(BotCommand):
             # .toggle() doesn't return anything if the param given to it is not a valid name for a loaded ResponseObject
             enableds = []
             for param in message.parameterList:
-                enableds.append(self.responses.toggle(param, message))
+                for responseName, responseObject in self.responses.items():
+                    if param.lower() == responseName.lower():
+                        enableds.append(responseObject.toggle(message))
             return enableds
         else:
             # on a !responses command, return sorted lists of currently enabled and disabled responses
@@ -146,7 +148,7 @@ class ResponseObject(object):
             self.lastTriggered = datetime.datetime.utcnow()
             return self.talkwords(message)
 
-    # toggle this ResponseObject on/off
+    # toggle this ResponseObject on/off in response to an IRCMessage
     def toggle(self, message: IRCMessage) -> IRCResponse:
         self.enabled = not self.enabled
         return IRCResponse(ResponseType.Say, f"Response {self.name!r} {'enabled' if self.enabled else 'disabled'}", message.replyTo)
@@ -154,46 +156,6 @@ class ResponseObject(object):
     # construct and return IRCResponse objects for the responseMessages this ResponseObject has
     def talkwords(self, message: IRCMessage) -> List[IRCResponse]:
         return [IRCResponse(self.responseType, response, message.replyTo) for response in self.responseMessages]
-
-
-class ResponseDict(object):
-    """
-    Wrapper class around a dict, with some basic helper methods
-    """
-    dict = {}
-
-    # methods to let a ResponseDict object just act as a dict, makes some of the code easier
-    def __len__(self):
-        return len(self.dict)
-
-    def __iter__(self):
-        return iter(self.dict)
-
-    def __getitem__(self, item):
-        return self.dict[item]
-
-    def __setitem__(self, key, value):
-        self.dict[key] = value
-
-    def __contains__(self, key):
-        return key in self.dict
-
-    def items(self):
-        return self.dict.items()
-
-    def add(self, r: ResponseObject):
-        """
-        Add a ResponseObject to this ResponseDict
-        """
-        self.dict[r.name] = r
-
-    def toggle(self, name: str, chatMessage: IRCMessage):
-        """
-        Toggle a ResponseObject in this ResponseDict by its name, using its ResponseObject.toggle() method
-        """
-        if name.lower() in self.dict:
-            return self.dict[name.lower()].toggle(chatMessage)
-        return
 
 
 responses = Responses()
