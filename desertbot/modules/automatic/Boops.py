@@ -3,6 +3,7 @@ from desertbot.moduleinterface import IModule, BotModule, ignore
 from desertbot.modules.commandinterface import admin
 from zope.interface import implementer
 
+import datetime
 import random
 import re
 
@@ -12,6 +13,11 @@ from desertbot.response import IRCResponse, ResponseType
 
 @implementer(IPlugin, IModule)
 class Boops(BotModule):
+
+    def onLoad(self) -> None:
+        self.lastTriggered = datetime.datetime.min
+        # TODO edit cooldown at runtime?
+        self.cooldown = 300
 
     def actions(self):
         return super(Boops, self).actions() + [('message-channel', 1, self.respond),
@@ -35,7 +41,8 @@ class Boops(BotModule):
                 return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
         else:
             match = re.search('(^|[^\w])b[o0]{2,}ps?([^\w]|$)', message.messageString, re.IGNORECASE)
-            if match:
+            if match and (datetime.datetime.utcnow() - self.lastTriggered).seconds >= self.cooldown:
+                self.lastTriggered = datetime.datetime.utcnow()
                 return IRCResponse(ResponseType.Say, f"Boop! {random.choice(self.bot.storage['boops'])}", message.replyTo)
 
     @admin("Only my admins may add boops!")
