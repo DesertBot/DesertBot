@@ -59,7 +59,19 @@ class Trigger(BotCommand):
     def _addTrigger(self, message: IRCMessage) -> IRCResponse:
         # .trigger add triggerName "regex" command
         # Some prefixes before the regex could specify what part of the message it looks at, eg n"regex" for nick. It would default to the text. (t)
-        pass
+        if len(message.parameterList) < 3:
+            return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
+        else:
+            triggerName = message.parameterList[1]
+            regex = message.parameterList[2]
+            if regex[0] == '"':
+                regex = f"t{regex}"  # pre-pend default "text" regexType if not explicitly given
+            command = " ".join(message.parameterList[3:])
+            # TODO support for more regexTypes?
+            regexType = "text" if regex[0] == "t" else "nick"
+            regex = regex[2:-1]  # strip out leading regextype and quotemarks surrounding regex
+            self._actuallyAddTrigger(triggerName, regex, regexType, command, True)
+            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} added and now enabled.", message.replyTo)
 
     def _actuallyAddTrigger(self, triggerName: str, regex: str, regexType: str, command: str, enabled: bool):
         # used by _addTrigger and _importTriggers
