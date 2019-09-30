@@ -3,7 +3,9 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand, admin
 from zope.interface import implementer
 
+from collections import OrderedDict
 import re
+from typing import List
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -21,12 +23,15 @@ class Trigger(BotCommand):
                                                  ('action-channel', 1, self.execute),
                                                  ('action-user', 1, self.execute)]
 
+    def help(self, parameters: List):
+        return "Doing trigger stuff."
+
     def onLoad(self):
         if 'triggers' not in self.bot.storage:
             self.bot.storage['triggers'] = {
                 "example": {
-                    "regex": ".*boop.*",        # if a message's text contains boop somewhere
-                    "regexType": "text",        # other values, nick? TBD.
+                    "regex": ".*reboop.*",      # if a message's text contains reboop somewhere
+                    "regexType": "text",        # other possible values, nick? TBD.
                     "command": "reload boop",   # run reload boop
                     "enabled": False            # allow disabling because oof ow
                 }
@@ -34,9 +39,13 @@ class Trigger(BotCommand):
 
     def execute(self, message: IRCMessage):
         if message.command.lower() in self.triggers():
-            pass
+            if len(message.parameterList) < 1 or message.parameterList[0].lower() not in self.subcommands:
+                return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
+            else:
+                subCommand = message.parameterList[0].lower()
+                return self.subCommands[subCommand](self, message)
         else:
-            for triggerName, triggerData in self.bot.storage['triggers']:
+            for triggerName, triggerData in self.bot.storage['triggers'].items():
                 if not triggerData['enabled']:
                     continue
                 if triggerData['regexType'] == "text":
@@ -52,6 +61,15 @@ class Trigger(BotCommand):
         # Some prefixes before the regex could specify what part of the message it looks at, eg n"regex" for nick. It would default to the text. (t)
         pass
 
+    def _actuallyAddTrigger(self, triggerName: str, regex: str, regexType: str, command: str, enabled: bool):
+        # used by _addTrigger and _importTriggers
+        self.bot.storage[triggerName] = {
+            "regex": regex,
+            "regexType": regexType,
+            "command": command,
+            "enabled": enabled
+        }
+
     @admin(msg="Only my admins may delete triggers!")
     def _delTrigger(self, message: IRCMessage) -> IRCResponse:
         # .trigger del triggerName
@@ -59,15 +77,26 @@ class Trigger(BotCommand):
 
     def _toggleTrigger(self, message: IRCMessage) -> IRCResponse:
         # .trigger toggle triggerName
-        pass
+        triggerName = message.parameterList[1]
+        if triggerName in self.bot.storage['triggers']:
+            self.bot.storage['triggers'][triggerName]["enabled"] = not self.bot.storage['triggers'][triggerName]["enabled"]
+            currentStatus = "enabled" if self.bot.storage['triggers'][triggerName]["enabled"] else "disabled"
+            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} is now {currentStatus}", message.replyTo)
+        else:
+            return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
 
     def _listTriggerNames(self, message: IRCMessage) -> IRCResponse:
         # .trigger list (just names)
-        pass
+        return IRCResponse(ResponseType.Say, str(self.bot.storage['triggers'].keys()), message.replyTo)
 
     def _showTrigger(self, message: IRCMessage) -> IRCResponse:
         # .trigger show triggerName (contents - regex and command)
-        pass
+        triggerName = message.parameterList[1]
+        if triggerName in self.bot.storage['triggers']:
+            triggerData = self.bot.storage['triggers'][triggerName]
+            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} - {triggerData['regexType']}\"{triggerData['regex']}\" - {triggerData['command']}", message.replyTo)
+        else:
+            return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
 
     @admin(msg="Only my admins may export triggers!")
     def _exportTriggers(self, message: IRCMessage) -> IRCResponse:
@@ -84,6 +113,16 @@ class Trigger(BotCommand):
         newCommand = newMessage.command.lower()
         if newCommand in self.bot.moduleHandler.mappedTriggers:
             return self.bot.moduleHandler.mappedTriggers[newCommand].execute(newMessage)
+
+    subCommands = OrderedDict([
+        ('add', _addTrigger),
+        ('del', _delTrigger),
+        ('toggle', _toggleTrigger),
+        ('list', _listTriggerNames),
+        ('show', _showTrigger),
+        ('export', _exportTriggers),
+        ('import', _importTriggers)
+    ])
 
 
 trigger = Trigger()
