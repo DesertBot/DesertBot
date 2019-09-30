@@ -73,7 +73,12 @@ class Trigger(BotCommand):
     @admin(msg="Only my admins may delete triggers!")
     def _delTrigger(self, message: IRCMessage) -> IRCResponse:
         # .trigger del triggerName
-        pass
+        triggerName = message.parameterList[1]
+        if triggerName in self.bot.storage['triggers']:
+            del self.bot.storage['triggers'][triggerName]
+            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} deleted!", message.replyTo)
+        else:
+            return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
 
     def _toggleTrigger(self, message: IRCMessage) -> IRCResponse:
         # .trigger toggle triggerName
