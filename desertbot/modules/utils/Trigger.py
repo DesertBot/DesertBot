@@ -24,7 +24,7 @@ class Trigger(BotCommand):
                                                  ('action-user', 1, self.execute)]
 
     def help(self, parameters: List):
-        return "Doing trigger stuff."
+        return f"Valid subcommands for {self.bot.commandChar}trigger: {', '.join(self.subCommands.keys())}"
 
     def onLoad(self):
         if 'triggers' not in self.bot.storage:
