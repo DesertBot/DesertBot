@@ -211,7 +211,7 @@ class Trigger(BotCommand):
 
     def _handleTriggerCommand(self, message: IRCMessage, triggerCommand: str) -> IRCResponse:
         self.logger.debug(f"{triggerCommand} executing from a trigger")
-        newMessage = IRCMessage(message.type, message.user, message.channel, triggerCommand, self.bot)
+        newMessage = IRCMessage(message.type, message.user, message.channel, f"{self.bot.commandChar}{triggerCommand}", self.bot)
         newCommand = newMessage.command.lower()
         self.logger.debug(f"Command appears to be: {newCommand}")
         if newCommand in self.bot.moduleHandler.mappedTriggers:
