@@ -35,9 +35,14 @@
 
 :server PRIVMSG DesertBot :!help trigger
 :server PRIVMSG DesertBot :!trigger fartbarts
+:server PRIVMSG DesertBot :!trigger list
 :server PRIVMSG DesertBot :!help trigger toggle
 :server PRIVMSG DesertBot :!trigger toggle example
 :server PRIVMSG DesertBot :hey, reboop things, bot
+:server PRIVMSG DesertBot :!trigger add test t".*attack.*" roll 1d20
+:server PRIVMSG DesertBot :Hey, attack me, bot!
+:server PRIVMSG DesertBot :!trigger export
+:server PRIVMSG DesertBot :!trigger del example
 
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
