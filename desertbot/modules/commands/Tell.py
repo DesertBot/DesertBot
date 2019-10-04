@@ -29,9 +29,8 @@ class Tell(BotCommand):
                                               ('message-user', 5, self._processTells)]
 
     def onLoad(self):
-        if "tells" not in self.bot.storage:
-            self.bot.storage["tells"] = []
-        self.tells = self.bot.storage["tells"]
+        if "tells" not in self.storage:
+            self.storage["tells"] = []
 
     def help(self, query):
         command = query[0].lower()
@@ -77,10 +76,9 @@ class Tell(BotCommand):
                     "from": message.user.nick,
                     "source": message.replyTo if message.replyTo[0] in self.bot.supportHelper.chanTypes else "PM"
                 }
-                self.tells.append(msg)
+                self.storage["tells"].append(msg)
                 sentTells.append(recep.replace("/", " or "))
             if len(sentTells) > 0:
-                self.bot.storage["tells"] = self.tells
                 if message.command == "tellafter":
                     m = "Okay, I'll tell {} that when they speak after {}.".format(" and ".join(sentTells),
                                                                                    strftimeWithTimezone(date))
@@ -88,7 +86,7 @@ class Tell(BotCommand):
                     m = "Okay, I'll tell {} that next time they speak.".format(" and ".join(sentTells))
                 responses.append(IRCResponse(ResponseType.Say, m, message.replyTo))
         elif message.command == "stells":
-            for tell in self.tells:
+            for tell in self.storage["tells"]:
                 if tell["from"].lower() == message.user.nick.lower():
                     responses.append(IRCResponse(ResponseType.Notice, _parseSentTell(tell), message.user.nick))
             if len(responses) == 0:
@@ -98,11 +96,10 @@ class Tell(BotCommand):
         elif message.command == "rtell":
             if len(params) == 0:
                 return IRCResponse(ResponseType.Say, "Remove what?", message.replyTo)
-            tells = [x for x in self.tells if x["from"].lower() == message.user.nick.lower()]
+            tells = [x for x in self.storage["tells"] if x["from"].lower() == message.user.nick.lower()]
             for tell in tells:
                 if re2.search(" ".join(params), b64ToStr(tell["body"]), re2.IGNORECASE):
-                    self.tells.remove(tell)
-                    self.bot.storage["tells"] = self.tells
+                    self.storage["tells"].remove(tell)
                     m = "Message {!r} was removed from the message database.".format(_parseSentTell(tell))
                     return IRCResponse(ResponseType.Notice, m, message.user.nick)
             else:
@@ -114,7 +111,7 @@ class Tell(BotCommand):
     def _processTells(self, message: IRCMessage):
         chanTells = []
         pmTells = []
-        for tell in [i for i in self.tells]: # Iterate over a copy so we don'rlt modify the list we're iterating over
+        for tell in [i for i in self.storage["tells"]]: # Iterate over a copy so we don'rlt modify the list we're iterating over
             if not any(fnmatch(message.user.nick.lower(), r) for r in tell["to"].split("/")):
                 continue
             if now().isoformat() < tell["datetoreceive"]:
@@ -122,18 +119,16 @@ class Tell(BotCommand):
             if tell["source"][0] in self.bot.supportHelper.chanTypes and len(chanTells) < 3:
                 if tell["source"] == message.replyTo:
                     chanTells.append(tell)
-                    self.tells.remove(tell)
+                    self.storage["tells"].remove(tell)
             elif tell["source"][0] not in self.bot.supportHelper.chanTypes:
                 pmTells.append(tell)
-                self.tells.remove(tell)
+                self.storage["tells"].remove(tell)
 
         responses = []
         for tell in chanTells:
             responses.append(IRCResponse(ResponseType.Say, _parseTell(message.user.nick, tell), message.replyTo))
         for tell in pmTells:
             responses.append(IRCResponse(ResponseType.Say, _parseTell(message.user.nick, tell), message.user.nick))
-        if len(chanTells) > 0 or len(pmTells) > 0:
-            self.bot.storage["tells"] = self.tells
         return responses
 
 

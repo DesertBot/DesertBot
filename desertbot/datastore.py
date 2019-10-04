@@ -3,36 +3,29 @@ import os
 
 
 class DataStore(object):
-    def __init__(self, storagePath="desertbot_data.json"):
+    def __init__(self, storagePath, defaultsPath):
         self.storagePath = storagePath
+        self.defaultsPath = defaultsPath
         self.data = {}
         self.load()
 
     def load(self):
-        if not os.path.exists(self.storagePath):
-            with open(os.path.join("desertbot", "datastore_default.json")) as templateFile:
-                self.data = json.load(templateFile)
-            self.save()
-            return
-        with open(self.storagePath) as storageFile:
-            self.data = json.load(storageFile)
-        self.checkDefaults()
-
-    def checkDefaults(self):
-        """
-        If data exists, we still wanna make sure we load in things from defaults if there's things in the defaults that aren't in our actual data
-        """
-        with open(os.path.join("desertbot", "datastore_default.json")) as templateFile:
-            defaultData = json.load(templateFile)
-        for key, data in defaultData.items():
-            if key not in self.data:
-                self.data[key] = data
+        # if a file data/defaults/<module>.json exists, it has priority on load
+        if os.path.exists(self.defaultsPath):
+            with open(self.defaultsPath) as storageFile:
+                self.data = json.load(storageFile)
+        # if not, use data/<network>/<module>.json instead
+        elif os.path.exists(self.storagePath):
+            with open(self.storagePath) as storageFile:
+                self.data = json.load(storageFile)
 
     def save(self):
-        tmpFile = "{}.tmp".format(self.storagePath)
-        with open(tmpFile, "w") as storageFile:
-            storageFile.write(json.dumps(self.data, indent=4))
-        os.rename(tmpFile, self.storagePath)
+        # don't save empty files, to keep the data directories from filling up with pointless files
+        if len(self.data) != 0:
+            tmpFile = "{}.tmp".format(self.storagePath)
+            with open(tmpFile, "w") as storageFile:
+                storageFile.write(json.dumps(self.data, indent=4))
+            os.rename(tmpFile, self.storagePath)
 
     def __len__(self):
         return len(self.data)
@@ -58,3 +51,6 @@ class DataStore(object):
 
     def keys(self):
         return self.data.keys()
+
+    def get(self, key, defaultValue=None):
+        return self.data.get(key, defaultValue)

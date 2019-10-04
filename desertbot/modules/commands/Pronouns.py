@@ -22,31 +22,24 @@ class Pronouns(BotCommand):
                 " Query the user's pronouns, specify your own pronouns,"
                 " or remove your pronouns from the database.")
 
-    def onLoad(self):
-        if "pronouns" not in self.bot.storage or not type(self.bot.storage["pronouns"] == dict):
-            self.bot.storage["pronouns"] = {}
-        self.pronounStorage = self.bot.storage["pronouns"]
-
     def execute(self, message: IRCMessage):
         if message.command == "setpron":
             if len(message.parameterList) < 1:
                 return IRCResponse(ResponseType.Say, "Your pronouns are... blank?", message.replyTo)
 
-            self.pronounStorage[message.user.nick.lower()] = message.parameters
-            self.bot.storage["pronouns"] = self.pronounStorage
+            self.storage[message.user.nick.lower()] = message.parameters
 
             return IRCResponse(ResponseType.Say,
                                "Your pronouns have been set as <{}>.".format(message.parameters),
                                message.replyTo)
 
         elif message.command == "rmpron":
-            if message.user.nick.lower() not in self.pronounStorage:
+            if message.user.nick.lower() not in self.storage:
                 return IRCResponse(ResponseType.Say,
                                    "I don't even know your pronouns!",
                                    message.replyTo)
             else:
-                del self.pronounStorage[message.user.nick.lower()]
-                self.bot.storage["pronouns"] = self.pronounStorage
+                del self.storage[message.user.nick.lower()]
 
                 return IRCResponse(ResponseType.Say,
                                    "Your pronouns have been deleted.",
@@ -57,14 +50,14 @@ class Pronouns(BotCommand):
             else:
                 lookup = message.parameterList[0]
 
-            if lookup.lower() not in self.pronounStorage:
+            if lookup.lower() not in self.storage:
                 return IRCResponse(ResponseType.Say,
                                    "User's pronouns have not been specified.",
                                    message.replyTo)
             else:
                 return IRCResponse(ResponseType.Say,
                                    "{} uses <{}> pronouns."
-                                   .format(lookup, self.pronounStorage[lookup.lower()]),
+                                   .format(lookup, self.storage[lookup.lower()]),
                                    message.replyTo)
 
 

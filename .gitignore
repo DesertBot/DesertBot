@@ -38,8 +38,8 @@ nosetests.xml
 
 *.*~
 logs
-data/*/
 !data/comics/
+data/*/alias.yaml
 data/*.json
 data/manhole.sshkey
 *.suo

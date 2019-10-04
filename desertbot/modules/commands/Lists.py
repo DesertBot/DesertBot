@@ -58,16 +58,11 @@ class Lists(BotCommand):
                 return ("{!r} is not a valid subcommand, use {}help list for a list of subcommands"
                         .format(query[1], self.bot.commandChar))
 
-    def onLoad(self):
-        if "lists" not in self.bot.storage:
-            self.bot.storage["lists"] = {}
-        self.lists = self.bot.storage["lists"]
-
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say, self.help(["lists"]), message.replyTo)
         elif len(message.parameterList) == 1:
-            if message.parameterList[0].lower() in self.lists:
+            if message.parameterList[0].lower() in self.storage:
                 return IRCResponse(ResponseType.Say,
                                    self._getRandomEntry(message.parameterList[0].lower()),
                                    message.replyTo)
@@ -83,7 +78,7 @@ class Lists(BotCommand):
 
             if subcommand == "add":
                 text = self._addEntry(listName, " ".join(paramsList))
-            elif listName not in self.lists:
+            elif listName not in self.storage:
                 text = ("I don't have a list named {!r}, maybe add some entries to it to create it?"
                         .format(listName))
             elif subcommand == "last":
@@ -122,7 +117,7 @@ class Lists(BotCommand):
         """
         Get a random entry from the list with the given name
         """
-        chosen = random.choice(self.lists[listName])
+        chosen = random.choice(self.storage[listName])
         return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
     def _getEntryByID(self, listName, number):
@@ -136,7 +131,7 @@ class Lists(BotCommand):
             return "I don't know what you mean by {!r}".format(number)
 
         chosen = None
-        for entry in self.lists[listName]:
+        for entry in self.storage[listName]:
             if entry["id"] == choice:
                 chosen = entry
 
@@ -148,7 +143,7 @@ class Lists(BotCommand):
         """
         Return the last entry from the given list
         """
-        chosen = self.lists[listName][-1]
+        chosen = self.storage[listName][-1]
         return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
     def _getMultipleEntries(self, listName, regexPattern=None):
@@ -157,9 +152,9 @@ class Lists(BotCommand):
         If regexPattern is None, just use the whole list,
         otherwise make a list of all entries matching the regexPattern.
         """
-        if len(self.lists[listName]) == 0:
+        if len(self.storage[listName]) == 0:
             return "That list is empty!"
-        entries = [entry for entry in self.lists[listName]]
+        entries = [entry for entry in self.storage[listName]]
 
         # If given a regexPattern, remove all the entries that don't match it
         if regexPattern is not None:
@@ -190,12 +185,12 @@ class Lists(BotCommand):
         """
         Get the next available ID for the given list
         """
-        if len(self.lists[listName]) == 0:
+        if len(self.storage[listName]) == 0:
             # List is empty, return 1. New entry will be first entry.
             return 1
         else:
             # Get the ID for the last entry in the list and give the new ID as 1 larger than that
-            lastEntry = self.lists[listName][-1]
+            lastEntry = self.storage[listName][-1]
             return int(lastEntry["id"]) + 1
 
     def _addEntry(self, listName, entryText):
@@ -203,15 +198,14 @@ class Lists(BotCommand):
         Add a new entry to the given list with the given text.
         If there is no list with the given name, create it first.
         """
-        if listName not in self.lists:
-            self.lists[listName] = []
+        if listName not in self.storage:
+            self.storage[listName] = []
         entryObject = {
             "id": self._getNextAvailableID(listName),
             "timestamp": datetime.datetime.utcnow().strftime("[%Y-%m-%d] [%H:%M]"),
             "text": entryText
         }
-        self.lists[listName].append(entryObject)
-        self.bot.storage["lists"] = self.lists
+        self.storage[listName].append(entryObject)
         return ("Entry #{} - {} - {} added to list {}".format(entryObject["id"],
                                                               entryObject["timestamp"],
                                                               entryObject["text"], listName))
@@ -222,9 +216,9 @@ class Lists(BotCommand):
         If desiredNumber is not none, try to return a specific match
         from the list of entries matching the regex.
         """
-        if len(self.lists[listName]) == 0:
+        if len(self.storage[listName]) == 0:
             return "That list is empty!"
-        entries = [entry for entry in self.lists[listName]]
+        entries = [entry for entry in self.storage[listName]]
 
         for entry in entries:
             match = re.search(regexPattern, entry["text"])
@@ -251,9 +245,9 @@ class Lists(BotCommand):
         Try to remove an entry from the list of the given name using the given regexPattern.
         Only removes an entry if there is only one entry matching the given regexPattern.
         """
-        if len(self.lists[listName]) == 0:
+        if len(self.storage[listName]) == 0:
             return "That list is empty!"
-        entries = [entry for entry in self.lists[listName]]
+        entries = [entry for entry in self.storage[listName]]
 
         for entry in entries:
             match = re.search(regexPattern, entry["text"])
@@ -270,8 +264,7 @@ class Lists(BotCommand):
 
         else:
             entryCopy = entries[0].copy()
-            self.lists[listName].remove(entries[0])
-            self.bot.storage["lists"] = self.lists
+            self.storage[listName].remove(entries[0])
             return ("Entry #{} - {} from list {} was removed"
                     .format(entryCopy["id"], entryCopy["text"], listName))
 
@@ -279,15 +272,14 @@ class Lists(BotCommand):
         """
         Remove an entry by its ID from the list with the given name.
         """
-        if len(self.lists[listName]) == 0:
+        if len(self.storage[listName]) == 0:
             return "That list is empty!"
-        entries = [entry for entry in self.lists[listName]]
+        entries = [entry for entry in self.storage[listName]]
 
         for entry in entries:
             if entry["id"] == idNumber:
                 entryCopy = entry.copy()
-                self.lists[listName].remove(entry)
-                self.bot.storage["lists"] = self.lists
+                self.storage[listName].remove(entry)
                 return ("Entry #{} - {} from list {} was removed"
                         .format(entryCopy["id"], entryCopy["text"], listName))
             else:

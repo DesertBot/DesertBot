@@ -21,12 +21,10 @@ class FFXIV(BotCommand):
         return "Commands: ffxiv [iam/forgetme/char/jobs/job <job abrv>/portrait] <name> <server>"
 
     def onLoad(self):
-        if "ffxiv" not in self.bot.storage or not type(self.bot.storage["ffxiv"] == dict):
-            self.bot.storage["ffxiv"] = {}
-        if "chars" not in self.bot.storage["ffxiv"] or not type(self.bot.storage["ffxiv"] == dict):
-            self.bot.storage["ffxiv"]["chars"] = {}
+        if "chars" not in self.storage:
+            self.storage["chars"] = {}
 
-        self.charLinkStorage = self.bot.storage["ffxiv"]["chars"]
+        self.charLinkStorage = self.storage["chars"]
 
 #   subCommands = {
 #       'link': _link,
@@ -224,7 +222,6 @@ class FFXIV(BotCommand):
                                        message.replyTo)
 
             self.charLinkStorage[message.user.nick.lower()] = playerID
-            self.bot.storage["ffxiv"]["chars"] = self.charLinkStorage
             char = char['Character']
             return IRCResponse(ResponseType.Say,
                                f"'{char['Name']}' on server '{char['DC']} - {char['Server']}' "
@@ -241,7 +238,6 @@ class FFXIV(BotCommand):
 
             playerID = self.charLinkStorage[message.user.nick.lower()]
             del self.charLinkStorage[message.user.nick.lower()]
-            self.bot.storage["ffxiv"]["chars"] = self.charLinkStorage
             return IRCResponse(ResponseType.Say,
                                f"You are now unlinked from FFXIV profile ID '{playerID}'",
                                message.replyTo)
