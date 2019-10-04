@@ -7,7 +7,7 @@ from zope.interface import implementer
 
 from bs4 import UnicodeDammit
 from collections import OrderedDict
-import re
+import reBotModule
 from typing import List
 
 
@@ -142,7 +142,7 @@ class Trigger(BotCommand):
 
         addCommands = []
         for triggerName, triggerData in triggers.items():
-            regexTypePrefix = self._regexTypeNameToTypePrefix(triggerName["regexType"])
+            regexTypePrefix = self._regexTypeNameToTypePrefix(triggerData["regexType"])
             cmd = f"{self.bot.commandChar}trigger add {triggerName} {regexTypePrefix}\"{triggerData['regex']}\" {triggerData['command']}"
             addCommands.append(cmd)
 
