@@ -148,9 +148,7 @@ class Trigger(BotCommand):
 
         exportText = "\n".join(sorted(addCommands))
         mh = self.bot.moduleHandler
-        url = mh.runActionUntilValue('upload-pasteee', exportText,
-                                     f"Exported {self.bot.nick} triggers for {self.bot.server}",
-                                     60)
+        url = mh.runActionUntilValue('upload-dbco', exportText, expire=60*60)
 
         return IRCResponse(ResponseType.Say,
                            f"Exported {len(addCommands)} triggers to {url}",
