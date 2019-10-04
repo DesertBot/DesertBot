@@ -191,10 +191,7 @@ class Alias(BotCommand):
                                    "\n".join(sorted(helpCommands)))
 
         mh = self.bot.moduleHandler
-        url = mh.runActionUntilValue('upload-pasteee', export,
-                                     "Exported {} aliases for {}".format(self.bot.nick,
-                                                                         self.bot.server),
-                                     60)
+        url = mh.runActionUntilValue('upload-dbco', export)
         return IRCResponse(ResponseType.Say,
                            "Exported {} aliases and {} help texts to {}".format(len(addCommands),
                                                                                 len(helpCommands),

@@ -31,7 +31,8 @@ class WebUtils(BotModule):
                                                   ('get-html-title', 1, self.getPageTitle),
                                                   ('shorten-url', 1, self.shortenURL),
                                                   ('search-web', 1, self.googleSearch),
-                                                  ('upload-pasteee', 1, self.pasteEE)]
+                                                  ('upload-pasteee', 1, self.pasteEE),
+                                                  ('upload-dbco', 1, self.pasteDBCO)]
 
     def onLoad(self):
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
@@ -162,7 +163,7 @@ class WebUtils(BotModule):
 
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L74
-    def pasteEE(self, data: str, description: str, expire: int, raw: bool=True) -> str:
+    def pasteEE(self, data: str, description: str="", expire: int=None, raw: bool=True) -> str:
         # pasteEEKey = load_key('Paste.ee') (Heufneutje, 2018-4-27): Unused?
 
         values = {"key": "public",
@@ -179,6 +180,26 @@ class WebUtils(BotModule):
             elif jsonResult["status"] == "error":
                 return ("An error occurred while posting to Paste.ee, code: {}, reason: {}"
                         .format(jsonResult["errorcode"], jsonResult["error"]))
+
+    def pasteDBCO(self, data: str, expire: int=0, vanity: str=None) -> str:
+        apiURL = 'https://dbco.link/'
+        post = {"content": data,
+                "sunset": expire}
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
+        if vanity:
+            apiURL += f"~{vanity}"
+
+        try:
+            response = requests.post(apiURL, json=post, headers=headers)
+            responseJson = response.json()
+            return responseJson['url']
+        except requests.exceptions.RequestException:
+            self.logger.exception("dbco.link POST paste error {}"
+                                  .format(data))
+        except json.decoder.JSONDecodeError:
+            self.logger.exception("dbco.link json response decode error, {} (at {})"
+                                  .format(response.content, data))
 
 
 web = WebUtils()
