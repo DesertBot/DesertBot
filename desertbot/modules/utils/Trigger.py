@@ -1,7 +1,7 @@
 from twisted.plugin import IPlugin
 from desertbot.message import IRCMessage
-from desertbot.moduleinterface import IModule, BotModule
-from desertbot.modules.commandinterface import admin
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand, admin
 from desertbot.response import IRCResponse, ResponseType
 from zope.interface import implementer
 
@@ -12,11 +12,7 @@ from typing import List
 
 
 @implementer(IPlugin, IModule)
-class Trigger(BotModule):
-
-    def triggers(self):
-        return ['trigger']
-
+class Trigger(BotCommand):
     def actions(self):
         return super(Trigger, self).actions() + [('message-channel', 1, self.execute),
                                                  ('message-user', 1, self.execute),
@@ -25,7 +21,7 @@ class Trigger(BotModule):
 
     def help(self, parameters: List):
         command = parameters[0].lower()
-        if command in self.triggers():
+        if command in self.ownTriggers:
             # actual command that's been executed is !help trigger <whatever>
             if len(parameters) > 1 and parameters[1].lower() in self.subCommands:
                 subCommandHelp = self.subCommands[parameters[1].lower()].__doc__
@@ -37,6 +33,7 @@ class Trigger(BotModule):
             return f"Valid subcommands for {self.bot.commandChar}trigger: {', '.join(self.subCommands.keys())}"
 
     def onLoad(self):
+        self.ownTriggers = ['trigger']
         if 'triggers' not in self.bot.storage:
             self.bot.storage['triggers'] = {
                 "example": {
@@ -48,7 +45,7 @@ class Trigger(BotModule):
             }
 
     def execute(self, message: IRCMessage):
-        if message.command.lower() in self.triggers():
+        if message.command.lower() in self.ownTriggers:
             if len(message.parameterList) < 1 or message.parameterList[0].lower() not in self.subCommands:
                 return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
             else:
