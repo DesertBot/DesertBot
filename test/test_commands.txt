@@ -33,6 +33,12 @@
 :server PRIVMSG DesertBot :!responses pokemon
 :server PRIVMSG DesertBot :Pokemon are a thing. This is a sentence about pokemon.
 
+:server PRIVMSG DesertBot :!help trigger
+:server PRIVMSG DesertBot :!trigger fartbarts
+:server PRIVMSG DesertBot :!help trigger toggle
+:server PRIVMSG DesertBot :!trigger toggle example
+:server PRIVMSG DesertBot :hey, reboop things, bot
+
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
 :server PRIVMSG DesertBot :!shutdown
