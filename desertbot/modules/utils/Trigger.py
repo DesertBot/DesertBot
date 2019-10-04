@@ -27,7 +27,7 @@ class Trigger(BotCommand):
         command = parameters[0].lower()
         if command in self.triggers():
             # actual command that's been executed is !help trigger <whatever>
-            subCommand = paramaters[1].lower()
+            subCommand = parameters[1].lower()
             if subCommand in self.subCommands:
                 subCommandHelp = self.subCommands[subCommand].__doc__
                 return f"{self.bot.commandChar}trigger {subCommandHelp}"
