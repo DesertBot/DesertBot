@@ -171,7 +171,7 @@ class Lists(BotCommand):
         if len(entries) == 0:
             return "That list doesn't contain anything matching {!r}!".format(regexPattern)
 
-        # Paste entries found into paste.EE
+        # Paste entries found into pastebin service
         pasteString = ""
         for entry in entries:
             pasteString += "Entry #{} - {} - {}".format(entry["id"],
@@ -180,12 +180,11 @@ class Lists(BotCommand):
             pasteString += "\n"
 
         mh = self.bot.moduleHandler
-        pasteEElink = mh.runActionUntilValue('upload-pasteee',
-                                             string.stripFormatting(pasteString),
-                                             listName,
-                                             10)
+        pasteLink = mh.runActionUntilValue('upload-dbco',
+                                           string.stripFormatting(pasteString),
+                                           10*60)
 
-        return "Link posted! (Expires in 10 minutes) {}".format(pasteEElink)
+        return "Link posted! (Expires in 10 minutes) {}".format(pasteLink)
 
     def _getNextAvailableID(self, listName):
         """

@@ -165,9 +165,9 @@ int main() {{
                      "*/".format(code=code,
                                  stdout=returned[0].decode('utf-8', 'ignore'),
                                  stderr=errors))
-            url = self.bot.moduleHandler.runActionUntilValue('upload-pasteee',
+            url = self.bot.moduleHandler.runActionUntilValue('upload-dbco',
                                                              paste,
-                                                             "TIO stderr", 10)
+                                                             10*60)
             error = "Errors occurred! Output: {url}".format(url=url)
             if lang in self.templates:
                 error += " (language uses a template, see link for framing code)"
