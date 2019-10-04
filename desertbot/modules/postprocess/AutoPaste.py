@@ -13,30 +13,27 @@ from desertbot.utils import string
 
 
 @implementer(IPlugin, IModule)
-class AutoPasteEE(BotModule):
+class AutoPaste(BotModule):
     def actions(self):
-        return super(AutoPasteEE, self).actions() + [('response-message', 100, self.execute),
-                                                     ('response-action', 100, self.execute),
-                                                     ('response-notice', 100, self.execute)]
+        return super(AutoPaste, self).actions() + [('response-message', 100, self.execute),
+                                                   ('response-action', 100, self.execute),
+                                                   ('response-notice', 100, self.execute)]
 
     def help(self, query):
         return ("Automatic module that uploads overly "
-                "long reponses to paste.ee and gives you a link instead")
+                "long reponses to a pastebin service and gives you a link instead")
 
     def execute(self, response: IRCResponse):
         limit = 700  # chars
-        expire = 10  # minutes
+        expire = 10*60  # seconds
         if len(response.response) > limit:
-            description = ('Response longer than {} chars intended for {}'
-                           .format(limit, response.target))
             mh = self.bot.moduleHandler
-            replaced = mh.runActionUntilValue('upload-pasteee',
+            replaced = mh.runActionUntilValue('upload-dbco',
                                               string.stripFormatting(response.response),
-                                              description,
                                               expire)
 
             response.response = ('Response too long, pasted here instead: '
                                  '{} (Expires in {} minutes)'.format(replaced, expire))
 
 
-autopasteee = AutoPasteEE()
+autopaste = AutoPaste()
