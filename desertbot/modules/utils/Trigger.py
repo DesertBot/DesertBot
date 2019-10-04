@@ -81,7 +81,7 @@ class Trigger(BotCommand):
 
     def _actuallyAddTrigger(self, triggerName: str, regex: str, regexType: str, command: str, enabled: bool):
         # used by _addTrigger and _importTriggers
-        self.bot.storage[triggerName] = {
+        self.bot.storage['triggers'][triggerName] = {
             "regex": regex,
             "regexType": regexType,
             "command": command,
