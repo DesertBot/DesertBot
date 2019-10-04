@@ -7,7 +7,7 @@ from zope.interface import implementer
 
 from bs4 import UnicodeDammit
 from collections import OrderedDict
-import reBotModule
+import re
 from typing import List
 
 
