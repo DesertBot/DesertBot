@@ -219,7 +219,7 @@ class Trigger(BotCommand):
         return self.regexTypes.get(typePrefix, "text")
 
     def _regexTypeNameToTypePrefix(self, typeName: str) -> str:
-        for prefix, name in self.regexTypes:
+        for prefix, name in self.regexTypes.items():
             if name == typeName:
                 return prefix
         return "t"
