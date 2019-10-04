@@ -49,7 +49,7 @@ class Trigger(BotCommand):
 
     def execute(self, message: IRCMessage):
         if message.command.lower() in self.triggers():
-            if len(message.parameterList) < 1 or message.parameterList[0].lower() not in self.subcommands:
+            if len(message.parameterList) < 1 or message.parameterList[0].lower() not in self.subCommands:
                 return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
             else:
                 subCommand = message.parameterList[0].lower()
