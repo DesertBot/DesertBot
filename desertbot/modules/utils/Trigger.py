@@ -68,10 +68,7 @@ class Trigger(BotCommand):
 
     @admin(msg="Only my admins may add new triggers!")
     def _addTrigger(self, message: IRCMessage) -> IRCResponse:
-        """
-        add <triggerName> <regexTypePrefix>"<regex>" <command> - add a new trigger
-        valid regexTypePrefixes are t for text, n for nick - specifies what the regex should match against
-        """
+        """add <triggerName> <regexTypePrefix>"<regex>" <command> - add a new trigger - valid regexTypePrefixes are t for text, n for nick - specifies what the regex should match against"""
         if len(message.parameterList) < 3:
             return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
         else:
@@ -96,9 +93,7 @@ class Trigger(BotCommand):
 
     @admin(msg="Only my admins may delete triggers!")
     def _delTrigger(self, message: IRCMessage) -> IRCResponse:
-        """
-        del <triggerName> - delete the specified trigger
-        """
+        """del <triggerName> - delete the specified trigger"""
         triggerName = message.parameterList[1]
         if triggerName in self.bot.storage['triggers']:
             del self.bot.storage['triggers'][triggerName]
@@ -107,9 +102,7 @@ class Trigger(BotCommand):
             return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
 
     def _toggleTrigger(self, message: IRCMessage) -> IRCResponse:
-        """
-        toggle <triggerName> - turn specified trigger on or off
-        """
+        """toggle <triggerName> - turn specified trigger on or off"""
         triggerName = message.parameterList[1]
         if triggerName in self.bot.storage['triggers']:
             self.bot.storage['triggers'][triggerName]["enabled"] = not self.bot.storage['triggers'][triggerName]["enabled"]
@@ -119,9 +112,7 @@ class Trigger(BotCommand):
             return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
 
     def _listTriggerNames(self, message: IRCMessage) -> List[IRCResponse]:
-        """
-        list - list names of all triggers, and their current status
-        """
+        """list - list names of all triggers, and their current status"""
         enableds = [triggerName for triggerName in self.bot.storage['triggers'] if self.bot.storage['triggers'][triggerName]['enabled']]
         disableds = [triggerName for triggerName in self.bot.storage['triggers'] if not self.bot.storage['triggers'][triggerName]['enabled']]
 
@@ -131,9 +122,7 @@ class Trigger(BotCommand):
         ]
 
     def _showTrigger(self, message: IRCMessage) -> IRCResponse:
-        """
-        show <triggerName> - show contents of trigger, type-prefixed regex and command
-        """
+        """show <triggerName> - show contents of trigger, type-prefixed regex and command"""
         triggerName = message.parameterList[1]
         if triggerName in self.bot.storage['triggers']:
             triggerData = self.bot.storage['triggers'][triggerName]
@@ -143,9 +132,7 @@ class Trigger(BotCommand):
 
     @admin(msg="Only my admins may export triggers!")
     def _exportTriggers(self, message: IRCMessage) -> IRCResponse:
-        """
-        export [<trigger name(s)] - exports all triggers - or the specified triggers - to paste.ee, and returns a link
-        """
+        """export [<trigger name(s)] - exports all triggers - or the specified triggers - to paste.ee, and returns a link"""
         if len(message.parameterList) > 1:
             # filter the trigger dictionary by the listed triggers
             params = [trigger.lower() for trigger in message.parameterList[1:]]
@@ -174,9 +161,7 @@ class Trigger(BotCommand):
 
     @admin(msg="Only my admins may import triggers!")
     def _importTriggers(self, message: IRCMessage) -> IRCResponse:
-        """
-        import <url> [<trigger(s)>] - import all triggers from the specified URLs, or only the listed triggers
-        """
+        """import <url> [<trigger(s)>] - import all triggers from the specified URLs, or only the listed triggers"""
         if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say, "You didn't give a url to import from!", message.replyTo)
 
