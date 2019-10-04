@@ -1,0 +1,173 @@
+{
+    "squishy": {
+        "messages": [
+            "GODDAMMIT, GET YOUR HAND OUT OF THERE"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)wet (and|&|'?n'?) squishy([^a-zA-Z]|$)",
+            "([^a-zA-Z]|^)squishy (and|&|'?n'?) wet([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": false
+    },
+    "ocean": {
+        "messages": [
+            "mimes out a *WHOOOOSH!*"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)ocean([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "windmill": {
+        "messages": [
+            "WINDMILLS DO NOT WORK THAT WAY!",
+            "GOODNIGHT!"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)windmills?([^a-zA-Z]|$)",
+            "([^a-zA-Z]|^)cool([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "pokemon": {
+        "messages": [
+            "Portable Atrocities! Must be encapsulated en masse!"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)pokemon([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": false,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "dutch": {
+        "messages": [
+            "The Dutch, AGAIN!"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)dutch([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": false,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "bees": {
+        "messages": [
+            "BEES?! AAAARRGGHGHFLFGFGFLHL"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)bee+s?([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "cheese": {
+        "messages": [
+            "loves cheese"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)cheese([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "fromage": {
+        "messages": [
+            "adore le fromage"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)fromage([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "kaas": {
+        "messages": [
+            "is gek op kaas"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)kaas([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "juusto": {
+        "messages": [
+            "rakastaa juustoa"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)juusto([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "k\u00e4se": {
+        "messages": [
+            "liebt K\u00e4se"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)K\u00e4se([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": false,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "wat": {
+        "messages": [
+            "NaNNaNNaNNaN https://www.destroyallsoftware.com/talks/wat man!"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)wat([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": false,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "everythingisfine": {
+        "messages": [
+            "IT'S FINE, EVERYTHING IS FINE"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)everything('?s| is) fine([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
+    "tradition": {
+        "messages": [
+            "As is tradition."
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)as is tradition([^a-zA-Z]|$)"
+        ],
+        "responseType": "Say",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    }
+}
