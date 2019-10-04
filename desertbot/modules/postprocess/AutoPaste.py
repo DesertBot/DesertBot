@@ -33,7 +33,7 @@ class AutoPaste(BotModule):
                                               expire)
 
             response.response = ('Response too long, pasted here instead: '
-                                 '{} (Expires in {} minutes)'.format(replaced, expire))
+                                 '{} (Expires in {} minutes)'.format(replaced, expire//60))
 
 
 autopaste = AutoPaste()
