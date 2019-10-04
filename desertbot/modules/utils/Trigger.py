@@ -1,7 +1,7 @@
 from twisted.plugin import IPlugin
 from desertbot.message import IRCMessage
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand, admin
+from desertbot.moduleinterface import IModule, BotModule
+from desertbot.modules.commandinterface import admin
 from desertbot.response import IRCResponse, ResponseType
 from zope.interface import implementer
 
@@ -12,7 +12,7 @@ from typing import List
 
 
 @implementer(IPlugin, IModule)
-class Trigger(BotCommand):
+class Trigger(BotModule):
 
     def triggers(self):
         return ['trigger']
