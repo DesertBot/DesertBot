@@ -34,8 +34,9 @@ class Trigger(BotCommand):
 
     def onLoad(self):
         self.ownTriggers = ['trigger']
-        if 'triggers' not in self.bot.storage:
-            self.bot.storage['triggers'] = {
+        
+        if len(self.storage) == 0:
+            self.storage = {
                 "example": {
                     "regex": ".*reboop.*",      # if a message's text contains reboop somewhere
                     "regexType": "text",        # other possible values, nick? TBD.
@@ -52,7 +53,7 @@ class Trigger(BotCommand):
                 subCommand = message.parameterList[0].lower()
                 return self.subCommands[subCommand](self, message)
         else:
-            for triggerName, triggerData in self.bot.storage['triggers'].items():
+            for triggerName, triggerData in self.storage.items():
                 if not triggerData['enabled']:
                     continue
                 # TODO support for more regexTypes
@@ -81,7 +82,7 @@ class Trigger(BotCommand):
 
     def _actuallyAddTrigger(self, triggerName: str, regex: str, regexType: str, command: str, enabled: bool):
         # used by _addTrigger and _importTriggers
-        self.bot.storage['triggers'][triggerName] = {
+        self.storage[triggerName] = {
             "regex": regex,
             "regexType": regexType,
             "command": command,
@@ -92,8 +93,8 @@ class Trigger(BotCommand):
     def _delTrigger(self, message: IRCMessage) -> IRCResponse:
         """del <triggerName> - delete the specified trigger"""
         triggerName = message.parameterList[1]
-        if triggerName in self.bot.storage['triggers']:
-            del self.bot.storage['triggers'][triggerName]
+        if triggerName in self.storage:
+            del self.storage[triggerName]
             return IRCResponse(ResponseType.Say, f"Trigger {triggerName} deleted!", message.replyTo)
         else:
             return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
@@ -101,17 +102,17 @@ class Trigger(BotCommand):
     def _toggleTrigger(self, message: IRCMessage) -> IRCResponse:
         """toggle <triggerName> - turn specified trigger on or off"""
         triggerName = message.parameterList[1]
-        if triggerName in self.bot.storage['triggers']:
-            self.bot.storage['triggers'][triggerName]["enabled"] = not self.bot.storage['triggers'][triggerName]["enabled"]
-            currentStatus = "enabled" if self.bot.storage['triggers'][triggerName]["enabled"] else "disabled"
+        if triggerName in self.storage:
+            self.storage[triggerName]["enabled"] = not self.storage[triggerName]["enabled"]
+            currentStatus = "enabled" if self.storage[triggerName]["enabled"] else "disabled"
             return IRCResponse(ResponseType.Say, f"Trigger {triggerName} is now {currentStatus}", message.replyTo)
         else:
             return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
 
     def _listTriggerNames(self, message: IRCMessage) -> List[IRCResponse]:
         """list - list names of all triggers, and their current status"""
-        enableds = [triggerName for triggerName in self.bot.storage['triggers'] if self.bot.storage['triggers'][triggerName]['enabled']]
-        disableds = [triggerName for triggerName in self.bot.storage['triggers'] if not self.bot.storage['triggers'][triggerName]['enabled']]
+        enableds = [triggerName for triggerName in self.storage if self.storage[triggerName]['enabled']]
+        disableds = [triggerName for triggerName in self.storage if not self.storage[triggerName]['enabled']]
 
         return [
             IRCResponse(ResponseType.Say, f"Enabled triggers: {', '.join(enableds)}", message.replyTo),
@@ -121,8 +122,8 @@ class Trigger(BotCommand):
     def _showTrigger(self, message: IRCMessage) -> IRCResponse:
         """show <triggerName> - show contents of trigger, type-prefixed regex and command"""
         triggerName = message.parameterList[1]
-        if triggerName in self.bot.storage['triggers']:
-            triggerData = self.bot.storage['triggers'][triggerName]
+        if triggerName in self.storage:
+            triggerData = self.storage[triggerName]
             return IRCResponse(ResponseType.Say, f"Trigger {triggerName} - {triggerData['regexType']}\"{triggerData['regex']}\" - {triggerData['command']}", message.replyTo)
         else:
             return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
@@ -133,9 +134,9 @@ class Trigger(BotCommand):
         if len(message.parameterList) > 1:
             # filter the trigger dictionary by the listed triggers
             params = [trigger.lower() for trigger in message.parameterList[1:]]
-            triggers = {trigger: self.bot.storage['triggers'][trigger] for trigger in params if trigger in self.bot.storage['triggers']}
+            triggers = {trigger: self.storage[trigger] for trigger in params if trigger in self.storage}
         else:
-            triggers = self.bot.storage['triggers']
+            triggers = self.storage
 
         if len(triggers) == 0:
             return IRCResponse(ResponseType.Say, "There are no triggers to export!", message.replyTo)

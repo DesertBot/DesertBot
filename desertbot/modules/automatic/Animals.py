@@ -28,8 +28,8 @@ class Animals(BotModule):
             "19": "{user} is DEFINITELY {article} {animal}.",
             "20": "{user} is a CRITICAL {animal}!"
         }
-        self.animalResponses = self.bot.storage["animals"]
-        self.animalReactions = dict(self.bot.storage["animalCustomReactions"])  # copy stored dict so we can extend with defaultReactions
+        self.animalResponses = self.storage["animals"]
+        self.animalReactions = dict(self.storage["animalCustomReactions"])  # copy stored dict so we can extend with defaultReactions
         for _, animalName in self.animalResponses.items():
             if animalName not in self.animalReactions:
                 self.animalReactions[animalName] = dict(defaultReactions)

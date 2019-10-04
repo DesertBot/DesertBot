@@ -4,10 +4,8 @@ from datetime import datetime
 
 from twisted.internet.interfaces import ISSLTransport
 from twisted.internet import reactor
-from twisted.internet.task import LoopingCall
 
 from desertbot.config import Config
-from desertbot.datastore import DataStore
 from desertbot.input import InputHandler
 from desertbot.ircbase import IRCBase
 from desertbot.modulehandler import ModuleHandler
@@ -68,12 +66,6 @@ class DesertBot(IRCBase, object):
 
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
 
-        # load in the shelve object from the datastore and tell twisted to keep it synced to file
-        self.logger.info('Loading storage file...')
-        self.storage = DataStore(os.path.join(self.dataPath, 'desertbot.json'))
-        self.storageSync = LoopingCall(self.storage.save())
-        self.storageSync.start(self.config.getWithDefault('storage_save_interval', 60), now=False)
-
         self.moduleHandler = ModuleHandler(self)
         self.moduleHandler.loadAll()
 
@@ -81,7 +73,6 @@ class DesertBot(IRCBase, object):
         self.startTime = datetime.utcnow()
 
     def cleanup(self) -> None:
-        self.storage.save()
         self.config.writeConfig()
         self.logger.info('Saved config and data.')
 

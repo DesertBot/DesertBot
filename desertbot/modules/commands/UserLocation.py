@@ -18,31 +18,24 @@ class UserLocation(BotCommand):
     def help(self, query):
         return "Commands: addloc <location>, remloc <location> | Add or remove your location from the database."
 
-    def onLoad(self):
-        if "userlocations" not in self.bot.storage or not type(self.bot.storage["userlocations"] == dict):
-            self.bot.storage["userlocations"] = {}
-        self.locationStorage = self.bot.storage["userlocations"]
-
     def execute(self, message: IRCMessage):
         if message.command == "addloc":
             if len(message.parameterList) < 1:
                 return IRCResponse(ResponseType.Say, "No location was specified.", message.replyTo)
-            self.locationStorage[message.user.nick.lower()] = message.parameters
-            self.bot.storage["userlocations"] = self.locationStorage
+            self.storage[message.user.nick.lower()] = message.parameters
             self.bot.moduleHandler.runGenericAction('userlocation-updated', message.user.nick, message.parameters)
             return IRCResponse(ResponseType.Say, "Your location has been updated.".format(message.parameters),
                                message.replyTo)
         elif message.command == "remloc":
-            if message.user.nick.lower() not in self.locationStorage:
+            if message.user.nick.lower() not in self.storage:
                 return IRCResponse(ResponseType.Say, "Your location is not registered!", message.replyTo)
             else:
-                del self.locationStorage[message.user.nick.lower()]
-                self.bot.storage["userlocations"] = self.locationStorage
+                del self.storage[message.user.nick.lower()]
                 self.bot.moduleHandler.runGenericAction('userlocation-removed', message.user.nick)
                 return IRCResponse(ResponseType.Say, "Your location has been removed.", message.replyTo)
 
     def lookUpLocation(self, nick: str):
-        if nick.lower() not in self.locationStorage:
+        if nick.lower() not in self.storage:
             return {
                 "success": False,
                 "error": "Your location is not registered. Register your location by using the \"addloc\" command "
@@ -51,7 +44,7 @@ class UserLocation(BotCommand):
         else:
             return {
                 "success": True,
-                "location": self.locationStorage[nick.lower()]
+                "location": self.storage[nick.lower()]
             }
 
 

@@ -19,12 +19,12 @@ class RSS(BotCommand):
         return super(RSS, self).actions() + [("ping", 1, self.checkFeeds)]
 
     def onLoad(self) -> None:
-        if "rss_feeds" not in self.bot.storage:
-            self.bot.storage["rss_feeds"] = {}
-        self.feeds = self.bot.storage["rss_feeds"]
-        if "rss_channels" not in self.bot.storage:
-            self.bot.storage["rss_channels"] = []
-        self.channels = self.bot.storage["rss_channels"]
+        if "rss_feeds" not in self.storage:
+            self.storage["rss_feeds"] = {}
+        self.feeds = self.storage["rss_feeds"]
+        if "rss_channels" not in self.storage:
+            self.storage["rss_channels"] = []
+        self.channels = self.storage["rss_channels"]
 
     def help(self, query):
         """
@@ -136,7 +136,7 @@ class RSS(BotCommand):
                 link = "Failed to find link for latest entry in feed!"
             self.feeds[feedName]["lastTitle"] = title
             self.feeds[feedName]["lastLink"] = link
-            self.bot.storage["rss_feeds"] = self.feeds
+            self.storage["rss_feeds"] = self.feeds
             return True
         return False
 
@@ -158,7 +158,7 @@ class RSS(BotCommand):
     @admin("[RSS] Only my admins may tell me what channels to send notifications to!")
     def _setChannels(self, message: IRCMessage):
         self.channels = message.parameterList[1:]
-        self.bot.storage["rss_channels"] = self.channels
+        self.storage["rss_channels"] = self.channels
         return IRCResponse(ResponseType.Say,
                            "RSS notifications will now be sent to: {}".format(self.channels),
                            message.replyTo)
@@ -177,7 +177,7 @@ class RSS(BotCommand):
                 "suppress": False
             }
             self.feeds[name] = feed_object
-            self.bot.storage["rss_feeds"] = self.feeds
+            self.storage["rss_feeds"] = self.feeds
             self._updateFeed(name)
             return IRCResponse(ResponseType.Say,
                                "Successfully followed {} at URL {}".format(name, url),
@@ -187,7 +187,7 @@ class RSS(BotCommand):
             # clean up if it already got saved, and the error was in _updateFeed
             if name in self.feeds:
                 del self.feeds[name]
-                self.bot.storage["rss_feeds"] = self.feeds
+                self.storage["rss_feeds"] = self.feeds
             return IRCResponse(ResponseType.Say,
                                "I couldn't quite parse that RSS follow, are you sure you did it right?",
                                message.replyTo)
@@ -197,7 +197,7 @@ class RSS(BotCommand):
         name = " ".join(message.parameterList[1:])
         if name in self.feeds:
             del self.feeds[name]
-            self.bot.storage["rss_feeds"] = self.feeds
+            self.storage["rss_feeds"] = self.feeds
             return IRCResponse(ResponseType.Say,
                                "Sucessfully unfollowed {}".format(name),
                                message.replyTo)
@@ -211,7 +211,7 @@ class RSS(BotCommand):
         name = " ".join(message.parameterList[1:])
         if name in self.feeds:
             self.feeds[name]["suppress"] = not self.feeds[name]["suppress"]
-            self.bot.storage["rss_feeds"] = self.feeds
+            self.storage["rss_feeds"] = self.feeds
             return IRCResponse(ResponseType.Say,
                                "Successfully {}ed {}".format("suppress" if self.feeds[name]["suppress"] else "unsupress", name),
                                message.replyTo)

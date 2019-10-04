@@ -30,7 +30,7 @@ class Responses(BotCommand):
         try:
             self.responses = dict()
 
-            for responseName, responseData in self.bot.storage['responses'].items():
+            for responseName, responseData in self.storage.items():
                 self.responses[responseName] = ResponseObject(responseName,
                                                               responseData['messages'],
                                                               responseData['regexes'],

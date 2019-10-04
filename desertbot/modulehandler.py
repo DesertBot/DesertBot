@@ -52,6 +52,7 @@ class ModuleHandler(object):
                                     ModuleLoadType.LOAD)
 
         module.hookBot(self.bot)
+        module.loadDataStore()
 
         actions = {}
         for action in module.actions():
