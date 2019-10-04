@@ -39,7 +39,7 @@ class Trigger(BotCommand):
                 "example": {
                     "regex": ".*reboop.*",      # if a message's text contains reboop somewhere
                     "regexType": "text",        # other possible values, nick? TBD.
-                    "command": "reload boop",   # run reload boop
+                    "command": "reload Boops",  # run reload Boops
                     "enabled": False            # allow disabling because oof ow
                 }
             }
