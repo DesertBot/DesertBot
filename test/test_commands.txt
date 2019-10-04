@@ -42,7 +42,9 @@
 :server PRIVMSG DesertBot :!trigger add test t".*attack.*" roll 1d20
 :server PRIVMSG DesertBot :Hey, attack me, bot!
 :server PRIVMSG DesertBot :!trigger export
+:server PRIVMSG DesertBot :!trigger list
 :server PRIVMSG DesertBot :!trigger del example
+:server PRIVMSG DesertBot :!trigger list
 
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
