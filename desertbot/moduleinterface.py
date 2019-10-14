@@ -4,6 +4,7 @@ from functools import wraps
 from fnmatch import fnmatch
 import json
 import os
+import random
 from typing import Any, Callable, List, Tuple, Union, TYPE_CHECKING
 import logging
 
@@ -101,12 +102,15 @@ class BotModule(object):
 
         # ensure storage is periodically synced to disk - DataStore.__set__() does call DataStore.save(), but you never know
         self.storageSync = LoopingCall(self.storage.save())
-        self.storageSync.start(self.bot.config.getWithDefault('storage_save_interval', 60), now=False)
+        # since each module has its own LoopingCall,
+        # space them out over a second using random.random() to add 0-1 seconds to each module's storage save interval
+        self.storageSync.start(self.bot.config.getWithDefault('storage_save_interval', 60) + random.random(), now=False)
 
     def getLegacyData(self, dataRootPath, defaultRootPath) -> DataStore:
         """
         Hacky as heck, delete ASAP, remove from fabric of universe
         """
+        # TODO remove entire method once legacy data has been imported fully and confirmed to be correct
         legacyData = DataStore(storagePath=os.path.join(dataRootPath, 'desertbot.json'),
                                defaultsPath='')
         className = self.__class__.__name__
