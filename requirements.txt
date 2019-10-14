@@ -1,4 +1,4 @@
-beautifulsoup4==4.8.0
+beautifulsoup4==4.8.1
 bcrypt==3.1.7
 croniter==0.3.30
 Cython==0.29.13
@@ -9,7 +9,7 @@ isodate==0.6.0
 jsonpath-ng==1.4.3
 lxml==4.4.1
 numpy==1.17.2
-Pillow==6.1.0
+Pillow==6.2.0
 parsedatetime==2.4
 psutil==5.6.3
 pyhedrals==0.2.0

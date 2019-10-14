@@ -282,8 +282,7 @@ class Lists(BotCommand):
                 self.storage[listName].remove(entry)
                 return ("Entry #{} - {} from list {} was removed"
                         .format(entryCopy["id"], entryCopy["text"], listName))
-            else:
-                return "Could not find an entry with ID {} in list {}".format(idNumber, listName)
+        return "Could not find an entry with ID {} in list {}".format(idNumber, listName)
 
 
 lists = Lists()
