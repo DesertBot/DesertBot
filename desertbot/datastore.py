@@ -22,7 +22,7 @@ class DataStore(object):
     def save(self):
         # don't save empty files, to keep the data directories from filling up with pointless files
         if len(self.data) != 0:
-            tmpFile = "{}.tmp".format(self.storagePath)
+            tmpFile = f"{self.storagePath}.tmp"
             with open(tmpFile, "w") as storageFile:
                 storageFile.write(json.dumps(self.data, indent=4))
             os.rename(tmpFile, self.storagePath)
@@ -31,7 +31,7 @@ class DataStore(object):
             # ideally, defaults should be synced to github...
             # but this means changes to modules with defaults at runtime aren't overwritten on the server on a reboot
             if os.path.exists(self.defaultsPath):
-                tmpFile = "{}.tmp".format(self.defaultsPath)
+                tmpFile = f"{self.defaultsPath}.tmp"
                 with open(tmpFile, "w") as storageFile:
                     storageFile.write(json.dumps(self.data, indent=4))
                 os.rename(tmpFile, self.defaultsPath)
