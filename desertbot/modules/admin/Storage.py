@@ -47,46 +47,72 @@ class Storage(BotCommand):
 
     @admin("[Storage] Only my admins may stop my storage sync!")
     def stopStorageSync(self, message: IRCMessage):
-        mh = self.bot.moduleHandler
-        moduleNames = [mh.caseMap[name.lower()] for name in message.parameterList[1:] if name.lower() in mh.caseMap]
+        moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
-            mh.modules[moduleName].storageSync.stop()
-
+            self._stopDataSync(moduleName)
         return IRCResponse(ResponseType.Say,
                            f"Stopped storage sync for modules {', '.join(moduleNames)}. They will no longer periodically autosave to file!",
                            message.replyTo)
 
     @admin("[Storage] Only my admins may start up my storage sync!")
     def startStorageSync(self, message: IRCMessage):
-        mh = self.bot.moduleHandler
-        moduleNames = [mh.caseMap[name.lower()] for name in message.parameterList[1:] if name.lower() in mh.caseMap]
+        moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
-            # since each module has its own LoopingCall,
-            # space them out over a second using random.random() to add 0-1 seconds to each module's storage save interval
-            mh.modules[moduleName].storageSync.start(self.bot.config.getWithDefault("storage_save_interval", 60) + random.random(), now=True)
+            self._startDataSync(moduleName)
         return IRCResponse(ResponseType.Say,
                            f"Started storage sync for modules {', '.join(moduleNames)}. They will periodically autosave to file.",
                            message.replyTo)
 
     @admin("[Storage] Only my admins can reload my storage file!")
     def loadStorage(self, message: IRCMessage):
-        mh = self.bot.moduleHandler
-        moduleNames = [mh.caseMap[name.lower()] for name in message.parameterList[1:] if name.lower() in mh.caseMap]
+        moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
-            mh.modules[moduleName].storage.load()
+            self._loadModuleData(moduleName)
         return IRCResponse(ResponseType.Say,
                            f"Reloaded storage from file for modules {', '.join(moduleNames)}.",
                            message.replyTo)
 
     @admin("[Storage] Only my admins can save my storage to file!")
     def saveStorage(self, message: IRCMessage):
-        mh = self.bot.moduleHandler
-        moduleNames = [mh.caseMap[name.lower()] for name in message.parameterList[1:] if name.lower() in mh.caseMap]
+        moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
-            mh.modules[moduleName].storage.save()
+            self._saveModuleData(moduleName)
         return IRCResponse(ResponseType.Say,
                            f"Saved storage to file for modules {', '.join(moduleNames)}.",
                            message.replyTo)
+
+    def _getValidModuleNames(self, parameterList):
+        """
+        Given a list of module names, returns Properly Capitalized names for those modules, if they are loaded.
+        """
+        return [self.bot.moduleHandler.caseMap[name.lower()] for name in parameterList if name.lower() in self.bot.moduleHandler.caseMap]
+
+    def _startDataSync(self, moduleName):
+        """
+        Given a valid, Proper Caps module name, enable storage sync for that module
+        """
+        # since each module has its own LoopingCall,
+        # space them out over a second using random.random() to add 0-1 seconds to each module's storage save interval
+        saveInterval = self.bot.config.getWithDefault("storage_save_interval", 60) + random.random()
+        self.bot.moduleHandler.modules[moduleName].storageSync.start(saveInterval, now=True)
+
+    def _stopDataSync(self, moduleName):
+        """
+        Given a valid, Proper Caps module name, disable storage sync for that module
+        """
+        self.bot.moduleHandler.modules[moduleName].storageSync.stop()
+
+    def _saveModuleData(self, moduleName):
+        """
+        Given a valid, Proper Caps module name, immediately save that module's data to disk
+        """
+        self.bot.moduleHandler.modules[moduleName].storage.save()
+
+    def _loadModuleData(self, moduleName):
+        """
+        Given a valid, Proper Caps module name, immediately load that module's data from disk
+        """
+        self.bot.moduleHandler.modules[moduleName].storage.load()
 
 
 storage = Storage()
