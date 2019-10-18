@@ -24,8 +24,6 @@ class FFXIV(BotCommand):
         if "chars" not in self.storage:
             self.storage["chars"] = {}
 
-        self.charLinkStorage = self.storage["chars"]
-
 #   subCommands = {
 #       'link': _link,
 #       'char': _char,
@@ -49,7 +47,7 @@ class FFXIV(BotCommand):
                                        self._failedParamLookup(params),
                                        message.replyTo)
             else:
-                if message.user.nick.lower() not in self.charLinkStorage:
+                if message.user.nick.lower() not in self.storage["chars"]:
                     return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
                 char = self._lookupCharacterByStorage(message.user.nick)
                 if not char:
@@ -106,7 +104,7 @@ class FFXIV(BotCommand):
                                        self._failedParamLookup(params),
                                        message.replyTo)
             else:
-                if message.user.nick.lower() not in self.charLinkStorage:
+                if message.user.nick.lower() not in self.storage["chars"]:
                     return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
                 char = self._lookupCharacterByStorage(message.user.nick)
                 if not char:
@@ -124,7 +122,7 @@ class FFXIV(BotCommand):
                                        self._failedParamLookup(params),
                                        message.replyTo)
             else:
-                if message.user.nick.lower() not in self.charLinkStorage:
+                if message.user.nick.lower() not in self.storage["chars"]:
                     return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
                 char = self._lookupCharacterByStorage(message.user.nick)
                 if not char:
@@ -170,7 +168,7 @@ class FFXIV(BotCommand):
                                        self._failedParamLookup(params),
                                        message.replyTo)
             else:
-                if message.user.nick.lower() not in self.charLinkStorage:
+                if message.user.nick.lower() not in self.storage["chars"]:
                     return IRCResponse(ResponseType.Say, self._noCharLinked(), message.replyTo)
                 char = self._lookupCharacterByStorage(message.user.nick)
                 if not char:
@@ -221,7 +219,7 @@ class FFXIV(BotCommand):
                                        f"perhaps you wanted to add by FirstName LastName Server?",
                                        message.replyTo)
 
-            self.charLinkStorage[message.user.nick.lower()] = playerID
+            self.storage["chars"][message.user.nick.lower()] = playerID
             char = char['Character']
             return IRCResponse(ResponseType.Say,
                                f"'{char['Name']}' on server '{char['DC']} - {char['Server']}' "
@@ -231,13 +229,13 @@ class FFXIV(BotCommand):
                                message.replyTo)
 
         elif subCommand == 'forgetme':
-            if message.user.nick.lower() not in self.charLinkStorage:
+            if message.user.nick.lower() not in self.storage["chars"]:
                 return IRCResponse(ResponseType.Say,
                                    "You aren't linked to an FFXIV character right now",
                                    message.replyTo)
 
-            playerID = self.charLinkStorage[message.user.nick.lower()]
-            del self.charLinkStorage[message.user.nick.lower()]
+            playerID = self.storage["chars"][message.user.nick.lower()]
+            del self.storage["chars"][message.user.nick.lower()]
             return IRCResponse(ResponseType.Say,
                                f"You are now unlinked from FFXIV profile ID '{playerID}'",
                                message.replyTo)
@@ -339,9 +337,9 @@ class FFXIV(BotCommand):
             return self._lookupCharacterByID(params[0])
 
     def _lookupCharacterByStorage(self, nick):
-        if nick.lower() not in self.charLinkStorage:
+        if nick.lower() not in self.storage["chars"]:
             return None
-        return self._lookupCharacterByID(self.charLinkStorage[nick.lower()])
+        return self._lookupCharacterByID(self.storage["chars"][nick.lower()])
 
     def _noCharLinked(self):
         return (f"You don't have a FFXIV character linked to your IRC nick. "
@@ -349,7 +347,7 @@ class FFXIV(BotCommand):
 
     def _failedLinkLookup(self, nick):
         return (f"Failed to lookup your linked character ID "
-                f"'{self.charLinkStorage[nick.lower()]}' (maybe the API timed out)")
+                f"'{self.storage['chars'][nick.lower()]}' (maybe the API timed out)")
 
     def _failedParamLookup(self, params):
         return f"Failed to find character '{' '.join(params)}' (or the API timed out)"
