@@ -343,7 +343,7 @@ class FFXIV(BotCommand):
 
     def _noCharLinked(self):
         return (f"You don't have a FFXIV character linked to your IRC nick. "
-                f"Use '{self.bot.commandChar}iam FirstName LastName Server' to link")
+                f"Use '{self.bot.commandChar}ffxiv iam FirstName LastName Server' to link")
 
     def _failedLinkLookup(self, nick):
         return (f"Failed to lookup your linked character ID "
