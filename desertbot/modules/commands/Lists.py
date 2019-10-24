@@ -39,7 +39,7 @@ class Lists(BotCommand):
             "add": "add <list entry> - adds the given text to the named list",
             "last": "last - returns the last entry from the named list",
             "list": "list <regex search>"
-                    " - uploads the named list to paste.ee and gives you a link."
+                    " - uploads the named list to a pastebin service and gives you a link."
                     " If a regex search is given, only matching entries are uploaded",
             "search": "search <regex> <number>"
                       " - regex search entries, returning a random matching one."
@@ -148,7 +148,7 @@ class Lists(BotCommand):
 
     def _getMultipleEntries(self, listName, regexPattern=None):
         """
-        Get multiple entries from the list with the given name as a paste.ee link
+        Get multiple entries from the list with the given name as a pastebin link
         If regexPattern is None, just use the whole list,
         otherwise make a list of all entries matching the regexPattern.
         """

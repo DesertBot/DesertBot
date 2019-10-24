@@ -130,7 +130,7 @@ class Trigger(BotCommand):
 
     @admin(msg="Only my admins may export triggers!")
     def _exportTriggers(self, message: IRCMessage) -> IRCResponse:
-        """export [<trigger name(s)] - exports all triggers - or the specified triggers - to paste.ee, and returns a link"""
+        """export [<trigger name(s)] - exports all triggers - or the specified triggers - to a pastebin service, and returns a link"""
         if len(message.parameterList) > 1:
             # filter the trigger dictionary by the listed triggers
             params = [trigger.lower() for trigger in message.parameterList[1:]]

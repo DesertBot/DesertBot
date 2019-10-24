@@ -157,8 +157,8 @@ class Alias(BotCommand):
                            message.replyTo)
 
     def _export(self, message):
-        """export [<alias name(s)] - exports all aliases - or the specified aliases - to paste.ee, \
-        and returns a link"""
+        """export [<alias name(s)] - exports all aliases - or the specified aliases - \
+        to a pastebin service, and returns a link"""
         if len(message.parameterList) > 1:
             # filter the alias dictionary by the listed aliases
             params = [alias.lower() for alias in message.parameterList[1:]]
