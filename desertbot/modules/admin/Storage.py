@@ -32,7 +32,7 @@ class Storage(BotCommand):
             return f"{self.bot.commandChar}storage stopsync/startsync/load/save <modulename> - Manage bot storage files."
 
     def execute(self, message: IRCMessage):
-        if len(message.parameterList) <= 2:
+        if len(message.parameterList) < 2:
             return IRCResponse(ResponseType.Say, self.help(["storage"]), message.replyTo)
         else:
             subcommand = message.parameterList[0].lower()
