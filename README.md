@@ -14,7 +14,7 @@ Features
   * with specialised follows to get extra relevant information from Imgur, KickStarter, Steam, Twitch, Twitter, and YouTube links
 * Recognizes [sed-like](desertbot/modules/commands/Sed.py) patterns in chat and replaces the most recent match in the last 20 messages
 * Also recognizes [`*correction`](desertbot/modules/automatic/AsterFix.py) style corrections and replaces the most likely candidate word in that user's previous message
-* [AutoPasteEE](desertbot/modules/postprocess/AutoPasteEE.py) detects when single responses are longer than ~2 IRC messages, and submits them to paste.ee instead, replacing the response with a link
+* [AutoPaste](desertbot/modules/postprocess/AutoPaste.py) detects when single responses are longer than ~2 IRC messages, and submits them to a pastebin service instead, replacing the response with a link
 * Consistent help for any module via the [Help](desertbot/modules/commands/Help.py) module
 * And many more (take a look in [modules](desertbot/modules))
 
