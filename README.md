@@ -1,4 +1,4 @@
-DesertBot [![Build Status](https://travis-ci.org/DesertBot/DesertBot.svg?branch=master)](https://travis-ci.org/DesertBot/DesertBot) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/starlitghost/desertbot.svg)](https://hub.docker.com/r/starlitghost/desertbot) [![Updates](https://pyup.io/repos/github/DesertBot/DesertBot/shield.svg)](https://pyup.io/repos/github/DesertBot/DesertBot/)
+DesertBot [![Build Status](https://travis-ci.com/DesertBot/DesertBot.svg?branch=master)](https://travis-ci.com/DesertBot/DesertBot) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/starlitghost/desertbot.svg)](https://hub.docker.com/r/starlitghost/desertbot) [![Updates](https://pyup.io/repos/github/DesertBot/DesertBot/shield.svg)](https://pyup.io/repos/github/DesertBot/DesertBot/)
 =========
 
 A modular IRC bot with extensive aliasing capabilities, written in Python.
