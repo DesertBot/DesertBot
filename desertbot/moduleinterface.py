@@ -2,7 +2,6 @@ from twisted.internet.task import LoopingCall
 from zope.interface import Interface
 from functools import wraps
 from fnmatch import fnmatch
-import json
 import os
 import random
 from typing import Any, Callable, List, Tuple, Union, TYPE_CHECKING
