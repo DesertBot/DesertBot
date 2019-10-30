@@ -74,6 +74,7 @@ class DesertBot(IRCBase, object):
 
     def cleanup(self) -> None:
         self.config.writeConfig()
+        self.moduleHandler.saveAllModuleData()
         self.logger.info('Saved config and data.')
 
     def connectionMade(self) -> None:

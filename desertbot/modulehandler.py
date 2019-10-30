@@ -87,6 +87,10 @@ class ModuleHandler(object):
         self.fileMap.update({fileName: className})
         self.caseMap.update({className.lower(): className})
 
+    def saveAllModuleData(self) -> None:
+        for module in self.modules.values():
+            module.saveDataStore()
+
     def unloadModule(self, name: str) -> str:
         if name.lower() not in self.caseMap:
             raise ModuleLoaderError(name, "The module is not loaded.", ModuleLoadType.UNLOAD)

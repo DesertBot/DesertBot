@@ -102,6 +102,9 @@ class BotModule(object):
         # space them out over a second using random.random() to add 0-1 seconds to each module's storage save interval
         self.storageSync.start(self.bot.config.getWithDefault('storage_save_interval', 60) + random.random(), now=False)
 
+    def saveDataStore(self):
+        self.storage.save()
+
     def displayHelp(self, query: Union[List[str], None]) -> str:
         if query is not None and query[0].lower() == self.__class__.__name__.lower():
             return self.help(query)
