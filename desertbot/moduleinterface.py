@@ -97,7 +97,7 @@ class BotModule(object):
                                  defaultsPath=os.path.join(defaultRootPath, f'{self.__class__.__name__}.json'))
 
         # ensure storage is periodically synced to disk - DataStore.__set__() does call DataStore.save(), but you never know
-        self.storageSync = LoopingCall(self.storage.save())
+        self.storageSync = LoopingCall(self.storage.save)
         # since each module has its own LoopingCall,
         # space them out over a second using random.random() to add 0-1 seconds to each module's storage save interval
         self.storageSync.start(self.bot.config.getWithDefault('storage_save_interval', 60) + random.random(), now=False)
