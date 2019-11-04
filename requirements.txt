@@ -1,7 +1,7 @@
 beautifulsoup4==4.8.1
 bcrypt==3.1.7
 croniter==0.3.30
-Cython==0.29.13
+Cython==0.29.14
 feedparser==5.2.1
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
 google-api-python-client==1.7.11
