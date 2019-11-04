@@ -25,7 +25,7 @@ class APIKeys(BotCommand):
             with open(API_KEY_PATH) as f:
                 self.keys = json.load(f)
         except Exception:
-            self.logger.exception(f"Failed to load API keys file, {API_KEY_PATH} likely doesn't exist.")
+            self.logger.warn(f"Failed to load API keys file, {API_KEY_PATH} likely doesn't exist.")
             self.keys = {}
 
     def saveKeys(self):
