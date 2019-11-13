@@ -35,8 +35,8 @@ class Delay(BotCommand):
         command = message.parameterList[1].lower()
         delay = timeparse(message.parameterList[0])
         if not delay:
-            return IRCResponse(ResponseType.Say, "I don't understand that time.", message.replyTo)
-        
+            delay = 0
+
         delayDelta = datetime.timedelta(seconds=delay)
         delayString = string.deltaTimeToString(delayDelta, 's')
         params = message.parameterList[2:]
