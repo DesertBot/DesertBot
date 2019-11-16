@@ -218,26 +218,26 @@ class Lists(BotCommand):
         """
         if len(self.storage[listName]) == 0:
             return "That list is empty!"
-        entries = [entry for entry in self.storage[listName]]
 
-        for entry in entries:
+        matches = []
+        for entry in self.storage[listName]:
             match = re.search(regexPattern, entry["text"])
-            if not match:
-                entries.remove(entry)
+            if match:
+                matches.append(entry)
 
-        if len(entries) == 0:
+        if len(matches) == 0:
             return "That list doesn't contain anything matching {!r}!".format(regexPattern)
 
         if desiredNumber is not None:
-            if desiredNumber >= len(entries):
-                chosen = entries[-1]
+            if desiredNumber >= len(matches):
+                chosen = matches[-1]
             else:
-                chosen = entries[desiredNumber + 1]
-            return "Match #{}/{} - {} - {}".format(entries.index(chosen) + 1, len(entries),
+                chosen = matches[desiredNumber + 1]
+            return "Match #{}/{} - {} - {}".format(matches.index(chosen) + 1, len(matches),
                                                    chosen["timestamp"], chosen["text"])
         else:
-            chosen = random.choice(entries)
-            return "Match #{}/{} - {} - {}".format(entries.index(chosen) + 1, len(entries),
+            chosen = random.choice(matches)
+            return "Match #{}/{} - {} - {}".format(matches.index(chosen) + 1, len(matches),
                                                    chosen["timestamp"], chosen["text"])
 
     def _removeEntry(self, listName, regexPattern):
@@ -247,24 +247,24 @@ class Lists(BotCommand):
         """
         if len(self.storage[listName]) == 0:
             return "That list is empty!"
-        entries = [entry for entry in self.storage[listName]]
 
-        for entry in entries:
+        matches = []
+        for entry in self.storage[listName]:
             match = re.search(regexPattern, entry["text"])
-            if not match:
-                entries.remove(entry)
+            if match:
+                matches.append(entry)
 
-        if len(entries) == 0:
+        if len(matches) == 0:
             return "That list doesn't contain anything matching {!r}!".format(regexPattern)
 
-        elif len(entries) > 1:
+        elif len(matches) > 1:
             return ("There are too many entries matching {!r} in that list,"
                     " please be more specific."
                     .format(regexPattern))
 
         else:
-            entryCopy = entries[0].copy()
-            self.storage[listName].remove(entries[0])
+            entryCopy = matches[0].copy()
+            self.storage[listName].remove(matches[0])
             return ("Entry #{} - {} from list {} was removed"
                     .format(entryCopy["id"], entryCopy["text"], listName))
 
