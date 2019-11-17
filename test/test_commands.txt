@@ -45,6 +45,10 @@
 :server PRIVMSG DesertBot :!trigger list
 :server PRIVMSG DesertBot :!trigger del example
 :server PRIVMSG DesertBot :!trigger list
+:server PRIVMSG DesertBot :!outofcontext add Imma boop you
+:server PRIVMSG DesertBot :!outofcontext id 1
+:server PRIVMSG DesertBot :!outofcontext search boop
+:server PRIVMSG DesertBot :!outofcontext remove Imma boop you
 
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
