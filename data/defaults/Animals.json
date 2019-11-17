@@ -10,7 +10,7 @@
         "ri+bb+i+t": "frog",
         "bloo+p": "fish",
         "o+i+n+k+": "piggy",
-        "(ho+n+k+\\s*)+": "goose",
+        "(h[o0]+n+k+\\s*)+": "goose",
         "hi+ss+": "snake",
         "r+o+a+r+": "lion",
         "(ho+w+l+|a+w?oo+)": "wolf",
