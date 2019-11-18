@@ -11,8 +11,10 @@
 
 :server PRIVMSG DesertBot :!list testlist add "But what if it doesn't work?"
 :server PRIVMSG DesertBot :!list testlist
+:server PRIVMSG DesertBot :!listv testlist
 :server PRIVMSG DesertBot :!reload lists
 :server PRIVMSG DesertBot :!list testlist 1
+:server PRIVMSG DesertBot :!listv testlist 1
 
 :server PRIVMSG DesertBot :!setpron they/them
 :server PRIVMSG DesertBot :!pronouns
