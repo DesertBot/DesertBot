@@ -27,15 +27,6 @@ class DataStore(object):
                 storageFile.write(json.dumps(self.data, indent=4))
             os.rename(tmpFile, self.storagePath)
 
-            # if this DataStore has a defaults file, save there aswell
-            # ideally, defaults should be synced to github...
-            # but this means changes to modules with defaults at runtime aren't overwritten on the server on a reboot
-            if os.path.exists(self.defaultsPath):
-                tmpFile = f"{self.defaultsPath}.tmp"
-                with open(tmpFile, "w") as storageFile:
-                    storageFile.write(json.dumps(self.data, indent=4))
-                os.rename(tmpFile, self.defaultsPath)
-
     def __len__(self):
         return len(self.data)
 
