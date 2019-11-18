@@ -15,12 +15,12 @@ from desertbot.response import IRCResponse, ResponseType
 @implementer(IPlugin, IModule)
 class Lists(BotCommand):
     def triggers(self):
-        return ["list"]
+        return ["list", "listv"]
 
     def help(self, query):
         """
         List module basic command syntax:
-        .list <list_name> [subcommand] [params]
+        .list/listv <list_name> [subcommand] [params]
 
         Valid subcommands:
         <None> - get random entry from list
@@ -32,7 +32,7 @@ class Lists(BotCommand):
         remove - remove an entry      (regex as params, only remove if matches only single entry)
         removebyid - remove an entry  (ID as param)
         """
-        prefix = "{}list <list_name>".format(self.bot.commandChar)
+        prefix = "{}list/listv <list_name>".format(self.bot.commandChar)
         helpDict = {
             "<nothing>": "returns a random entry from the named list",
             "<number>": "returns a specific entry from the named list",
@@ -48,8 +48,8 @@ class Lists(BotCommand):
             "removebyid": "removebyid <id> - remove an entry by id"
         }
         if len(query) == 1:
-            return ("{} <nothing>/<number>/add/list/search/remove/removebyid - manages named lists."
-                    " Use {}help list <subcommand> for help with the subcommands"
+            return ("{} <nothing>/<number>/add/list/search/remove/removebyid - manages named lists. "
+                    "Use {}help list <subcommand> for help with the subcommands"
                     .format(prefix, self.bot.commandChar))
         else:
             if query[1].lower() in helpDict:
@@ -59,12 +59,14 @@ class Lists(BotCommand):
                         .format(query[1], self.bot.commandChar))
 
     def execute(self, message: IRCMessage):
+        verbose = message.command.lower() == "listv"  # include timestamp in IRCResponse if command is listv
+
         if len(message.parameterList) == 0:
             return IRCResponse(ResponseType.Say, self.help(["lists"]), message.replyTo)
         elif len(message.parameterList) == 1:
             if message.parameterList[0].lower() in self.storage:
                 return IRCResponse(ResponseType.Say,
-                                   self._getRandomEntry(message.parameterList[0].lower()),
+                                   self._getRandomEntry(message.parameterList[0].lower(), printTimestamp=verbose),
                                    message.replyTo)
             else:
                 return IRCResponse(ResponseType.Say,
@@ -77,21 +79,21 @@ class Lists(BotCommand):
             paramsList = [param for param in message.parameterList[2:]]
 
             if subcommand == "add":
-                text = self._addEntry(listName, " ".join(paramsList))
+                text = self._addEntry(listName, " ".join(paramsList), printTimestamp=verbose)
             elif listName not in self.storage:
                 text = ("I don't have a list named {!r}, maybe add some entries to it to create it?"
                         .format(listName))
             elif subcommand == "last":
-                text = self._getLastEntry(listName)
+                text = self._getLastEntry(listName, printTimestamp=verbose)
             elif subcommand == "list":
-                text = self._getMultipleEntries(listName, " ".join(paramsList))
+                text = self._getMultipleEntries(listName, " ".join(paramsList), printTimestamp=verbose)
             elif subcommand == "search":
                 try:
                     desiredNumber = int(paramsList[-1])
                     paramsList.pop(-1)
                 except ValueError:
                     desiredNumber = None
-                text = self._search(listName, " ".join(paramsList), desiredNumber)
+                text = self._search(listName, " ".join(paramsList), desiredNumber, printTimestamp=verbose)
             elif subcommand == "remove":
                 if len(paramsList) == 0:
                     text = "You didn't give me anything to match against!"
@@ -105,7 +107,7 @@ class Lists(BotCommand):
             else:
                 try:
                     desiredNumber = int(subcommand)
-                    text = self._getEntryByID(listName, desiredNumber)
+                    text = self._getEntryByID(listName, desiredNumber, printTimestamp=verbose)
                 except ValueError:
                     text = self.help(["lists"])
 
@@ -113,14 +115,16 @@ class Lists(BotCommand):
         else:
             return IRCResponse(ResponseType.Say, self.help(["lists"]), message.replyTo)
 
-    def _getRandomEntry(self, listName):
+    def _getRandomEntry(self, listName, printTimestamp=False):
         """
         Get a random entry from the list with the given name
         """
         chosen = random.choice(self.storage[listName])
+        if not printTimestamp:
+            return "Entry #{} - {}".format(chosen["id"], chosen["text"])
         return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
-    def _getEntryByID(self, listName, number):
+    def _getEntryByID(self, listName, number, printTimestamp=False):
         """
         Get a specific entry from the list with the given name.
         If that number entry doesn't exist in the given list, return an error.
@@ -137,16 +141,20 @@ class Lists(BotCommand):
 
         if chosen is None:
             return "There is no entry with the id {} in the {!r} list!".format(number, listName)
+        if not printTimestamp:
+            return "Entry #{} - {}".format(chosen["id"], chosen["text"])
         return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
-    def _getLastEntry(self, listName):
+    def _getLastEntry(self, listName, printTimestamp=False):
         """
         Return the last entry from the given list
         """
         chosen = self.storage[listName][-1]
+        if not printTimestamp:
+            return "Entry #{} - {}".format(chosen["id"], chosen["text"])
         return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
 
-    def _getMultipleEntries(self, listName, regexPattern=None):
+    def _getMultipleEntries(self, listName, regexPattern=None, printTimestamp=False):
         """
         Get multiple entries from the list with the given name as a pastebin link
         If regexPattern is None, just use the whole list,
@@ -169,10 +177,13 @@ class Lists(BotCommand):
         # Paste entries found into pastebin service
         pasteString = ""
         for entry in entries:
-            pasteString += "Entry #{} - {} - {}".format(entry["id"],
-                                                        entry["timestamp"],
-                                                        entry["text"])
-            pasteString += "\n"
+            if not printTimestamp:
+                pasteString += "Entry #{} - {}\n".format(entry["id"],
+                                                         entry["text"])
+            else:
+                pasteString += "Entry #{} - {} - {}\n".format(entry["id"],
+                                                              entry["timestamp"],
+                                                              entry["text"])
 
         mh = self.bot.moduleHandler
         pasteLink = mh.runActionUntilValue('upload-dbco',
@@ -193,7 +204,7 @@ class Lists(BotCommand):
             lastEntry = self.storage[listName][-1]
             return int(lastEntry["id"]) + 1
 
-    def _addEntry(self, listName, entryText):
+    def _addEntry(self, listName, entryText, printTimestamp=False):
         """
         Add a new entry to the given list with the given text.
         If there is no list with the given name, create it first.
@@ -206,11 +217,14 @@ class Lists(BotCommand):
             "text": entryText
         }
         self.storage[listName].append(entryObject)
+        if not printTimestamp:
+            return ("Entry #{} - {} added to list {}".format(entryObject["id"],
+                                                             entryObject["text"], listName))
         return ("Entry #{} - {} - {} added to list {}".format(entryObject["id"],
                                                               entryObject["timestamp"],
                                                               entryObject["text"], listName))
 
-    def _search(self, listName, regexPattern, desiredNumber=None):
+    def _search(self, listName, regexPattern, desiredNumber=None, printTimestamp=False):
         """
         Search the list with the given name using the given regex pattern.
         If desiredNumber is not none, try to return a specific match
@@ -233,12 +247,12 @@ class Lists(BotCommand):
                 chosen = matches[-1]
             else:
                 chosen = matches[desiredNumber + 1]
-            return "Match #{}/{} - {} - {}".format(matches.index(chosen) + 1, len(matches),
-                                                   chosen["timestamp"], chosen["text"])
         else:
             chosen = random.choice(matches)
-            return "Match #{}/{} - {} - {}".format(matches.index(chosen) + 1, len(matches),
-                                                   chosen["timestamp"], chosen["text"])
+        if not printTimestamp:
+            return "Match #{}/{} - {}".format(matches.index(chosen) + 1, len(matches), chosen["text"])
+        return "Match #{}/{} - {} - {}".format(matches.index(chosen) + 1, len(matches),
+                                               chosen["timestamp"], chosen["text"])
 
     def _removeEntry(self, listName, regexPattern):
         """
