@@ -11,6 +11,7 @@
         "bloo+p": "fish",
         "o+i+n+k+": "piggy",
         "(h[o0]+n+k+\\s*)+": "goose",
+        "h+a*e+n+k+": "alternate",
         "hi+ss+": "snake",
         "r+o+a+r+": "lion",
         "(ho+w+l+|a+w?oo+)": "wolf",
@@ -42,6 +43,13 @@
             "14": "{user} /might/ be a goose.",
             "19": "{user} is DEFINITELY a goose.",
             "20": "It's a lovely day in the chat, and {user} is a horrible goose."
+        },
+        "alternate": {
+            "1": "{user} is DEFINITELY stuck in a time loop!",
+            "8": "{user} /might/ be stuck in a time loop.",
+            "14": "{user} is not experiencing time-space flux.",
+            "19": "{user} /might/ be jumping dimensions.",
+            "20": "{user} is DEFINITELY jumping dimensions!"
         }
     }
 }
