@@ -119,10 +119,13 @@ class Lists(BotCommand):
         """
         Get a random entry from the list with the given name
         """
-        chosen = random.choice(self.storage[listName])
-        if not printTimestamp:
-            return "Entry #{} - {}".format(chosen["id"], chosen["text"])
-        return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
+        if len(self.storage[listName]) > 0:
+            chosen = random.choice(self.storage[listName])
+            if not printTimestamp:
+                return "Entry #{} - {}".format(chosen["id"], chosen["text"])
+            return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
+        else:
+            return "That list is empty!"
 
     def _getEntryByID(self, listName, number, printTimestamp=False):
         """
@@ -149,10 +152,13 @@ class Lists(BotCommand):
         """
         Return the last entry from the given list
         """
-        chosen = self.storage[listName][-1]
-        if not printTimestamp:
-            return "Entry #{} - {}".format(chosen["id"], chosen["text"])
-        return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
+        if len(self.storage[listName]) > 0:
+            chosen = self.storage[listName][-1]
+            if not printTimestamp:
+                return "Entry #{} - {}".format(chosen["id"], chosen["text"])
+            return "Entry #{} - {} - {}".format(chosen["id"], chosen["timestamp"], chosen["text"])
+        else:
+            return "That list is empty!"
 
     def _getMultipleEntries(self, listName, regexPattern=None, printTimestamp=False):
         """
