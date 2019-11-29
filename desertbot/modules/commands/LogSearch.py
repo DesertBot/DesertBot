@@ -81,10 +81,9 @@ class LogSearch(BotCommand):
             fullPattern = re2.compile(fr'.*<.*> .*({searchTerms}).*', re2.IGNORECASE)
         found = None
 
-        if not includeToday:
-            today = f"{strftime('%Y-%m-%d')}.log"
-            if today in files:
-                files.remove(today)
+        today = f"{strftime('%Y-%m-%d')}.log"
+        if today in files and not includeToday:
+            files.remove(today)
 
         if reverse:
             files.reverse()
@@ -99,7 +98,7 @@ class LogSearch(BotCommand):
             lines = contents.split('\n')
             if reverse:
                 lines = reversed(lines)
-            if reverse and includeToday:
+            if reverse and includeToday and filename == today:
                 lines = list(lines)[1:]
             for line in lines:
                 if fullPattern.match(line.rstrip()):
