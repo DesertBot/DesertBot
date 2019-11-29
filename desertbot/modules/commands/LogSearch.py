@@ -95,7 +95,7 @@ class LogSearch(BotCommand):
             # If they do, we move on to the more expensive line search.
             if not candidatePattern.search(contents):
                 continue
-            lines = contents.split('\n')
+            lines = contents.rstrip().split('\n') # remove trailing newline or we end up with a blank line in the list
             if reverse:
                 lines = reversed(lines)
             if reverse and includeToday and filename == today:
