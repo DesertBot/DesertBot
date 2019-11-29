@@ -74,10 +74,11 @@ class LogSearch(BotCommand):
         return self._search(message.parameters, logPath, logs, False, False, True)
 
     def _search(self, searchTerms, logPath, files, searchForNick, includeToday, reverse):
+        candidatePattern = re2.compile(searchTerms, re2.IGNORECASE)
         if searchForNick:
-            pattern = re2.compile(fr"^\[[^]]+\]\s+<(.?{searchTerms})>\s+.*", re2.IGNORECASE)
+            fullPattern = re2.compile(fr"^\[[^]]+\]\s+<(.?{searchTerms})>\s+.*", re2.IGNORECASE)
         else:
-            pattern = re2.compile(fr'.*<.*> .*({searchTerms}).*', re2.IGNORECASE)
+            fullPattern = re2.compile(fr'.*<.*> .*({searchTerms}).*', re2.IGNORECASE)
         found = None
 
         if not includeToday:
@@ -89,14 +90,19 @@ class LogSearch(BotCommand):
             files.reverse()
         for filename in files:
             with open(os.path.join(logPath, filename), 'r', errors='ignore') as logfile:
-                if reverse:
-                    lines = reversed(logfile.readlines())
-                else:
-                    lines = logfile.readlines()
+                contents = logfile.read()
+            # We do an initial check to see if our searchTerms show up anywhere in the file.
+            # If they don't, we know the file contains no matches and move on.
+            # If they do, we move on to the more expensive line search.
+            if not candidatePattern.search(contents):
+                continue
+            lines = contents.split('\n')
+            if reverse:
+                lines = reversed(lines)
             if reverse and includeToday:
                 lines = list(lines)[1:]
             for line in lines:
-                if pattern.match(line.rstrip()):
+                if fullPattern.match(line.rstrip()):
                     found = line.rstrip()
                     break
             if found:
