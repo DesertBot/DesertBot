@@ -122,6 +122,18 @@
         "cooldown": 300,
         "allRegexesMustMatch": true
     },
+    "ost": {
+        "messages": [
+            "älskar ost"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)ost([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
     "k\u00e4se": {
         "messages": [
             "liebt K\u00e4se"
@@ -130,7 +142,7 @@
             "([^a-zA-Z]|^)K\u00e4se([^a-zA-Z]|$)"
         ],
         "responseType": "Do",
-        "enabledByDefault": false,
+        "enabledByDefault": true,
         "cooldown": 300,
         "allRegexesMustMatch": true
     },
