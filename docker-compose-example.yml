@@ -10,7 +10,7 @@ services:
     command: ["-c", "configs/server.yaml"]
     volumes:
       - ./configs:/app/configs
-      - ./data:/app/data
+      - ./server_data:/app/data/servers
       - ./logs:/app/logs
     logging:
       options:
