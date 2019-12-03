@@ -18,6 +18,9 @@ class DataStore(object):
         elif os.path.exists(self.storagePath):
             with open(self.storagePath) as storageFile:
                 self.data = json.load(storageFile)
+        # if there's nothing, make sure the folder at least exists for the server-specific data files
+        else:
+            os.makedirs(os.path.dirname(self.storagePath), exist_ok=True)
 
     def save(self):
         # don't save empty files, to keep the data directories from filling up with pointless files
