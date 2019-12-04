@@ -29,21 +29,8 @@ class Alias(BotCommand):
     def onLoad(self):
         self.ownTriggers = ['alias']
 
-        # load aliases from data file
-        try:
-            path = os.path.join(self.bot.dataPath, 'alias.yaml')
-            with open(path, 'r') as file:
-                self.data = yaml.load(file)
-
-            if not self.data:
-                self.data = {'aliases': {},
-                             'help': {}}
-        except FileNotFoundError:
-            self.data = {'aliases': {},
-                         'help': {}}
-
-        self.aliases = self.data['aliases']
-        self.aliasHelp = self.data['help']
+        self.aliases = self.storage.get('aliases', {})
+        self.aliasHelp = self.storage.get('help', {})
 
         self._helpText = ("{1}alias ({0}) - does alias things. "
                           "Use '{1}help alias <subcommand>' for subcommand help. "
@@ -342,9 +329,9 @@ class Alias(BotCommand):
         self.aliasHelp[alias] = aliasHelp
 
     def _syncAliases(self):
-        path = os.path.join(self.bot.dataPath, 'alias.yaml')
-        with open(path, 'w') as file:
-            yaml.dump(self.data, file)
+        self.storage['aliases'] = self.aliases
+        self.storage['help'] = self.aliasHelp
+        self.storage.save()
 
     def _aliasedMessage(self, message):
         if message.command.lower() not in self.aliases:
