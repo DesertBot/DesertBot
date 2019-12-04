@@ -36,13 +36,12 @@ class Trigger(BotCommand):
         self.ownTriggers = ['trigger']
         
         if len(self.storage) == 0:
-            self.storage = {
-                "example": {
-                    "regex": ".*reboop.*",      # if a message's text contains reboop somewhere
-                    "regexType": "text",        # other possible values, nick? TBD.
-                    "command": "reload Boops",  # run reload Boops
-                    "enabled": False            # allow disabling because oof ow
-                }
+            # example Trigger, also for testing
+            self.storage["example"] = {
+                "regex": ".*reboop.*",      # if a message's text contains reboop somewhere
+                "regexType": "text",        # other possible values, nick? TBD.
+                "command": "reload Boops",  # run reload Boops
+                "enabled": False            # allow disabling because oof ow
             }
 
     def execute(self, message: IRCMessage):
