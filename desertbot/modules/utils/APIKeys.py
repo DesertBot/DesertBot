@@ -1,4 +1,3 @@
-import json
 from twisted.plugin import IPlugin
 from typing import Union
 from zope.interface import implementer
@@ -7,8 +6,6 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import admin, BotCommand
 from desertbot.response import IRCResponse, ResponseType
-
-API_KEY_PATH = 'data/api_keys.json'
 
 
 @implementer(IPlugin, IModule)
@@ -19,21 +16,6 @@ class APIKeys(BotCommand):
 
     def triggers(self):
         return ["apikey"]
-
-    def onLoad(self):
-        try:
-            with open(API_KEY_PATH) as f:
-                self.keys = json.load(f)
-        except FileNotFoundError:
-            self.logger.warn(f"Failed to load API keys file, {API_KEY_PATH} likely doesn't exist.")
-            self.keys = {}
-        except Exception as e:
-            self.logger.exception(e)
-            self.keys = {}
-
-    def saveKeys(self):
-        with open(API_KEY_PATH, "w") as f:
-            json.dump(self.keys, f)
 
     def actions(self):
         return super(APIKeys, self).actions() + [("get-api-key", 1, self.getKey)]
@@ -52,7 +34,6 @@ class APIKeys(BotCommand):
         if command == "add":
             try:
                 self.keys[keyname] = key
-                self.saveKeys()
             except Exception:
                 self.logger.exception(f"Failed to add API key {keyname}!")
                 return IRCResponse(ResponseType.Say, f"Failed to add API key {keyname} to the bot!", message.replyTo)
@@ -62,7 +43,7 @@ class APIKeys(BotCommand):
             try:
                 if keyname in self.keys:
                     del self.keys[keyname]
-                    self.saveKeys()
+                    self.storage.save()
                 else:
                     return IRCResponse(ResponseType.Say, f"There is no API key named {keyname}!", message.replyTo)
             except Exception:
@@ -77,7 +58,7 @@ class APIKeys(BotCommand):
         """
         Returns the API key with the given name, or None if it doesn't exist.
         """
-        return self.keys.get(name, None)
+        return self.storage.get(name, None)
 
 
 apikeys = APIKeys()
