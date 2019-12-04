@@ -8,17 +8,13 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand, admin
 from zope.interface import implementer
 
-import os
 import re
 from collections import OrderedDict
 
 from bs4 import UnicodeDammit
-from ruamel.yaml import YAML
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
-
-yaml = YAML()
 
 
 @implementer(IPlugin, IModule)
