@@ -46,6 +46,9 @@ class DataStore(object):
     def __contains__(self, key):
         return key in self.data
 
+    def __delitem__(self, key):
+        del self.data[key]
+
     def items(self):
         return self.data.items()
 
