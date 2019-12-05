@@ -13,6 +13,9 @@ from desertbot.response import IRCResponse, ResponseType
 
 @implementer(IPlugin, IModule)
 class Boops(BotModule):
+    
+    def triggers(self):
+        return ['boop']
 
     def onLoad(self) -> None:
         self.lastTriggered = datetime.datetime.min
