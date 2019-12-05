@@ -20,6 +20,8 @@ class UnbalancedBracesException(Exception):
     def __init__(self, message, column):
         # Call the base exception constructor with the params it needs
         super(UnbalancedBracesException, self).__init__(message)
+        # Store the message
+        self.message = message
         # Store the column position of the unbalanced brace
         self.column = column
 
@@ -53,7 +55,7 @@ class Sub(BotCommand):
                      + normal + subString[e.column+1:])
             error = self._unmangleEscapes(error, False)
             return [IRCResponse(ResponseType.Say,
-                                "Sub Error: {}".format(e.message),
+                                "Sub Error: {} (column {})".format(e.message, e.column),
                                 message.replyTo),
                     IRCResponse(ResponseType.Say, error, message.replyTo)]
 
