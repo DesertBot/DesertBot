@@ -33,7 +33,7 @@ class APIKeys(BotCommand):
 
         if command == "add":
             try:
-                self.keys[keyname] = key
+                self.storage[keyname] = key
             except Exception:
                 self.logger.exception(f"Failed to add API key {keyname}!")
                 return IRCResponse(ResponseType.Say, f"Failed to add API key {keyname} to the bot!", message.replyTo)
@@ -42,7 +42,7 @@ class APIKeys(BotCommand):
         elif command == "remove":
             try:
                 if keyname in self.keys:
-                    del self.keys[keyname]
+                    del self.storage[keyname]
                     self.storage.save()
                 else:
                     return IRCResponse(ResponseType.Say, f"There is no API key named {keyname}!", message.replyTo)
