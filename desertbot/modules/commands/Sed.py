@@ -34,18 +34,18 @@ class Sed(BotCommand):
     historySize = 20
 
     def help(self, query):
-        return ('s/search/replacement/[flags] [input for c flag]'
+        return ['s/search/replacement/[flags] [input for c flag]'
                 ' - matches sed-like regex replacement patterns and'
-                ' attempts to execute them on the latest matching line from the last {}\n'
+                ' attempts to execute them on the latest matching line'
+                f' from the last {self.historySize}',
                 'flags are'
                 ' g (global),'
                 ' i (case-insensitive),'
                 ' o (only user messages),'
                 ' v (verbose, ignores whitespace),'
-                ' c (chained)\n'
+                ' c (chained)',
                 'Example usage:'
-                ' "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
-                .format(self.historySize))
+                ' "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"']
 
     def onLoad(self):
         self.messages = {}

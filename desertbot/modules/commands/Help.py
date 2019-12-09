@@ -21,8 +21,10 @@ class Help(BotCommand):
 
         if message.parameterList:
             helpStr = moduleHandler.runActionUntilValue('help', message.parameterList)
-            if helpStr:
+            if isinstance(helpStr, str):
                 return IRCResponse(ResponseType.Say, helpStr, message.replyTo)
+            elif isinstance(helpStr, list):
+                return [IRCResponse(ResponseType.Say, line, message.replyTo) for line in helpStr]
             else:
                 return IRCResponse(ResponseType.Say,
                                    '"{0}" not found, try "{1}" without parameters'

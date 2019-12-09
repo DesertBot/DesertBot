@@ -36,11 +36,11 @@ class Sub(BotCommand):
         return ['sub']
 
     def help(self, query):
-        return (
+        return [
             "sub <text> - "
-            "executes nested commands in <text> and replaces the commands with their output\n"
-            "syntax: text {command params} more text {command {command params} {command params}}\n"
-            "example: .sub Some {rainbow magical} {flip topsy-turvy} text")
+            "executes nested commands in <text> and replaces the commands with their output",
+            "syntax: text {command params} more text {command {command params} {command params}}",
+            "example: .sub Some {rainbow magical} {flip topsy-turvy} text"]
 
     def execute(self, message: IRCMessage):
         subString = self._mangleEscapes(message.parameters)
