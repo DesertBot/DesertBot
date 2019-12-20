@@ -88,6 +88,9 @@ class DesertBot(IRCBase, object):
         # Try to enable IRCv3 support.
         self.logger.info('Requesting supported capabilities...')
         self.capabilities["init"] = True
+        self.capabilities["requested"] = []
+        self.capabilities["enabled"] = []
+        self.capabilities["finished"] = []
         self.output.cmdCAP_LS()
 
         # Initialize login data from the config.
