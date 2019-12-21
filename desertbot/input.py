@@ -347,6 +347,7 @@ class InputHandler(object):
     def _handleNumeric001(self, prefix, params):
         # 001: RPL_WELCOME
         self.bot.loggedIn = True
+        self.bot.factory.connectionAttempts = 0
         message = IRCMessage('001', IRCUser(prefix), None, '', self.bot)
         self.handleMessage(message)
         channels = self.bot.config.getWithDefault('channels', {})

@@ -43,7 +43,6 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
         self.logger.info('Connected.')
         self.logger.info('Resetting reconnection delay.')
         self.resetDelay()
-        self.connectionAttempts = 0
         return self.bot
 
     def clientConnectionLost(self, connector, reason):
