@@ -15,6 +15,7 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
     def __init__(self, config: Config):
         self.logger = logging.getLogger('desertbot.factory')
         self.exitStatus = 0
+        self.connectionAttempts = 0
 
         self.bot = DesertBot(self, config)
         self.protocol = self.bot
@@ -35,12 +36,14 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
             reactor.connectTCP(self.server, self.port, self)
 
     def startedConnecting(self, connector):
-        self.logger.info('Started to connect')
+        self.connectionAttempts += 1
+        self.logger.info(f'Started to connect, attempt #{self.connectionAttempts}')
 
     def buildProtocol(self, addr):
         self.logger.info('Connected.')
         self.logger.info('Resetting reconnection delay.')
         self.resetDelay()
+        self.connectionAttempts = 0
         return self.bot
 
     def clientConnectionLost(self, connector, reason):
@@ -51,5 +54,8 @@ class DesertBotFactory(protocol.ReconnectingClientFactory):
             protocol.ClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
-        self.logger.error('Connection failed! - {}'.format(reason))
-        protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
+        if self.connectionAttempts < 10:
+            self.logger.error('Connection failed! - {}'.format(reason))
+            protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
+        else:
+            protocol.ClientFactory.clientConnectionFailed(self, connector, reason)
