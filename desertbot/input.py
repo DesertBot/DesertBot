@@ -2,6 +2,7 @@ from desertbot.channel import IRCChannel
 from desertbot.ircbase import ModeType
 from desertbot.message import IRCMessage
 from desertbot.user import IRCUser
+from base64 import b64encode
 from datetime import datetime
 from typing import List, Optional, Tuple, TYPE_CHECKING
 
@@ -42,6 +43,14 @@ class InputHandler(object):
         else:
             user.account = params[0]
 
+    def _handleAUTHENTICATE(self, nick, ident, host, params):
+        if params[0] == '+':
+            username = self.bot.config.getWithDefault('sasl_username', '').encode('ascii')
+            password = self.bot.config.getWithDefault('sasl_password', '').encode('ascii')
+            self.bot.output.cmdAUTHENTICATE(b64encode(username + b'\u0000' +
+                                                      username + b'\u0000' +
+                                                      password).decode('utf-8'))
+
     def _handleAWAY(self, nick, ident, host, params):
         if 'away-notify' not in self.bot.capabilities['finished']:
             return
@@ -74,11 +83,13 @@ class InputHandler(object):
             capList = _parseCapReply(params[2])
             self.bot.capabilities['requested'] = [x for x in self.bot.capabilities['requested'] if x not in capList]
             if params[1] == 'ACK':
-                for capName in capList:
+                for capName, capParam in capList.items():
                     if capName not in self.bot.capabilities['enabled']:
                         self.bot.capabilities['enabled'].append(capName)
-                    # TODO Special handling for capabilities that need more work after being acknowledged
-                    if capName not in self.bot.capabilities['finished']:
+                    
+                    if capName == 'sasl':
+                        self._handleSASL(capParam)
+                    elif capName not in self.bot.capabilities['finished']:
                         self.bot.capabilities['finished'].append(capName)
 
                 self.bot.logger.info(f'Acknowledged capability changes: {params[2]}.')
@@ -494,8 +505,48 @@ class InputHandler(object):
         self.bot.nick = newNick
         self.bot.output.cmdNICK(self.bot.nick)
 
+    def _handleNumeric900(self, prefix, params):
+        self._handleAuthSuccessful()
+
+    def _handleNumeric902(self, prefix, params):
+        self._handleAuthFailed()
+
+    def _handleNumeric903(self, prefix, params):
+        self._handleAuthSuccessful()
+
+    def _handleNumeric904(self, prefix, params):
+        self._handleAuthFailed()
+
+    def _handleNumeric905(self, prefix, params):
+        self._handleAuthFailed()
+
+    def _handleNumeric907(self, prefix, params):
+        self._handleAuthFailed()
+
     def handleMessage(self, message: IRCMessage):
         self.bot.moduleHandler.handleMessage(message)
+
+    def _handleSASL(self, capParam):
+        if capParam is None:
+            saslMechs = [ 'PLAIN' ] # IRCv3.1 reply, assume PLAIN is available
+        else:
+            saslMechs = capParam.split(',')
+        
+        if 'PLAIN' in saslMechs:
+            self.bot.logger.info('Sending SASL authentication request (PLAIN)...')
+            self.bot.output.cmdAUTHENTICATE('PLAIN')
+        else:
+            self.bot.logger.warning('Aborting SASL authentication; server does not support PLAIN mechanism!')
+
+    def _handleAuthSuccesful(self):
+        self.bot.capabilities['finished'].append('sasl')
+        self.bot.logger.info('SASL authentication successful.')
+        self.checkCAPNegotiationFinished()
+
+    def _handleAuthFailed(self):
+        self.bot.capabilities['finished'].append('sasl')
+        self.bot.logger.warning('SASL authentication failed!')
+        self.checkCAPNegotiationFinished()
 
     def checkCAPNegotiationFinished(self):
         if not self.bot.capabilities['init'] or len(self.bot.capabilities['requested']) != 0:
