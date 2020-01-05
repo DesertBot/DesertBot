@@ -33,7 +33,7 @@ class Admin(BotCommand):
 
         for adminName in message.parameterList[1:]:
             if message.replyTo in self.bot.channels:
-                if adminName in self.bot.channels[message.replyTo].users:
+                if not adminName.startswith('R:') and adminName in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[adminName]
                     adminName = '*!{}@{}'.format(user.ident, user.host)
 
@@ -60,7 +60,7 @@ class Admin(BotCommand):
         admins = self.bot.config.getWithDefault('admins', [])
         for adminName in message.parameterList[1:]:
             if message.replyTo in self.bot.channels:
-                if adminName in self.bot.channels[message.replyTo].users:
+                if not adminName.startswith('R:') and adminName in self.bot.channels[message.replyTo].users:
                     user = self.bot.channels[message.replyTo].users[admin]
                     adminName = '*!{}@{}'.format(user.user, user.host)
 
