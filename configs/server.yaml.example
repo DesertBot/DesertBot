@@ -8,6 +8,10 @@ port: 6667
 # whether or not the connection should be secured
 tls: False
 
+# SASL login for your NickServ account
+#sasl_username: null
+#sasl_password: null
+
 # the channels to join
 channels:
   '#channel': null
