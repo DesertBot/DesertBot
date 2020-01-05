@@ -45,11 +45,10 @@ class InputHandler(object):
 
     def _handleAUTHENTICATE(self, nick, ident, host, params):
         if params[0] == '+':
-            username = self.bot.config.getWithDefault('sasl_username', '').encode('ascii')
-            password = self.bot.config.getWithDefault('sasl_password', '').encode('ascii')
-            self.bot.output.cmdAUTHENTICATE(b64encode(username + b'\u0000' +
-                                                      username + b'\u0000' +
-                                                      password).decode('utf-8'))
+            username = self.bot.config.getWithDefault('sasl_username', '')
+            password = self.bot.config.getWithDefault('sasl_password', '')
+            payload = b64encode((username + '\u0000' + username + '\u0000' + password).encode('ascii'))
+            self.bot.output.cmdAUTHENTICATE(payload.decode('utf-8'))
 
     def _handleAWAY(self, nick, ident, host, params):
         if 'away-notify' not in self.bot.capabilities['finished']:
@@ -538,7 +537,7 @@ class InputHandler(object):
         else:
             self.bot.logger.warning('Aborting SASL authentication; server does not support PLAIN mechanism!')
 
-    def _handleAuthSuccesful(self):
+    def _handleAuthSuccessful(self):
         self.bot.capabilities['finished'].append('sasl')
         self.bot.logger.info('SASL authentication successful.')
         self.checkCAPNegotiationFinished()
