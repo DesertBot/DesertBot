@@ -12,7 +12,7 @@ class OutputHandler(object):
         self.bot.sendMessage('CAP', 'END')
 
     def cmdCAP_LS(self):
-        self.bot.sendMessage('CAP', 'LS')
+        self.bot.sendMessage('CAP', 'LS', '302')
 
     def cmdCAP_REQ(self, toRequest: str):
         self.bot.sendMessage('CAP', 'REQ', toRequest)
