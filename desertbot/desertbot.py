@@ -56,7 +56,7 @@ class DesertBot(IRCBase, object):
             'finished': []
         }
 
-        if 'sasl_username' in self.config:
+        if self.config.getWithDefault('sasl_username', None) is not None:
             self.capabilities['available'].append('sasl')
 
         self.rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
