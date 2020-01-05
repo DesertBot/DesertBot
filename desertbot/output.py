@@ -8,6 +8,9 @@ class OutputHandler(object):
     def __init__(self, bot: 'DesertBot'):
         self.bot = bot
 
+    def cmdAUTHENTICATE(self, authPart):
+        self.bot.sendMessage('AUTHENTICATE', authPart)
+
     def cmdCAP_END(self):
         self.bot.sendMessage('CAP', 'END')
 
