@@ -27,7 +27,8 @@
         "(boo+|oooo+)": "spoopy goast",
         "(noo+t\\s*)+": "penguin",
         "too+t": "mastodon",
-        "whee+k": "guinea pig"
+        "whee+k": "guinea pig",
+        "Hello There!*": "General Kenobi"
     },
     "animalCustomReactions": {
         "droid": {
@@ -50,6 +51,13 @@
             "14": "{user} is not experiencing time-space flux.",
             "19": "{user} /might/ be jumping dimensions.",
             "20": "{user} is DEFINITELY jumping dimensions!"
+        },
+        "General Kenobi": {
+            "1": "{user} is on this Council, but we do not grant you the rank of Master.",
+            "8": "{user} is not Obi-Wan Kenobi.",
+            "14": "{user} might be Old Ben.",
+            "19": "{user} is Obi-Wan Kenobi.",
+            "20": "General Kenobi! You are a bold one."
         }
     }
 }
