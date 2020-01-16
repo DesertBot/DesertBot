@@ -36,7 +36,7 @@ class Chatmap(BotCommand):
                 return
 
             return IRCResponse(ResponseType.Say,
-                               self.setLocation(message.user.nick, loc["place"], False),
+                               self.setLocation(message.user.nick, loc["location"], False),
                                message.replyTo)
         elif message.command == "remmap":
             return IRCResponse(ResponseType.Say, self.deleteLocation(message.user.nick), message.replyTo)
