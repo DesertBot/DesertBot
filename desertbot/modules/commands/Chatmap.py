@@ -58,7 +58,7 @@ class Chatmap(BotCommand):
         if setResult and setResult.status_code == 204:
             return "Your location has been added to the chatmap."
         else:
-            self.bot.log.warn(setResult)
+            self.logger.warning(setResult)
             return "Something went wrong while adding your location to the chatmap."
 
     def deleteLocation(self, nick):
@@ -75,7 +75,7 @@ class Chatmap(BotCommand):
         if deleteResult.status_code == 204:
             return "Your location has been removed from the chatmap."
         else:
-            self.bot.log.warn(deleteResult)
+            self.logger.warning(deleteResult)
             return "Something went wrong while removing your location from the chatmap."
 
 
