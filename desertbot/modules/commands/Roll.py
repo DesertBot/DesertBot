@@ -33,6 +33,12 @@ class Roll(BotCommand):
         verbose = False
         if message.command.lower().endswith('v'):
             verbose = True
+            
+        if not message.parameters.strip():
+            return IRCResponse(ResponseType.Say,
+                               ('Error: roll what? (roll expects #d# dice expressions, '
+                                f'see {self.bot.commandChar}help roll for details)'),
+                               message.replyTo)
 
         try:
             result = self.roller.parse(message.parameters)
