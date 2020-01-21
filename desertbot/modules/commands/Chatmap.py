@@ -3,7 +3,6 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
-import json
 from typing import Union
 from zope.interface import implementer
 
@@ -54,8 +53,8 @@ class Chatmap(BotCommand):
                 return
 
         userloc = self.bot.moduleHandler.runActionUntilValue("geolocation-place", location)
-        data = json.dumps({"lat": userloc["latitude"], "lon": userloc["longitude"]})
-        setResult = self.bot.moduleHandler.runActionUntilValue("post-url", url, data, extraHeaders)
+        data = {"lat": userloc["latitude"], "lon": userloc["longitude"]}
+        setResult = self.bot.moduleHandler.runActionUntilValue("post-url", url, json=data, extraHeaders=extraHeaders)
         if setResult and setResult.status_code == 204:
             return "Your location has been added to the chatmap."
         else:
@@ -66,7 +65,7 @@ class Chatmap(BotCommand):
         if not self.apiKey:
             return
 
-        url = "{}api/chatizen/{}".format(self.chatmapBaseUrl, nick.lower())
+        url = "{}api/chatizen/{}".format(self.chatmapBaseUrl, nick)
         extraHeaders = {"Cookie": "password={}".format(self.apiKey)}
         result = self.bot.moduleHandler.runActionUntilValue("fetch-url", url, None, extraHeaders)
         if not result or result.status_code == 404:
