@@ -9,7 +9,7 @@ from zope.interface import implementer
 
 @implementer(IPlugin, IModule)
 class Chatmap(BotCommand):
-    chatmapBaseUrl = "https://chatmap.raptorpond.com/"
+    chatmapBaseUrl = "https://chatmap.dbco.link/"
 
     def triggers(self):
         return ["chatmap", "addmap", "remmap"]
