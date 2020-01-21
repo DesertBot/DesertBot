@@ -58,8 +58,7 @@ class Chatmap(BotCommand):
         if setResult and setResult.status_code == 204:
             return "Your location has been added to the chatmap."
         else:
-            self.logger.warning(f"Failed to add marker to chatmap - API returned status {setResult.status_code}")
-            self.logger.warning(f"{setResult}")
+            self.logger.warning(f"Failed to add marker to chatmap - API returned status {setResult}")
             return "Something went wrong while adding your location to the chatmap."
 
     def deleteLocation(self, nick):
@@ -73,11 +72,10 @@ class Chatmap(BotCommand):
             return "Your location on the chatmap could not be determined."
 
         deleteResult = self.bot.moduleHandler.runActionUntilValue("delete-url", url, extraHeaders)
-        if deleteResult.status_code == 204:
+        if deleteResult and deleteResult.status_code == 204:
             return "Your location has been removed from the chatmap."
         else:
-            self.logger.warning(f"Failed to delete marker from chatmap - API returned status {deleteResult.status_code}")
-            self.logger.warning(f"{deleteResult}")
+            self.logger.warning(f"Failed to delete marker from chatmap - API returned {deleteResult}")
             return "Something went wrong while removing your location from the chatmap."
 
 
