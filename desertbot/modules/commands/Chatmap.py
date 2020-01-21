@@ -46,14 +46,14 @@ class Chatmap(BotCommand):
             return
 
         url = "{}api/chatizen/{}".format(self.chatmapBaseUrl, nick.lower())
-        extraHeaders = {"Cookie": "password={}".format(self.apiKey)}
+        extraHeaders = {"Cookie": "password={}".format(self.apiKey), "Content-Type": "application/json"}
         if checkExists:
             result = self.bot.moduleHandler.runActionUntilValue("fetch-url", url, None, extraHeaders)
             if not result or result.status_code == 404:
                 return
 
         userloc = self.bot.moduleHandler.runActionUntilValue("geolocation-place", location)
-        data = "{{ \"lat\": {}, \"lon\": {} }}".format(userloc["latitude"], userloc["longitude"])
+        data = {"lat": userloc["latitude"], "lon": userloc["longitude"]}
         setResult = self.bot.moduleHandler.runActionUntilValue("post-url", url, data, extraHeaders)
         if setResult and setResult.status_code == 204:
             return "Your location has been added to the chatmap."
