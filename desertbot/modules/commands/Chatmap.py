@@ -46,7 +46,7 @@ class Chatmap(BotCommand):
         if not self.apiKey:
             return
 
-        url = "{}api/chatizen/{}".format(self.chatmapBaseUrl, nick.lower())
+        url = "{}api/chatizen/{}".format(self.chatmapBaseUrl, nick)
         extraHeaders = {"Cookie": "password={}".format(self.apiKey), "Content-Type": "application/json"}
         if checkExists:
             result = self.bot.moduleHandler.runActionUntilValue("fetch-url", url, None, extraHeaders)
