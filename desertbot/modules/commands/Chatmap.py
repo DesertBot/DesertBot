@@ -3,7 +3,7 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
-from typing import Union
+from typing import List, Union
 from zope.interface import implementer
 
 
@@ -14,9 +14,16 @@ class Chatmap(BotCommand):
     def triggers(self):
         return ["chatmap", "addmap", "remmap"]
 
-    def help(self, query: Union[str, None]) -> str:
-        return "Commands: chatmap, addmap, remmap | View the Desert Bus Chatmap or add or remove your location to" \
-               "or from it."
+    def help(self, query: Union[List[str], None]) -> str:
+        helpDict = {
+            "chatmap": f"{self.bot.commandChar}chatmap - View the Desert Bus Chatmap",
+            "addmap": f"{self.bot.commandChar}addmap - Add or update your location marker to the Desert Bus Chatmap",
+            "remmap": f"{self.bot.commandChar}remmap - Remove your location marker from the Desert Bus Chatmap"
+        }
+        if query is None or query[0].lower() not in helpDict:
+            return f"{self.bot.commandChar}chatmap/addmap/remmap - View the Desert Bus Chatmap, and add or remove your location marker on it."
+        else:
+            return helpDict[query[0].lower()]
 
     def actions(self):
         return super(Chatmap, self).actions() + [("userlocation-updated", 1, self.setLocation),
@@ -33,7 +40,7 @@ class Chatmap(BotCommand):
         if message.command == "addmap":
             loc = self.bot.moduleHandler.runActionUntilValue("userlocation", message.user.nick)
             if not loc or not loc["success"]:
-                return
+                return IRCResponse(ResponseType.Say, f"You do not have a location stored in {self.bot.nick}!", message.replyTo)
 
             return IRCResponse(ResponseType.Say,
                                self.setLocation(message.user.nick, loc["location"], False),
