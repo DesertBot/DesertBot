@@ -2,6 +2,8 @@ DesertBot [![Build Status](https://travis-ci.com/DesertBot/DesertBot.svg?branch=
 =========
 
 A modular IRC bot with extensive aliasing capabilities, written in Python.
+* In part inspired by https://github.com/ElementalAlchemist/txircd
+* Uses some code from txircd, which is used under its BSD license.
 
 Features
 --------
