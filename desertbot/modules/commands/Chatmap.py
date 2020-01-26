@@ -16,12 +16,13 @@ class Chatmap(BotCommand):
 
     def help(self, query: Union[List[str], None]) -> str:
         helpDict = {
-            "chatmap": f"{self.bot.commandChar}chatmap - View the Desert Bus Chatmap",
+            "chatmap": f"{self.bot.commandChar}chatmap/addmap/remmap - View the Desert Bus Chatmap, or manage your location marker on it."
             "addmap": f"{self.bot.commandChar}addmap - Add or update your location marker to the Desert Bus Chatmap",
             "remmap": f"{self.bot.commandChar}remmap - Remove your location marker from the Desert Bus Chatmap"
         }
         if query is None or query[0].lower() not in helpDict:
-            return f"{self.bot.commandChar}chatmap/addmap/remmap - View the Desert Bus Chatmap, and add or remove your location marker on it."
+            # should never happen??
+            return helpDict["chatmap"]
         else:
             return helpDict[query[0].lower()]
 
