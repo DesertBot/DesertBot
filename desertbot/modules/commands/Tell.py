@@ -48,11 +48,11 @@ class Tell(BotCommand):
         params = message.parameterList
         responses = []
         if message.command == "tell" or message.command == "tellafter":
-            if len(params) == 0 or len(params) == 1:
+            if len(params) == 0:
                 return IRCResponse(ResponseType.Say, "Tell who?", message.replyTo)
             elif len(params) == 1 and message.command == "tellafter":
                 return IRCResponse(ResponseType.Say, "Tell it when?", message.replyTo)
-            elif len(params) == 1 or len(params) == 2 and message.command == "tellafter":
+            elif len(params) == 1 and message.command == "tell" or len(params) == 2 and message.command == "tellafter":
                 return IRCResponse(ResponseType.Say, "Tell {} what?".format(params[0]), message.replyTo)
             sentTells = []
             if message.command == "tellafter":
