@@ -124,7 +124,7 @@ class Twitter(BotCommand):
 
         # Thu Jan 30 16:44:15 +0000 2020
         tweetTimeText = j['created_at']
-        tweetTimeText = time.strptime(tweetTimeText, '%a %b %d %I:%M:%S %z %Y')
+        tweetTimeText = time.strptime(tweetTimeText, '%a %b %d %H:%M:%S %z %Y')
         tweetTimeText = time.strftime('%Y/%m/%d %H:%M UTC', tweetTimeText)
 
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
