@@ -18,7 +18,8 @@ class APIKeys(BotCommand):
         return ["apikey"]
 
     def actions(self):
-        return super(APIKeys, self).actions() + [("get-api-key", 1, self.getKey)]
+        return super(APIKeys, self).actions() + [("get-api-key", 1, self.getKey),
+                                                 ("set-api-key", 1, self.setKey)]
 
     def help(self, query):
         return f"{self.bot.commandChar}apikey add/remove <name> <apikey> -- Add or remove the specified API key to the bot."
@@ -59,6 +60,12 @@ class APIKeys(BotCommand):
         Returns the API key with the given name, or None if it doesn't exist.
         """
         return self.storage.get(name, None)
+
+    def setKey(self, name: str, key: str) -> None:
+        """
+        Sets the API key with the given name
+        """
+        self.storage[name] = key
 
 
 apikeys = APIKeys()
