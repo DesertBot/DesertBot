@@ -9,13 +9,13 @@ from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
-from desertbot.utils import string
 
-from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 
 import re
 import time
+import base64
+import json
 
 
 @implementer(IPlugin, IModule)
@@ -26,51 +26,112 @@ class Twitter(BotCommand):
     def help(self, query):
         return 'Automatic module that follows Twitter URLs'
 
+    def onLoad(self):
+        self.token = None
+        self.tokenType = None
+
+    def getToken(self):
+        token = self.mhRunActionUntilValue("get-api-key", "TwitterToken")
+        tokenType = self.mhRunActionUntilValue("get-api-key", "TwitterTokenType")
+
+        if token:
+            self.token = token
+            self.tokenType = tokenType
+            return
+
+        key = self.mhRunActionUntilValue("get-api-key", "TwitterKey")
+        secret = self.mhRunActionUntilValue("get-api-key", "TwitterSecret")
+        if not key or not secret:
+            self.logger.error("no Twitter API key or secret defined")
+            return
+
+        creds = base64.b64encode(f'{key}:{secret}'.encode('utf-8'))
+        headers = {
+            'Authorization': f'Basic {creds}',
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        }
+        data = 'grant_type=client_credentials'
+        url = 'https://api.twitter.com/oauth2/token'
+
+        response = self.mhRunActionUntilValue('post-url', url, data=data, extraHeaders=headers)
+        if response is None:
+            self.logger.error('no response from Twitter auth endpoint')
+            return
+        elif not response:
+            error = response.json()['errors'][0]
+            self.logger.error(f'error {error["code"]} from Twitter auth: {error["message"]}')
+            return
+
+        j = response.json()
+        if 'access_token' not in j:
+            self.logger.warning(f'failed to retrieve Twitter token, {json.dumps(j)}')
+            self.token = None
+            self.tokenType = None
+        else:
+            self.token = j['access_token']
+            self.tokenType = j['token_type']
+
     def follow(self, _: IRCMessage, url: str) -> [str, None]:
         match = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
         if not match:
             return
 
-        tweeter = match.group('tweeter')
+        if not self.token:
+            self.getToken()
+
+            if not self.token:
+                return
+
+        # tweeter = match.group('tweeter')
         tweetID = match.group('tweetID')
-        url = 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)
-        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
-        soup = BeautifulSoup(response.content, 'lxml')
+        url = 'https://api.twitter.com/1.1/statuses/show.json'
+        headers = {'Authorization': f'{self.tokenType} {self.token}'}
+        params = {'id': tweetID, 'tweet_mode': 'extended'}
+        response = self.mhRunActionUntilValue('fetch-url', url, params=params, extraHeaders=headers)
+        j = response.json()
 
-        tweet = soup.find(class_='permalink-tweet')
+        # replace retweets with the original tweet
+        if 'retweeted_status' in j:
+            j = j['retweeted_status']
 
-        displayName = tweet['data-name']
-        user = tweet.find(class_='username').text
+        displayName = j['user']['name']
+        user = j['user']['screen_name']
 
-        reply = tweet.find(class_='ReplyingToContextBelowAuthor')
-        if reply:
-            reply = 'r' + reply.text.strip()[1:]
+        if j['in_reply_to_screen_name'] and j['in_reply_to_screen_name'] != user:
+            reply = f"replying to @{j['in_reply_to_screen_name']}"
+        else:
+            reply = None
 
-        tweetText = tweet.find(class_='tweet-text')
+        tweetText = j['full_text']
 
-        tweetTimeText = tweet.find(class_='client-and-actions').text.strip()
-        try:
-            tweetTimeText = time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y')
-            tweetTimeText = time.strftime('%Y/%m/%d %H:%M', tweetTimeText)
-        except ValueError:
-            pass
-        tweetTimeText = re.sub(r'[\r\n\s]+', u' ', tweetTimeText)
+        # replace twitter shortened links with real urls
+        for url in j['entities']['urls']:
+            tweetText = tweetText.replace(url['url'], url['expanded_url'])
 
-        links = tweetText.find_all('a', {'data-expanded-url': True})
-        for link in links:
-            link.string = ' ' + link['data-expanded-url']
+        # replace twitter shortened embedded media links with real urls
+        if 'media' in j['entities']:
+            mediaDict = {}
+            for media in j['extended_entities']['media']:
+                if media['url'] not in mediaDict:
+                    mediaDict[media['url']] = [media['media_url_https']]
+                else:
+                    mediaDict[media['url']].append(media['media_url_https'])
+            for media, mediaURLs in mediaDict.items():
+                splitter = ' · '
+                mediaString = splitter.join(mediaURLs)
+                tweetText = tweetText.replace(media, mediaString)
 
-        embeddedLinks = tweetText.find_all('a', {'data-pre-embedded': 'true'})
-        for link in embeddedLinks:
-            link.string = ' ' + link['href']
+        # Thu Jan 30 16:44:15 +0000 2020
+        tweetTimeText = j['created_at']
+        tweetTimeText = time.strptime(tweetTimeText, '%a %b %d %I:%M:%S %z %Y')
+        tweetTimeText = time.strftime('%Y/%m/%d %H:%M UTC', tweetTimeText)
 
-        text = string.unescapeXHTML(tweetText.text)
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
-        text = re.sub('[\r\n]+', graySplitter, text)
+        text = re.sub('[\r\n]+', graySplitter, tweetText)
 
         formatString = str(colour(A.normal[A.fg.gray['[{time}]'],
-                                           A.bold[' {name} ({user})',
+                                           A.bold[' {name} (@{user})',
                                                   A.normal[A.fg.gray[' {reply}']] if reply else '',
                                                   ':'],
                                            ' {text}']))

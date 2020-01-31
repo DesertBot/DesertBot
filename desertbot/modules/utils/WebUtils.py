@@ -52,6 +52,7 @@ class WebUtils(BotModule):
                  extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
         # check the requested url is public
         if not self.isPublicURL(url):
+            self.logger.info(f'non-public url {url} ignored')
             return
 
         headers = {"User-agent": self.ua, "Accept": self.accept}
@@ -87,6 +88,7 @@ class WebUtils(BotModule):
                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
         # check the requested url is public
         if not self.isPublicURL(url):
+            self.logger.info(f'non-public url {url} ignored')
             return
 
         headers = {"User-agent": self.ua, "Accept": self.accept}

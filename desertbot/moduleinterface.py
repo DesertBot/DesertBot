@@ -57,6 +57,48 @@ class IModule(Interface):
         Called when the module is unloaded. Cleanup, if any.
         """
 
+    def mhRunGenericAction(actionName: str, *params: Any, **kw: Any) -> None:
+        """
+        Convenience wrapper around action system call.
+        Queries the ModuleHandler for modules that handle actionName,
+        and runs each of them.
+        """
+
+    def mhRunProcessingAction(actionName: str, data: Any, *params: Any, **kw: Any) -> Any:
+        """
+        Convenience wrapper around action system call.
+        Queries the ModuleHandler for modules that handle actionName,
+        and runs each of them with the given data.
+        """
+
+    def mhRunGatheringAction(actionName: str, *params: Any, **kw: Any) -> List:
+        """
+        Convenience wrapper around action system call.
+        Queries the ModuleHandler for modules that handle actionName,
+        and runs each of them, returning all of the responses in a list.
+        """
+
+    def mhRunActionUntilValue(actionName: str, *params: Any, **kw: Any) -> Any:
+        """
+        Convenience wrapper around action system call.
+        Queries the ModuleHandler for modules that handle actionName,
+        and runs each of them until a value is returned.
+        """
+
+    def mhRunActionUntilTrue(actionName: str, *params: Any, **kw: Any) -> bool:
+        """
+        Convenience wrapper around action system call.
+        Queries the ModuleHandler for modules that handle actionName,
+        and runs each of them until True is returned.
+        """
+
+    def mhRunActionUntilFalse(actionName: str, *params: Any, **kw: Any) -> bool:
+        """
+        Convenience wrapper around action system call.
+        Queries the ModuleHandler for modules that handle actionName,
+        and runs each of them until False is returned.
+        """
+
 
 def ignore(func):
     @wraps(func)
@@ -120,3 +162,21 @@ class BotModule(object):
             if fnmatch(message.user.fullUserPrefix(), ignore):
                 return True
         return False
+
+    def mhRunGenericAction(self, actionName: str, *params: Any, **kw: Any) -> None:
+        return self.bot.moduleHandler.runGenericAction(actionName, *params, **kw)
+
+    def mhRunProcessingAction(self, actionName: str, data: Any, *params: Any, **kw: Any) -> Any:
+        return self.bot.moduleHandler.runProcessingAction(actionName, data, *params, **kw)
+
+    def mhRunGatheringAction(self, actionName: str, *params: Any, **kw: Any) -> List:
+        return self.bot.moduleHandler.runGatheringAction(actionName, *params, **kw)
+
+    def mhRunActionUntilValue(self, actionName: str, *params: Any, **kw: Any) -> Any:
+        return self.bot.moduleHandler.runActionUntilValue(actionName, *params, **kw)
+
+    def mhRunActionUntilTrue(self, actionName: str, *params: Any, **kw: Any) -> bool:
+        return self.bot.moduleHandler.runActionUntilTrue(actionName, *params, **kw)
+
+    def mhRunActionUntilFalse(self, actionName: str, *params: Any, **kw: Any) -> bool:
+        return self.bot.moduleHandler.runActionUntilFalse(actionName, *params, **kw)
