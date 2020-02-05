@@ -52,8 +52,11 @@ class OutOfContext(BotCommand):
         quote = f"{todayDate} {matches[0]}"
         if message.replyTo not in self.storage:
             self.storage[message.replyTo] = []
-        self.storage[message.replyTo].append(quote)
-        return IRCResponse(ResponseType.Say, f"Quote '{quote}' was added to the log!", message.replyTo)
+        if len(self.storage[message.replyTo]) > 0 and self.storage[message.replyTo][-1] == quote:
+            return IRCResponse(ResponseType.Say, "That quote has already been added to the log!", message.replyTo)
+        else:
+            self.storage[message.replyTo].append(quote)
+            return IRCResponse(ResponseType.Say, f"Quote '{quote}' was added to the log!", message.replyTo)
 
     def _remove(self, message: IRCMessage):
         """remove <regex> - remove a quote from the OutOfContext log."""
