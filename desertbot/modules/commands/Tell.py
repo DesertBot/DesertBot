@@ -6,7 +6,7 @@ from desertbot.response import IRCResponse, ResponseType
 from desertbot.utils.string import b64ToStr, strftimeWithTimezone, strToB64, timeDeltaString
 from desertbot.utils.timeutils import now
 from zope.interface import implementer
-from datetime import datetime, timedelta
+import datetime
 from fnmatch import fnmatch
 from pytimeparse.timeparse import timeparse
 
@@ -57,10 +57,10 @@ class Tell(BotCommand):
             if message.command == "tellafter":
                 try:
                     try:  # first, try parsing as an ISO format string
-                        date = datetime.fromisoformat(params[1])
+                        date = datetime.datetime.fromisoformat(params[1])
                     except ValueError:
                         # if this fails, try parsing as a duration
-                        date = now() + timedelta(seconds=timeparse(params[1]))
+                        date = now() + datetime.timedelta(seconds=timeparse(params[1]))
                 except TypeError:
                     return IRCResponse(ResponseType.Say, "The given duration is invalid.", message.replyTo)
             else:
@@ -139,7 +139,7 @@ def _parseTell(nick, tell):
     return "{}: {} < From {} ({} ago).".format(nick,
                                                b64ToStr(tell["body"]),
                                                tell["from"],
-                                               timeDeltaString(now(), datetime.fromisoformat(tell["date"])))
+                                               timeDeltaString(now(), datetime.datetime.fromisoformat(tell["date"])))
 
 
 def _parseSentTell(tell):
