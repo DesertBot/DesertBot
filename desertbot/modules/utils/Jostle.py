@@ -11,6 +11,7 @@ from zope.interface import implementer
 from json import JSONDecodeError
 import jsonpath_ng
 import re
+import collections
 
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
@@ -71,7 +72,10 @@ class Jostle(BotCommand):
         value = m[0].value
 
         if not isinstance(value, str):
-            value = ' '.join(value)
+            if isinstance(value, collections.Iterable):
+                value = ' '.join(value)
+            else:
+                value = f'{value}'
 
         # sanitize the value
         value = value.strip()
