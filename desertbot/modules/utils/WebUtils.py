@@ -50,14 +50,12 @@ class WebUtils(BotModule):
         parsedURL = urlparse(url)
         host = socket.gethostbyname(parsedURL.hostname)
         ip = ipaddress.ip_address(host)
-        url = urlunparse(parsedURL._replace(
-                netloc=f"{ip}{'' if parsedURL.port is None else f':{parsedURL.port}'}"
-            )
-        )
+        port = '' if parsedURL.port is None else f':{parsedURL.port}'
+        url = urlunparse(parsedURL._replace(netloc=f"{ip}{port}"))
 
         # check the requested url is public
         if not ip.is_global:
-            self.logger.info(f'non-public url {url} ignored')
+            self.logger.info(f'non-public url {origURL} (ip {ip}) ignored')
             return
 
         headers = {"User-agent": self.ua, "Accept": self.accept, "Host": parsedURL.hostname}
@@ -105,14 +103,12 @@ class WebUtils(BotModule):
         parsedURL = urlparse(url)
         host = socket.gethostbyname(parsedURL.hostname)
         ip = ipaddress.ip_address(host)
-        url = urlunparse(parsedURL._replace(
-                netloc=f"{ip}{'' if parsedURL.port is None else f':{parsedURL.port}'}"
-            )
-        )
+        port = '' if parsedURL.port is None else f':{parsedURL.port}'
+        url = urlunparse(parsedURL._replace(netloc=f"{ip}{port}"))
 
         # check the requested url is public
         if not ip.is_global:
-            self.logger.info(f'non-public url {url} ignored')
+            self.logger.info(f'non-public url {origURL} (ip {ip}) ignored')
             return
 
         headers = {"User-agent": self.ua, "Accept": self.accept, "Host": parsedURL.hostname}
