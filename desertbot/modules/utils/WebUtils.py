@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 import html
 import ipaddress
 import socket
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 import re
 import json
 
@@ -41,21 +41,28 @@ class WebUtils(BotModule):
                        "application/rss+xml, application/atom+xml, application/rdf+xml, "
                        "application/json")
 
-    def isPublicURL(self, url: str) -> bool:
-        parsed = urlparse(url)
-        host = socket.gethostbyname(parsed.hostname)
-        ip = ipaddress.ip_address(host)
-        return ip.is_global
-
     def fetchURL(self, url: str,
                  params: Any=None,
                  extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
+
+        # stop changing DNS attacks by locking in the IP
+        origURL = url
+        parsedURL = urlparse(url)
+        host = socket.gethostbyname(parsedURL.hostname)
+        ip = ipaddress.ip_address(host)
+        url = urlunparse(parsedURL._replace(
+                netloc=f"{ip}{'' if parsedURL.port is None else f':{parsedURL.port}'}"
+            )
+        )
+
         # check the requested url is public
-        if not self.isPublicURL(url):
+        if not ip.is_global:
             self.logger.info(f'non-public url {url} ignored')
             return
 
-        headers = {"User-agent": self.ua, "Accept": self.accept}
+        headers = {"User-agent": self.ua, "Accept": self.accept, "Host": parsedURL.hostname}
+        timeout = 10  # seconds
+
         # Make sure we don't download any unwanted things
         check = (r"^("
                  r"text/.*|"  # text
@@ -63,10 +70,12 @@ class WebUtils(BotModule):
                  r"application/(.*)json(;.*)?"  # json
                  r")$")
         check = re.compile(check)
+
         if extraHeaders:
             headers.update(extraHeaders)
+
         try:
-            response = requests.get(url, params=params, headers=headers, timeout=10)
+            response = requests.get(url, params=params, headers=headers, timeout=timeout)
             if 'content-type' in response.headers:
                 pageType = response.headers["content-type"]
             else:
@@ -77,8 +86,12 @@ class WebUtils(BotModule):
             else:
                 response.close()
 
+        except requests.exceptions.ReadTimeout:
+            self.logger.exception(f"GET from {origURL!r} timed out on reading ({timeout}s)")
+        except requests.exceptions.ConnectTimeout:
+            self.logger.exception(f"GET from {origURL!r} timed out on connection ({timeout}s)")
         except requests.exceptions.RequestException:
-            self.logger.exception("GET from {!r} failed!".format(url))
+            self.logger.exception(f"GET from {origURL!r} failed!")
 
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L43
@@ -86,22 +99,39 @@ class WebUtils(BotModule):
                 data: Any=None,
                 json: Any=None,
                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
+
+        # stop changing DNS attacks by locking in the IP
+        origURL = url
+        parsedURL = urlparse(url)
+        host = socket.gethostbyname(parsedURL.hostname)
+        ip = ipaddress.ip_address(host)
+        url = urlunparse(parsedURL._replace(
+                netloc=f"{ip}{'' if parsedURL.port is None else f':{parsedURL.port}'}"
+            )
+        )
+
         # check the requested url is public
-        if not self.isPublicURL(url):
+        if not ip.is_global:
             self.logger.info(f'non-public url {url} ignored')
             return
 
-        headers = {"User-agent": self.ua, "Accept": self.accept}
+        headers = {"User-agent": self.ua, "Accept": self.accept, "Host": parsedURL.hostname}
+        timeout = 10  # seconds
+
         if extraHeaders:
             headers.update(extraHeaders)
 
         try:
-            response = requests.post(url, data=data, json=json, headers=headers, timeout=10)
+            response = requests.post(url, data=data, json=json, headers=headers, timeout=timeout)
 
             return response
 
+        except requests.exceptions.ReadTimeout:
+            self.logger.exception(f"POST to {origURL!r} timed out on reading ({timeout}s)")
+        except requests.exceptions.ConnectTimeout:
+            self.logger.exception(f"POST to {origURL!r} timed out on connection ({timeout}s)")
         except requests.exceptions.RequestException:
-            self.logger.exception("POST to {!r} failed!".format(url))
+            self.logger.exception(f"POST to {origURL!r} failed!")
 
     def getPageTitle(self, webpage: str) -> Optional[str]:
         def cleanTitle(title: str) -> str:
