@@ -7,7 +7,7 @@ before_install:
   - "sudo apt-get install libre2-dev -y"
 install:
   - "pip install pyflakes"
-  - "git clone https://github.com/DesertBot/weercd.git"
+  - "git clone -b desertbot --single-branch https://github.com/DesertBot/weercd.git"
   - "pip install Cython"
   - "pip install -r requirements.txt"
 cache:
