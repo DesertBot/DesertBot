@@ -43,7 +43,7 @@ class WebUtils(BotModule):
                        "application/json")
 
     # stop changing DNS attacks by locking in the IP
-    def lockURLtoIP(self, url: str) -> Tuple[str, str, ipaddress._BaseAddress]:
+    def lockURL(self, url: str) -> Tuple[str, str, ipaddress._BaseAddress]:
         parsedURL = urlparse(url)
         host = socket.gethostbyname(parsedURL.hostname)
         ip = ipaddress.ip_address(host)
@@ -57,7 +57,7 @@ class WebUtils(BotModule):
                  extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
 
         origURL = url
-        url, hostname, ip = self.lockURLtoIP(url)
+        url, hostname, ip = self.lockURL(url)
 
         # check the requested url is public
         if not ip.is_global:
@@ -107,7 +107,7 @@ class WebUtils(BotModule):
                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
 
         origURL = url
-        url, hostname, ip = self.lockURLtoIP(url)
+        url, hostname, ip = self.lockURL(url)
 
         # check the requested url is public
         if not ip.is_global:
