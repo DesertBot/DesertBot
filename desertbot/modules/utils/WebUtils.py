@@ -9,7 +9,6 @@ from zope.interface import implementer
 
 import requests
 from requests import Response
-from requests_toolbelt.adapters.host_header_ssl import HostHeaderSSLAdapter
 from bs4 import BeautifulSoup
 
 import html
@@ -19,7 +18,7 @@ from urllib.parse import urlparse, urlunparse
 import re
 import json
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 from apiclient.discovery import build
 
@@ -42,29 +41,24 @@ class WebUtils(BotModule):
                        "application/rss+xml, application/atom+xml, application/rdf+xml, "
                        "application/json")
 
-    # stop changing DNS attacks by locking in the IP
-    def lockURL(self, url: str) -> Tuple[str, str, ipaddress._BaseAddress]:
+    def fetchURL(self, url: str,
+                 params: Any=None,
+                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
+
+        # stop changing DNS attacks by locking in the IP
+        origURL = url
         parsedURL = urlparse(url)
         host = socket.gethostbyname(parsedURL.hostname)
         ip = ipaddress.ip_address(host)
         port = '' if parsedURL.port is None else f':{parsedURL.port}'
         url = urlunparse(parsedURL._replace(netloc=f"{ip}{port}"))
 
-        return url, parsedURL.hostname, ip
-
-    def fetchURL(self, url: str,
-                 params: Any=None,
-                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
-
-        origURL = url
-        url, hostname, ip = self.lockURL(url)
-
         # check the requested url is public
         if not ip.is_global:
             self.logger.info(f'non-public url {origURL} (ip {ip}) ignored')
             return
 
-        headers = {"User-agent": self.ua, "Accept": self.accept, "Host": hostname}
+        headers = {"User-agent": self.ua, "Accept": self.accept, "Host": parsedURL.hostname}
         timeout = 10  # seconds
 
         # Make sure we don't download any unwanted things
@@ -79,9 +73,7 @@ class WebUtils(BotModule):
             headers.update(extraHeaders)
 
         try:
-            session = requests.Session()
-            session.mount('https://', HostHeaderSSLAdapter())
-            response = session.get(url, params=params, headers=headers, timeout=timeout)
+            response = requests.get(url, params=params, headers=headers, timeout=timeout)
             if 'content-type' in response.headers:
                 pageType = response.headers["content-type"]
             else:
@@ -106,24 +98,27 @@ class WebUtils(BotModule):
                 json: Any=None,
                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
 
+        # stop changing DNS attacks by locking in the IP
         origURL = url
-        url, hostname, ip = self.lockURL(url)
+        parsedURL = urlparse(url)
+        host = socket.gethostbyname(parsedURL.hostname)
+        ip = ipaddress.ip_address(host)
+        port = '' if parsedURL.port is None else f':{parsedURL.port}'
+        url = urlunparse(parsedURL._replace(netloc=f"{ip}{port}"))
 
         # check the requested url is public
         if not ip.is_global:
             self.logger.info(f'non-public url {origURL} (ip {ip}) ignored')
             return
 
-        headers = {"User-agent": self.ua, "Accept": self.accept, "Host": hostname}
+        headers = {"User-agent": self.ua, "Accept": self.accept, "Host": parsedURL.hostname}
         timeout = 10  # seconds
 
         if extraHeaders:
             headers.update(extraHeaders)
 
         try:
-            session = requests.Session()
-            session.mount('https://', HostHeaderSSLAdapter())
-            response = session.post(url, data=data, json=json, headers=headers, timeout=timeout)
+            response = requests.post(url, data=data, json=json, headers=headers, timeout=timeout)
 
             return response
 
