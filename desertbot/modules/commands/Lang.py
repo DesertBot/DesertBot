@@ -65,7 +65,7 @@ int main() {{
                 code = self.templates[lang].format(code=code)
             result = self._tio(lang, code)
             return IRCResponse(ResponseType.Say,
-                               result.replace("\n", " "),
+                               result.rstrip("\n").replace("\n", " "),
                                message.replyTo)
         else:
             return IRCResponse(ResponseType.Say,
@@ -88,7 +88,7 @@ int main() {{
             code = response.content
             result = self._tio(lang, code, userInput)
             return IRCResponse(ResponseType.Say,
-                               result.replace("\n", " "),
+                               result.rstrip("\n").replace("\n", " "),
                                message.replyTo)
         else:
             return IRCResponse(ResponseType.Say,
