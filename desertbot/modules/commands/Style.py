@@ -96,7 +96,7 @@ class Style(BotCommand):
                 ord('n'): 'ɴ',
                 ord('o'): 'ᴏ',
                 ord('p'): 'ᴘ',
-                ord('q'): 'ꞯ',
+                ord('q'): 'ǫ',
                 ord('r'): 'ʀ',
                 ord('s'): 'ꜱ',
                 ord('t'): 'ᴛ',
