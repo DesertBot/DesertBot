@@ -312,7 +312,7 @@ class FFXIV(BotCommand):
         return response['Results'][0]['ID']
 
     def _lookupCharacterByID(self, ID):
-        lookupURL = f"{self.apiURL}/character/{ID}?extended=1&data=FC"
+        lookupURL = f"{self.apiURL}/character/{ID}?extended=1&data=FC,CJ"
         print(lookupURL)
         response = self.bot.moduleHandler.runActionUntilValue("fetch-url", lookupURL)
         if not response:
