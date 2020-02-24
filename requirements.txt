@@ -11,7 +11,7 @@ lxml==4.5.0
 numpy==1.18.1
 Pillow==7.0.0
 parsedatetime==2.5
-psutil==5.6.7
+psutil==5.7.0
 pyhedrals==0.2.0
 python-dateutil==2.8.1
 pytimeparse==1.1.8
