@@ -40,9 +40,9 @@ class Tell(BotCommand):
             return "tellafter <user> <duration> <message> - Tell the given user(s) a message when they speak " \
                    "after the given duration or on the given date."
         elif command == "stells":
-            return "stells - List all tells sent by you that have not yet been received."
+            return "stells - List all tells sent by you that have not yet been delivered."
         elif command == "rtell":
-            return "rtell <message> - Remove the earlier message sent by you that matches."
+            return "rtell <string> - Remove an undelivered tell sent by you where the message content contains <string>."
     
     def execute(self, message: IRCMessage):
         params = message.parameterList
