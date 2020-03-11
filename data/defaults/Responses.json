@@ -146,6 +146,18 @@
         "cooldown": 300,
         "allRegexesMustMatch": true
     },
+    "\u30c1\u30fc\u30ba": {
+        "messages": [
+            "\u306f\u30c1\u30fc\u30ba\u304c\u5927\u597d\u304d"
+        ],
+        "regexes": [
+            "([^a-zA-Z]|^)\u30c1\u30fc\u30ba([^a-zA-Z]|$)"
+        ],
+        "responseType": "Do",
+        "enabledByDefault": true,
+        "cooldown": 300,
+        "allRegexesMustMatch": true
+    },
     "wat": {
         "messages": [
             "NaNNaNNaNNaN https://www.destroyallsoftware.com/talks/wat man!"
