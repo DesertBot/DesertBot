@@ -31,13 +31,13 @@ class StringUtils(BotCommand):
     def _tojson(self, message: IRCMessage):
         """converts input string to json-escaped string"""
         return IRCResponse(ResponseType.Say,
-                           json.dumps(message.messageString),
+                           json.dumps(message.parameters),
                            message.replyTo)
 
     def _fromjson(self, message: IRCMessage):
         """un-escapes json strings"""
         return IRCResponse(ResponseType.Say,
-                           str(json.loads(message.messageString)),
+                           str(json.loads(message.parameters)),
                            message.replyTo)
 
     commands = OrderedDict([
