@@ -46,16 +46,17 @@ class StringUtils(BotCommand):
     ])
 
     def execute(self, message: IRCMessage):
-        if message.command.lower() in self.commands():
-            return self.commands[message.command.lower()](message)
+        command = message.command.lower()
+        if command in self.commands:
+            return self.commands[command](self, message)
         else:
             return IRCResponse(ResponseType.Say,
-                               f"{message.command} is not a recognized StringUtils command",
+                               f'"{message.command}" is not a recognized StringUtils command',
                                message.replyTo)
 
     def help(self, query):
         command = query.lower()
-        if command in self.commands():
+        if command in self.commands:
             doc = re.sub(r"\s+", " ", self.commands[command].__doc__)
             return f"{self.bot.commandChar}{command} {doc}"
 
