@@ -16,6 +16,7 @@ import re
 import time
 import base64
 import json
+import html
 
 
 @implementer(IPlugin, IModule)
@@ -121,6 +122,9 @@ class Twitter(BotCommand):
                 splitter = ' · '
                 mediaString = splitter.join(mediaURLs)
                 tweetText = tweetText.replace(media, mediaString)
+
+        # unescape html entities to their unicode equivalents
+        tweetText = html.unescape(tweetText)
 
         # Thu Jan 30 16:44:15 +0000 2020
         tweetTimeText = j['created_at']
