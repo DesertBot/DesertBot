@@ -134,11 +134,10 @@ class Mastodon(BotCommand):
             numMedia = len(media)
             if numMedia == 1:
                 medType = media[0]['type']
-                size = media[0]['meta']['original']['size']
+                #size = media[0]['meta']['original']['size']
                 description = media[0]['description']
                 description = ': {}'.format(description) if description else ''
                 media = '(attached {medType}{description})'.format(medType=medType,
-                                                                   size=size,
                                                                    description=description)
             else:
                 media = '({} media attached)'.format(numMedia)

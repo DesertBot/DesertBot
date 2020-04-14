@@ -24,8 +24,7 @@ class UserLocation(BotCommand):
                 return IRCResponse(ResponseType.Say, "No location was specified.", message.replyTo)
             self.storage[message.user.nick.lower()] = message.parameters
             self.bot.moduleHandler.runGenericAction('userlocation-updated', message.user.nick, message.parameters)
-            return IRCResponse(ResponseType.Say, "Your location has been updated.".format(message.parameters),
-                               message.replyTo)
+            return IRCResponse(ResponseType.Say, "Your location has been updated.", message.replyTo)
         elif message.command == "remloc":
             if message.user.nick.lower() not in self.storage:
                 return IRCResponse(ResponseType.Say, "Your location is not registered!", message.replyTo)
