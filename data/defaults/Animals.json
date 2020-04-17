@@ -28,7 +28,8 @@
         "(noo+t\\s*)+": "penguin",
         "too+t": "mastodon",
         "whee+k": "guinea pig",
-        "Hello There!*": "General Kenobi"
+        "Hello There!*": "General Kenobi",
+		"wa+h+": "Waluigi"
     },
     "animalCustomReactions": {
         "droid": {
@@ -58,6 +59,14 @@
             "14": "{user} might be Old Ben.",
             "19": "{user} is Obi-Wan Kenobi.",
             "20": "General Kenobi! You are a bold one."
-        }
+        },
+		"Waluigi": {
+			"1": "{user} is DEFINITELY not Waluigi!",
+			"8": "{user} is not Waluigi.",
+			"13": "{user} might be Waluigi.",
+			"14": "{user} appears to be some kind of purple Mario?",
+			"19": "{user} is Waluigi!",
+			"20": "{user} is Number WAHHHHN"
+		}
     }
 }
