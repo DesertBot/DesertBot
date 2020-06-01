@@ -1,6 +1,6 @@
 beautifulsoup4==4.9.1
 bcrypt==3.1.7
-croniter==0.3.31
+croniter==0.3.32
 Cython==0.29.19
 feedparser==5.2.1
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
