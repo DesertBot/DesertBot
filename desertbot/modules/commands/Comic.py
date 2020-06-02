@@ -50,7 +50,7 @@ class Comic(BotCommand):
         self.messageStore = {}
 
     def triggers(self):
-        return ['comic', 'comicjson', 'comicfromjson']
+        return ['comic', 'comicfromjson']
 
     def help(self, query):
         return 'comic (<length>) (<firstmessage>) - Make a comic. If given a length x it will use the last x number of ' \
@@ -70,44 +70,45 @@ class Comic(BotCommand):
                 comicInfo = response.json()
             except Exception:
                 return IRCResponse(ResponseType.Say, "URL contents were not valid JSON", message.replyTo)
-        else:
-            # parse messages
-            comicLimit = 8
-            params = list(message.parameterList)
-            if len(params) > 0 and string.isNumber(params[0]):
-                comicLimit = int(params.pop(0))
+            return IRCResponse(ResponseType.Say, self.postComic(self.renderComic(comicInfo)), message.replyTo)
 
-            messages = self.getMessages(message.replyTo)
-            if len(params) > 0:
-                regex = re2.compile(" ".join(params), re2.IGNORECASE)
-                matches = list(filter(regex.search, [msg[1] for msg in messages]))
-                if len(matches) == 0:
-                    return IRCResponse(ResponseType.Say,
-                                       "Sorry, that didn't match anything in my message buffer.",
-                                       message.replyTo)
-                elif len(matches) > 1:
-                    return IRCResponse(ResponseType.Say,
-                                       "Sorry, that matches too many lines in my message buffer.",
-                                       message.replyTo)
+        # main command
+        comicLimit = 8
+        params = list(message.parameterList)
+        if len(params) > 0 and string.isNumber(params[0]):
+            comicLimit = int(params.pop(0))
 
-                index = [msg[1] for msg in messages].index(matches[0])
-                lastIndex = index + comicLimit
-                if lastIndex > len(messages):
-                    lastIndex = len(messages)
-                messages = messages[index:lastIndex]
-            else:
-                messages = messages[comicLimit * -1:]
-            if not messages:
+        messages = self.getMessages(message.replyTo)
+        if len(params) > 0:
+            regex = re2.compile(" ".join(params), re2.IGNORECASE)
+            matches = list(filter(regex.search, [msg[1] for msg in messages]))
+            if len(matches) == 0:
                 return IRCResponse(ResponseType.Say,
-                                   "There are no messages in the buffer to create a comic with.",
+                                   "Sorry, that didn't match anything in my message buffer.",
                                    message.replyTo)
-            comicInfo = self.generateComicInfo(messages)
+            elif len(matches) > 1:
+                return IRCResponse(ResponseType.Say,
+                                   "Sorry, that matches too many lines in my message buffer.",
+                                   message.replyTo)
 
-        if message.command.lower() == "comicjson":
-            content = json.dumps(comicInfo, indent=2)
-            response = self.bot.moduleHandler.runActionUntilValue('upload-dbco', content)
+            index = [msg[1] for msg in messages].index(matches[0])
+            lastIndex = index + comicLimit
+            if lastIndex > len(messages):
+                lastIndex = len(messages)
+            messages = messages[index:lastIndex]
         else:
-            response = self.postComic(self.renderComic(comicInfo))
+            messages = messages[comicLimit * -1:]
+
+        if not messages:
+            return IRCResponse(ResponseType.Say,
+                               "There are no messages in the buffer to create a comic with.",
+                               message.replyTo)
+
+        comicInfo = self.generateComicInfo(messages)
+        comicJSON = json.dumps(comicInfo, indent=2)
+        jsonLink = self.bot.moduleHandler.runActionUntilValue('upload-dbco', comicJSON)
+        comicLink = self.postComic(self.renderComic(comicInfo))
+        response = f"{comicLink} (permanent JSON link: {jsonLink})"
 
         return IRCResponse(ResponseType.Say, response, message.replyTo)
 
