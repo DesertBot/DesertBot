@@ -50,7 +50,7 @@ class Comic(BotCommand):
         self.messageStore = {}
 
     def triggers(self):
-        return ['comic', 'comicjson']
+        return ['comic', 'comicjson', 'comicfromjson']
 
     def help(self, query):
         return 'comic (<length>) (<firstmessage>) - Make a comic. If given a length x it will use the last x number of ' \
@@ -58,43 +58,58 @@ class Comic(BotCommand):
                'message.'
 
     def execute(self, message: IRCMessage):
-        comicLimit = 8
-        params = list(message.parameterList)
-        if len(params) > 0 and string.isNumber(params[0]):
-            comicLimit = int(params.pop(0))
-
-        messages = self.getMessages(message.replyTo)
-        if len(params) > 0:
-            regex = re2.compile(" ".join(params), re2.IGNORECASE)
-            matches = list(filter(regex.search, [msg[1] for msg in messages]))
-            if len(matches) == 0:
-                return IRCResponse(ResponseType.Say,
-                                   "Sorry, that didn't match anything in my message buffer.",
-                                   message.replyTo)
-            elif len(matches) > 1:
-                return IRCResponse(ResponseType.Say,
-                                   "Sorry, that matches too many lines in my message buffer.",
-                                   message.replyTo)
-
-            index = [msg[1] for msg in messages].index(matches[0])
-            lastIndex = index + comicLimit
-            if lastIndex > len(messages):
-                lastIndex = len(messages)
-            messages = messages[index:lastIndex]
+        if message.command.lower() == "comicfromjson":
+            params = list(message.parameterList)
+            if len(params) != 1:
+                return IRCResponse(ResponseType.Say, "You didn't give me a URL to load", message.replyTo)
+            url = params[0]
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
+            if response is None:
+                return IRCResponse(ResponseType.Say, "Error fetching given URL", message.replyTo)
+            try:
+                comicInfo = response.json()
+            except Exception:
+                return IRCResponse(ResponseType.Say, "URL contents were not valid JSON", message.replyTo)
         else:
-            messages = messages[comicLimit * -1:]
-        if messages:
-            comicInfo = self.generateComicInfo(messages)
-            if message.command.lower() == "comicjson":
-                content = json.dumps(comicInfo, indent=2)
-                response = self.bot.moduleHandler.runActionUntilValue('upload-dbco', content)
+            # parse messages
+            comicLimit = 8
+            params = list(message.parameterList)
+            if len(params) > 0 and string.isNumber(params[0]):
+                comicLimit = int(params.pop(0))
+
+            messages = self.getMessages(message.replyTo)
+            if len(params) > 0:
+                regex = re2.compile(" ".join(params), re2.IGNORECASE)
+                matches = list(filter(regex.search, [msg[1] for msg in messages]))
+                if len(matches) == 0:
+                    return IRCResponse(ResponseType.Say,
+                                       "Sorry, that didn't match anything in my message buffer.",
+                                       message.replyTo)
+                elif len(matches) > 1:
+                    return IRCResponse(ResponseType.Say,
+                                       "Sorry, that matches too many lines in my message buffer.",
+                                       message.replyTo)
+
+                index = [msg[1] for msg in messages].index(matches[0])
+                lastIndex = index + comicLimit
+                if lastIndex > len(messages):
+                    lastIndex = len(messages)
+                messages = messages[index:lastIndex]
             else:
-                response = self.postComic(self.renderComic(comicInfo))
-            return IRCResponse(ResponseType.Say, response, message.replyTo)
+                messages = messages[comicLimit * -1:]
+            if not messages:
+                return IRCResponse(ResponseType.Say,
+                                   "There are no messages in the buffer to create a comic with.",
+                                   message.replyTo)
+            comicInfo = self.generateComicInfo(messages)
+
+        if message.command.lower() == "comicjson":
+            content = json.dumps(comicInfo, indent=2)
+            response = self.bot.moduleHandler.runActionUntilValue('upload-dbco', content)
         else:
-            return IRCResponse(ResponseType.Say,
-                               "There are no messages in the buffer to create a comic with.",
-                               message.replyTo)
+            response = self.postComic(self.renderComic(comicInfo))
+
+        return IRCResponse(ResponseType.Say, response, message.replyTo)
 
     def getMessages(self, channel: str):
         """
@@ -350,6 +365,10 @@ class Comic(BotCommand):
         """
         textImage = Image.new("RGBA", panel.size, (0xff, 0xff, 0xff, 0xff))
         textDraw = ImageDraw.Draw(textImage)
+
+        # Our input colour tuple might be a list if it got round-tripped to JSON,
+        # but PIL requires it be a tuple
+        colour = tuple(colour)
 
         # draw black outline first, by drawing the text in black, blurring it,
         # then boosting the contrast
