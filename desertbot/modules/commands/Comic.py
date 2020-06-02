@@ -50,7 +50,7 @@ class Comic(BotCommand):
         self.messageStore = {}
 
     def triggers(self):
-        return ['comic', 'comicfromjson']
+        return ['comic', 'rendercomic']
 
     def help(self, query):
         return 'comic (<length>) (<firstmessage>) - Make a comic. If given a length x it will use the last x number of ' \
@@ -58,7 +58,7 @@ class Comic(BotCommand):
                'message.'
 
     def execute(self, message: IRCMessage):
-        if message.command.lower() == "comicfromjson":
+        if message.command.lower() == "rendercomic":
             params = list(message.parameterList)
             if len(params) != 1:
                 return IRCResponse(ResponseType.Say, "You didn't give me a URL to load", message.replyTo)
