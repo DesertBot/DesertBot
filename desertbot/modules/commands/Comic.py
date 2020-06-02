@@ -50,7 +50,7 @@ class Comic(BotCommand):
         self.messageStore = {}
 
     def triggers(self):
-        return ['comic']
+        return ['comic', 'comicjson']
 
     def help(self, query):
         return 'comic (<length>) (<firstmessage>) - Make a comic. If given a length x it will use the last x number of ' \
@@ -84,8 +84,13 @@ class Comic(BotCommand):
         else:
             messages = messages[comicLimit * -1:]
         if messages:
-            comicBytes = self.makeComic(messages)
-            return IRCResponse(ResponseType.Say, self.postComic(comicBytes), message.replyTo)
+            comicInfo = self.generateComicInfo(messages)
+            if message.command.lower() == "comicjson":
+                content = json.dumps(comicInfo, indent=2)
+                response = self.bot.moduleHandler.runActionUntilValue('upload-dbco', content)
+            else:
+                response = self.postComic(self.renderComic(comicInfo))
+            return IRCResponse(ResponseType.Say, response, message.replyTo)
         else:
             return IRCResponse(ResponseType.Say,
                                "There are no messages in the buffer to create a comic with.",
@@ -133,9 +138,6 @@ class Comic(BotCommand):
         except json.decoder.JSONDecodeError:
             self.logger.exception("dbco.link json response decode error, {} (at {})".format(
                 response.content, comicObject))
-
-    def makeComic(self, messages):
-        return self.renderComic(self.generateComicInfo(messages))
 
     def generateComicInfo(self, messages):
         """Returns a comic info object, which is a dict containing:
