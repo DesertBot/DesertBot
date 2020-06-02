@@ -3,11 +3,11 @@ Created on Apr 18, 2019
 
 @author: lunik1
 """
-import glob
+import colorsys
 import json
+import os
 from io import BytesIO
 from random import choice, sample, uniform
-import colorsys
 
 import requests
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance, ImageChops
@@ -24,6 +24,10 @@ try:
     import re2
 except ImportError:
     import re as re2
+
+
+CHARS_PATH = 'data/comics/chars'
+BACKGROUNDS_PATH = 'data/comics/backgrounds'
 
 
 @implementer(IPlugin, IModule)
@@ -127,10 +131,19 @@ class Comic(BotCommand):
                 response.content, comicObject))
 
     def makeComic(self, messages):
+        return self.renderComic(self.generateComicInfo(messages))
+
+    def generateComicInfo(self, messages):
+        """Returns a comic info object, which is a dict containing:
+            background: The background filename to use
+            charmap: A dict mapping character names (normally nicks) to character image filenames
+            colmap: A dict mapping character names to a tuple of uint8 numbers [r, g, b, a] specifying a RGBA color
+            panels: A list of panels. Each panel is a 1 or 2-item list of (character name, message)
+        All filenames are just the file basename, ie. not the full path.
+        Note that to allow round-tripping to JSON, the tuples may instead be lists.
+        """
         chars = set()  # chars is a set of the "characters" involved, at this point these are message.user.nick
         panels = []  # panels is a list of comic "panels", each involving 1-2 "characters", each with a message spoken
-        panelHeight = 300
-        panelWidth = 450
 
         # one "panel" is a list of the (message.user.nick, message.messageString) pairs to be drawn in that panel
         panel = []
@@ -157,12 +170,10 @@ class Comic(BotCommand):
         panels.append(panel)
 
         # Randomly associate a character image to each user
-        filenames = glob.glob('data/comics/chars/*')
-        charmap_filenames = zip(chars, sample(filenames, len(chars)))
-        charmap = {ch: Image.open(f).convert("RGBA") for ch, f in charmap_filenames}
-
-        self.logger.debug("Character images used for comic: {}".format(", ".join([f for ch, f in charmap_filenames])))
+        filenames = os.listdir(CHARS_PATH)
+        charmap = dict(zip(chars, sample(filenames, len(chars))))
         # charmap is now a dict of message.user.nick to their randomly picked "character" image
+        self.logger.debug("Character images used for comic: {}".format(", ".join([f for ch, f in charmap.items()])))
 
         # Randomly associate a text colour to each user
         # get lightness and saturation from our baseline purple #cc99ff
@@ -174,24 +185,40 @@ class Comic(BotCommand):
         # map our generated colours to characters
         colmap = {ch: col for ch, col in zip(chars, sample(colours, len(chars)))}
 
+        # this will be the background image for each separate panel
+        background = choice(os.listdir(BACKGROUNDS_PATH))
+        self.logger.debug("Background image used for comic: {}".format(background))
+
+        return {
+            'panels': panels,
+            'charmap': charmap,
+            'colmap': colmap,
+            'background': background,
+        }
+
+    def renderComic(self, info):
+        """From a comic info object, renders an image and returns a PNG as a bytestring"""
+        panelHeight = 300
+        panelWidth = 450
+
+        charmap = {ch: Image.open(os.path.join(CHARS_PATH, path)).convert("RGBA") for ch, path in info['charmap'].items()}
+
         # How big is the whole comic?
         imgWidth = panelWidth
-        imgHeight = panelHeight * len(panels)
+        imgHeight = panelHeight * len(info['panels'])
 
-        # this will be the background image for each separate panel
-        background_file = choice(glob.glob('data/comics/backgrounds/*'))
-        background = Image.open(background_file).convert("RGBA")
-        self.logger.debug("Background image used for comic: {}".format(background_file))
+        background_path = os.path.join(BACKGROUNDS_PATH, info['background'])
+        background = Image.open(background_path).convert("RGBA")
         background = Comic.fitbkg(background, panelWidth, panelHeight)
 
         # comicImage is our entire comic, to be filled with our panels
         comicImage = Image.new("RGBA", (imgWidth, imgHeight), (0xff, 0xff, 0xff, 0xff))
         font = ImageFont.truetype('data/comics/fonts/ComicNeue-Bold.ttf', 16)
 
-        for i, panel in enumerate(panels):
+        for i, panel in enumerate(info['panels']):
             # paste the panel Image object onto our comic Image object, using the index i to offset height
             comicImage.paste(Comic.makePanel(panel, panelWidth, panelHeight,
-                                             charmap, background, font, colmap),
+                                             charmap, background, font, info['colmap']),
                              (0, panelHeight * i))
 
         comicByteArray = BytesIO()
