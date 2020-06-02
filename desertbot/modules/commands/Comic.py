@@ -53,9 +53,14 @@ class Comic(BotCommand):
         return ['comic', 'rendercomic']
 
     def help(self, query):
-        return 'comic (<length>) (<firstmessage>) - Make a comic. If given a length x it will use the last x number of ' \
-               'messages. If also given a first message it will use x number of messages starting from the given first ' \
-               'message.'
+        if len(query) == 1:
+            return "{cc}comic - Make a comic, {cc}rendercomic - Restore a previously saved comic JSON".format(cc=self.bot.commandChar)
+        elif query[1].lower() == "rendercomic":
+            return 'rendercomic <url> - Download JSON from URL and render a comic based on the saved comic info'
+        else:
+            return 'comic (<length>) (<firstmessage>) - Make a comic. If given a length x it will use the last x number of ' \
+                   'messages. If also given a first message it will use x number of messages starting from the given first ' \
+                   'message.'
 
     def execute(self, message: IRCMessage):
         if message.command.lower() == "rendercomic":
