@@ -30,6 +30,10 @@ CHARS_PATH = 'data/comics/chars'
 BACKGROUNDS_PATH = 'data/comics/backgrounds'
 
 
+class ComicInfoError(object):
+    """Raised when there is a problem with the given comic info object"""
+
+
 @implementer(IPlugin, IModule)
 class Comic(BotCommand):
     # just hardcode a limit on max messages for now, should limit comic size pretty effecively?
@@ -201,13 +205,34 @@ class Comic(BotCommand):
         panelHeight = 300
         panelWidth = 450
 
-        charmap = {ch: Image.open(os.path.join(CHARS_PATH, path)).convert("RGBA") for ch, path in info['charmap'].items()}
+        # Don't let malicious input explode memory
+        maxChars = 100
+        maxPanels = 100
+        if len(info['charmap']) > maxChars:
+            raise ComicInfoError("Too many characters (max {})".format(maxChars))
+        if len(info['panels']) > maxPanels:
+            raise ComicInfoError("Too many panels (max {})".format(maxPanels))
+
+        charmap = {}
+        for char, filename in info['charmap'].items():
+            # Protect from directory traversal
+            if '/' in filename:
+                raise ComicInfoError("Character filename {!r} is invalid: Must be a file name, not a path".format(filename))
+            filepath = os.path.join(CHARS_PATH, filename)
+            if not os.path.isfile(filepath):
+                raise ComicInfoError("Character file {!r} not found".format(filename))
+            charmap[char] = Image.open(filepath).convert("RGBA")
 
         # How big is the whole comic?
         imgWidth = panelWidth
         imgHeight = panelHeight * len(info['panels'])
 
+        # Protect from directory traversal
+        if '/' in info['background']:
+            raise ComicInfoError("Background filename {!r} is invalid: Must be a file name, not a path".format(info['background']))
         background_path = os.path.join(BACKGROUNDS_PATH, info['background'])
+        if not os.path.isfile(background_path):
+            raise ComicInfoError("Background file {!r} not found".format(info['background']))
         background = Image.open(background_path).convert("RGBA")
         background = Comic.fitbkg(background, panelWidth, panelHeight)
 
