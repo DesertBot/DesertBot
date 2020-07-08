@@ -20,7 +20,7 @@ except ImportError:
 @implementer(IPlugin, IModule)
 class Tell(BotCommand):
     def triggers(self):
-        return ["tell", "pmtell", "pmtellafter", "tellafter", "stells", "rtell"]
+        return ["tell", "pmtell", "pmtellafter", "tellafter", "stells", "rtell", "givetells"]
 
     def actions(self):
         return super(Tell, self).actions() + [('action-channel', 5, self._processTells),
@@ -48,6 +48,8 @@ class Tell(BotCommand):
             return "stells - List all tells sent by you that have not yet been delivered."
         elif command == "rtell":
             return "rtell <string> - Remove an undelivered tell sent by you where the message content contains <string>."
+        elif command == "givetells":
+            return "givetells - Send all currently undelivered tells for the triggering user via PM."
     
     def execute(self, message: IRCMessage):
         params = message.parameterList
@@ -121,7 +123,9 @@ class Tell(BotCommand):
                                    message.user.nick)
         return responses
 
-    def _processTells(self, message: IRCMessage):
+    def _processTells(self, message: IRCMessage, alwaysPM=False):
+        if message.command == "givetells":
+            alwaysPM = True
         chanTells = []
         pmTells = []
         for tell in [i for i in self.storage["tells"]]: # Iterate over a copy so we don'rlt modify the list we're iterating over
@@ -129,11 +133,11 @@ class Tell(BotCommand):
                 continue
             if now().isoformat() < tell["datetoreceive"]:
                 continue
-            if tell["source"][0] in self.bot.supportHelper.chanTypes and len(chanTells) < 3:
+            if not alwaysPM and tell["source"][0] in self.bot.supportHelper.chanTypes and len(chanTells) < 3:
                 if tell["source"] == message.replyTo:
                     chanTells.append(tell)
                     self.storage["tells"].remove(tell)
-            elif tell["source"][0] not in self.bot.supportHelper.chanTypes:
+            elif alwaysPM or tell["source"][0] not in self.bot.supportHelper.chanTypes:
                 pmTells.append(tell)
                 self.storage["tells"].remove(tell)
 
