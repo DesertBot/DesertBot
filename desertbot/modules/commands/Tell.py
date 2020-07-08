@@ -128,7 +128,7 @@ class Tell(BotCommand):
             alwaysPM = True
         chanTells = []
         pmTells = []
-        for tell in [i for i in self.storage["tells"]]: # Iterate over a copy so we don'rlt modify the list we're iterating over
+        for tell in list(self.storage["tells"]):  # Iterate over a copy so we don't modify the list we're iterating over
             if not any(fnmatch(message.user.nick.lower(), r) for r in tell["to"].split("/")):
                 continue
             if now().isoformat() < tell["datetoreceive"]:
