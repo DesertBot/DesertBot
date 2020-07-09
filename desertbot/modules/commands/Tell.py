@@ -20,7 +20,7 @@ except ImportError:
 @implementer(IPlugin, IModule)
 class Tell(BotCommand):
     def triggers(self):
-        return ["tell", "pmtell", "pmtellafter", "tellafter", "stells", "rtell"]
+        return ["tell", "tellafter", "stells", "rtell"]
 
     def actions(self):
         return super(Tell, self).actions() + [('action-channel', 5, self._processTells),
@@ -39,11 +39,6 @@ class Tell(BotCommand):
         elif command == "tellafter":
             return "tellafter <user> <duration> <message> - Tell the given user(s) a message when they speak " \
                    "after the given duration or on the given date."
-        elif command == "pmtell":
-            return "pmtell <user> <message> = Tell the given user(s) a message in a PM when they next speak."
-        elif command == "pmtellafter":
-            return "pmtellafter <user> <duration> <message> - Tell the given user(s) a message in a PM when they speak " \
-                   "after the given duration or on the given date."
         elif command == "stells":
             return "stells - List all tells sent by you that have not yet been delivered."
         elif command == "rtell":
@@ -52,15 +47,15 @@ class Tell(BotCommand):
     def execute(self, message: IRCMessage):
         params = message.parameterList
         responses = []
-        if message.command in ["tell", "tellafter", "pmtell", "pmtellafter"]:
+        if message.command == "tell" or message.command == "tellafter":
             if len(params) == 0:
                 return IRCResponse(ResponseType.Say, "Tell who?", message.replyTo)
-            elif len(params) == 1 and message.command in ["tellafter", "pmtellafter"]:
+            elif len(params) == 1 and message.command == "tellafter":
                 return IRCResponse(ResponseType.Say, "Tell it when?", message.replyTo)
-            elif len(params) == 1 and message.command in ["tell", "pmtell"] or len(params) == 2 and message.command in ["tellafter", "pmtellafter"]:
+            elif len(params) == 1 and message.command == "tell" or len(params) == 2 and message.command == "tellafter":
                 return IRCResponse(ResponseType.Say, "Tell {} what?".format(params[0]), message.replyTo)
             sentTells = []
-            if message.command in ["tellafter", "pmtellafter"]:
+            if message.command == "tellafter":
                 try:
                     try:  # first, try parsing as an ISO format string
                         date = isoparse(params[1])
@@ -85,10 +80,6 @@ class Tell(BotCommand):
                     "from": message.user.nick,
                     "source": message.replyTo if message.replyTo[0] in self.bot.supportHelper.chanTypes else "PM"
                 }
-                # if this is a pmtell or a pmtellafter, send it as a PM
-                if self.command[0:2] == "pm":
-                    msg["source"] = "PM"
-
                 self.storage["tells"].append(msg)
                 sentTells.append(recep.replace("/", " or "))
             if len(sentTells) > 0:
