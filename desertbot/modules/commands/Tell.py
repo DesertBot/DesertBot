@@ -88,7 +88,7 @@ class Tell(BotCommand):
                     "source": message.replyTo if message.replyTo[0] in self.bot.supportHelper.chanTypes else "PM"
                 }
                 # if this is a pmtell or a pmtellafter, send it as a PM
-                if message.command[0:2] == "pm":
+                if self.command[0:2] == "pm":
                     msg["source"] = "PM"
 
                 self.storage["tells"].append(msg)
