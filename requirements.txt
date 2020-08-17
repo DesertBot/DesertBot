@@ -1,5 +1,5 @@
 beautifulsoup4==4.9.1
-bcrypt==3.1.7
+bcrypt==3.2.0
 croniter==0.3.34
 Cython==0.29.21
 feedparser==5.2.1
