@@ -51,4 +51,4 @@ if __name__ == '__main__':
     else:
         factory = DesertBotFactory(config)
         reactor.run()
-        sys.exit(factory.exitStatus) 
+        sys.exit(factory.exitStatus)
