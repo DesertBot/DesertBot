@@ -4,7 +4,7 @@ croniter==0.3.34
 Cython==0.29.21
 feedparser==6.0.1
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
-google-api-python-client==1.12.1
+google-api-python-client==1.12.2
 isodate==0.6.0
 jsonpath-ng==1.5.2
 lxml==4.5.2
