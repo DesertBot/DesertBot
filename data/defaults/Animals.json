@@ -10,7 +10,7 @@
         "ri+bb+i+t": "frog",
         "bloo+p": "fish",
         "o+i+n+k+": "piggy",
-        "(h[o0]+n+k+\\s*)+": "goose",
+        "(h[o0öÖ]+n+k+\\s*)+": "goose",
         "h+a*e+n+k+": "alternate",
         "hi+ss+": "snake",
         "r+o+a+r+": "lion",
