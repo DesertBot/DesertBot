@@ -173,7 +173,7 @@ class Lists(BotCommand):
         # If given a regexPattern, remove all the entries that don't match it
         if regexPattern is not None:
             for entry in entries:
-                match = re.search(regexPattern, entry["text"])
+                match = re.search(regexPattern, entry["text"], re.IGNORECASE)
                 if not match:
                     entries.remove(entry)
 
@@ -241,7 +241,7 @@ class Lists(BotCommand):
 
         matches = []
         for entry in self.storage[listName]:
-            match = re.search(regexPattern, entry["text"])
+            match = re.search(regexPattern, entry["text"], re.IGNORECASE)
             if match:
                 matches.append(entry)
 
