@@ -30,7 +30,7 @@
         "whee+k": "guinea pig",
         "Hello There!*": "General Kenobi",
         "wa+h+": "Waluigi",
-	"(choo+\\s*)+": "train"
+        "(choo+\\s*)+": "train"
     },
     "animalCustomReactions": {
         "droid": {
