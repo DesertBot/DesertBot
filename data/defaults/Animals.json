@@ -29,7 +29,8 @@
         "too+t": "mastodon",
         "whee+k": "guinea pig",
         "Hello There!*": "General Kenobi",
-        "wa+h+": "Waluigi"
+        "wa+h+": "Waluigi",
+	"(choo+\\s*)+": "train"
     },
     "animalCustomReactions": {
         "droid": {
