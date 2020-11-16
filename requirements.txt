@@ -16,6 +16,6 @@ pyhedrals==0.2.0
 python-dateutil==2.8.1
 pytimeparse==1.1.8
 pyxDamerauLevenshtein==1.6.1
-requests==2.24.0
+requests==2.25.0
 ruamel.yaml==0.16.12
 Twisted[tls]==20.3.0
