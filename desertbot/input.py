@@ -146,6 +146,8 @@ class InputHandler(object):
             self.bot.users[nick] = user
         else:
             user = self.bot.users[nick]
+            user.ident = ident
+            user.host = host
 
         if params[0] not in self.bot.channels:
             channel = IRCChannel(params[0], self.bot)
