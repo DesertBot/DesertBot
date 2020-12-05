@@ -35,7 +35,7 @@ class Chain(BotCommand):
         chain = re.split(r'(?<!\\)\|', message.parameters)
 
         response = None
-        metadata = {}
+        metadata = message.metadata
 
         for link in chain:
             link = link.strip()
