@@ -15,9 +15,7 @@ class IRCResponse(object):
     target = ''
 
     def __init__(self, messageType: ResponseType, response: Union[str, bytes], target: Union[str, bytes],
-                 extraVars: Dict=None, metadata: Dict=None):
-        if extraVars is None:
-            extraVars = {}
+                 metadata: Dict=None):
         if metadata is None:
             metadata = {}
         self.type = messageType
@@ -34,5 +32,4 @@ class IRCResponse(object):
         if not self.type == ResponseType.Raw:
             self.response = self.response.replace('\x01', '')
 
-        self.ExtraVars = extraVars
         self.Metadata = metadata

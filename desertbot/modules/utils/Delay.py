@@ -56,7 +56,7 @@ class Delay(BotCommand):
             return IRCResponse(ResponseType.Say,
                                "OK, I'll execute that in {}".format(delayString),
                                message.replyTo,
-                               {'delay': delay, 'delayString': delayString})
+                               metadata={'var': {'delay': delay, 'delayString': delayString}})
         else:
             if 'Alias' not in moduleHandler.commands:
                 return IRCResponse(ResponseType.Say,

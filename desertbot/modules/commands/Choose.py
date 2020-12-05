@@ -37,7 +37,7 @@ class Choose(BotCommand):
 
         choice = random.choice(options).strip()
 
-        return IRCResponse(ResponseType.Say, choice, message.replyTo, {'chooseChoice': choice})
+        return IRCResponse(ResponseType.Say, choice, message.replyTo, metadata={'var': {'chooseChoice': choice}})
 
 
 choose = Choose()

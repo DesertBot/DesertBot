@@ -81,8 +81,7 @@ class Slurp(BotCommand):
         value = unescape(value)
 
         return IRCResponse(ResponseType.Say, value, message.replyTo,
-                           extraVars={'slurpURL': url},
-                           metadata={'slurp': {url: soup}})
+                           metadata={'slurp': {url: soup}, 'var': {'slurpURL': url}})
 
 
 slurp = Slurp()

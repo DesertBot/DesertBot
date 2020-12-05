@@ -31,7 +31,7 @@ class Var(BotCommand):
 
         varname = message.parameterList[0]
         value = ' '.join(message.parameters.split(' ')[1:])
-        return IRCResponse(ResponseType.Say, "", message.replyTo, extraVars={varname: value})
+        return IRCResponse(ResponseType.Say, "", message.replyTo, metadata={'var': {varname: value}})
 
 
 var = Var()

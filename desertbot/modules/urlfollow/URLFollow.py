@@ -58,7 +58,7 @@ class URLFollow(BotCommand):
                 return IRCResponse(ResponseType.Say,
                                    '[no url recognized]',
                                    message.replyTo,
-                                   {'urlfollowURL': '[no url recognized]'})
+                                   metadata={'var': {'urlfollowURL': '[no url recognized]'}})
             return
 
         url = match.group('url')
@@ -68,11 +68,12 @@ class URLFollow(BotCommand):
                 return IRCResponse(ResponseType.Say,
                                    '[no follows worked for {}]'.format(url),
                                    message.replyTo,
-                                   {'urlfollowURL': '[no follows worked for {}]'})
+                                   metadata={'var': {'urlfollowURL': '[no follows worked for {}]'}})
             return
         text, url = follows
 
-        return IRCResponse(ResponseType.Say, text, message.replyTo, {'urlfollowURL': url})
+        return IRCResponse(ResponseType.Say, text, message.replyTo,
+                           metadata={'var': {'urlfollowURL': url}})
 
     def dispatchToFollows(self, message: IRCMessage, url: str):
         if not re.search('\.(jpe?g|gif|png|bmp)$', url):

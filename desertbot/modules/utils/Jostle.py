@@ -83,8 +83,7 @@ class Jostle(BotCommand):
         value = re.sub(r'\s+', ' ', value)
 
         return IRCResponse(ResponseType.Say, value, message.replyTo,
-                           extraVars={'jostleURL': url},
-                           metadata={'jostle': {url: j}})
+                           metadata={'jostle': {url: j}, 'var': {'jostleURL': url}})
 
 
 jostle = Jostle()

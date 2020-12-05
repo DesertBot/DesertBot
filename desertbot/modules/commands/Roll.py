@@ -71,7 +71,7 @@ class Roll(BotCommand):
             response += ' {}'.format(result.description)
 
         return IRCResponse(ResponseType.Say, response, message.replyTo,
-                           {'rollTotal': result.result})
+                           metadata={'var': {'rollTotal': result.result}})
 
 
 roll = Roll()

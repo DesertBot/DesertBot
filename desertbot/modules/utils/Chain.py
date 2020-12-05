@@ -13,7 +13,7 @@ import re
 from desertbot.message import IRCMessage
 from desertbot.response import IRCResponse, ResponseType
 
-from desertbot.utils import string
+from desertbot.utils import string, dictutils
 
 
 @implementer(IPlugin, IModule)
@@ -35,7 +35,7 @@ class Chain(BotCommand):
         chain = re.split(r'(?<!\\)\|', message.parameters)
 
         response = None
-        extraVars = {}
+        metadata = {}
 
         for link in chain:
             link = link.strip()
@@ -48,9 +48,12 @@ class Chain(BotCommand):
                                        message.replyTo)
                 # replace $output with output of previous command
                 link = link.replace('$output', response.response)
-                extraVars.update(response.ExtraVars)
-                for var, value in extraVars.items():
-                    link = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), link)
+                # merge response metadata back into our chain-global dict
+                metadata = dictutils.recursiveMerge(metadata, response.Metadata)
+                # replace any vars in the command
+                if 'var' in metadata:
+                    for var, value in metadata['var'].items():
+                        link = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), link)
             else:
                 # replace $output with empty string if previous command had no output
                 # (or this is the first command in the chain,
@@ -66,7 +69,7 @@ class Chain(BotCommand):
             # build a new message out of this 'link' in the chain
             inputMessage = IRCMessage(message.type, message.user, message.channel,
                                       self.bot.commandChar + link.lstrip(),
-                                      self.bot)
+                                      self.bot, metadata=metadata)
             # might be used at some point to tell commands they're being called from Chain
             inputMessage.chained = True
 
