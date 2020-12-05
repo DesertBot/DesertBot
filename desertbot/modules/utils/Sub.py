@@ -62,7 +62,7 @@ class Sub(BotCommand):
 
         prevLevel = -1
         responseStack = []
-        metadata = {}
+        metadata = message.metadata
 
         for segment in segments:
             (level, command, start, end) = segment
