@@ -29,9 +29,7 @@ class Jostle(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say,
-                               'Not enough parameters, usage: {}'.format(self.help(None)),
-                               message.replyTo)
+            return IRCResponse('Not enough parameters, usage: {}'.format(self.help(None)), message.replyTo)
 
         path = ' '.join(message.parameterList[1:])
 
@@ -39,9 +37,7 @@ class Jostle(BotCommand):
             parser = jsonpath_ng.parse(path)
         except (jsonpath_ng.lexer.JsonPathLexerError, Exception) as e:
             # yep, jsonpath_ng uses generic exceptions, so this is the best we can do
-            return IRCResponse(ResponseType.Say,
-                               '[Jostle Error: {}]'.format(e),
-                               message.replyTo)
+            return IRCResponse('[Jostle Error: {}]'.format(e), message.replyTo)
 
         url = message.parameterList[0]
         if not re.match(r'^\w+://', url):
@@ -53,21 +49,17 @@ class Jostle(BotCommand):
         else:
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             if not response:
-                return IRCResponse(ResponseType.Say,
-                                   '[Jostle Error: problem fetching {}]'.format(url),
-                                   message.replyTo)
+                return IRCResponse('[Jostle Error: problem fetching {}]'.format(url), message.replyTo)
             try:
                 j = response.json()
             except JSONDecodeError:
-                return IRCResponse(ResponseType.Say,
-                                   '[Jostle Error: data at {} is not valid JSON]'.format(url),
-                                   message.replyTo)
+                return IRCResponse('[Jostle Error: data at {} is not valid JSON]'.format(url), message.replyTo)
 
         m = parser.find(j)
         if not m:
             reply = '[Jostle Error: the jsonpath {!r} does not resolve a value from {!r}]'
             reply = reply.format(path, url)
-            return IRCResponse(ResponseType.Say, reply, message.replyTo)
+            return IRCResponse(reply, message.replyTo)
 
         value = m[0].value
 
@@ -82,8 +74,7 @@ class Jostle(BotCommand):
         value = re.sub(r'[\r\n]+', ' ', value)
         value = re.sub(r'\s+', ' ', value)
 
-        return IRCResponse(ResponseType.Say, value, message.replyTo,
-                           metadata={'jostle': {url: j}, 'var': {'jostleURL': url}})
+        return IRCResponse(value, message.replyTo, metadata={'jostle': {url: j}, 'var': {'jostleURL': url}})
 
 
 jostle = Jostle()

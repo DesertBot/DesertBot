@@ -25,9 +25,7 @@ class Ignore(BotCommand):
         You can list multiple users to add them all at once.
         Nick alone will be converted to a glob hostmask, eg: *!user@host"""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me a user to ignore!",
-                               message.replyTo)
+            return IRCResponse("You didn't give me a user to ignore!", message.replyTo)
 
         for ignore in message.parameterList[1:]:
             if message.replyTo in self.bot.channels:
@@ -40,18 +38,14 @@ class Ignore(BotCommand):
             self.bot.config['ignored'] = ignores
 
         self.bot.config.writeConfig()
-        return IRCResponse(ResponseType.Say,
-                           "Now ignoring specified users!",
-                           message.replyTo)
+        return IRCResponse("Now ignoring specified users!", message.replyTo)
 
     @admin("Only my admins may remove ignores!")
     def _del(self, message):
         """del <full hostmask> - removes the specified user from the ignored list.
         You can list multiple users to remove them all at once."""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me a user to unignore!",
-                               message.replyTo)
+            return IRCResponse("You didn't give me a user to unignore!", message.replyTo)
 
         deleted = []
         skipped = []
@@ -72,17 +66,13 @@ class Ignore(BotCommand):
         self.bot.config['ignored'] = ignores
         self.bot.config.writeConfig()
 
-        return IRCResponse(ResponseType.Say,
-                           "Removed '{}' from ignored list, {} skipped"
-                           .format(', '.join(deleted), len(skipped)),
-                           message.replyTo)
+        return IRCResponse("Removed '{}' from ignored list, {} skipped"
+                           .format(', '.join(deleted), len(skipped)), message.replyTo)
 
     def _list(self, message):
         """list - lists all ignored users"""
         ignores = self.bot.config.getWithDefault('ignored', [])
-        return IRCResponse(ResponseType.Say,
-                           "Ignored Users: {}".format(', '.join(ignores)),
-                           message.replyTo)
+        return IRCResponse("Ignored Users: {}".format(', '.join(ignores)), message.replyTo)
 
     subCommands = OrderedDict([
         ('add', _add),
@@ -116,14 +106,10 @@ class Ignore(BotCommand):
         if len(message.parameterList) > 0:
             subCommand = message.parameterList[0].lower()
             if subCommand not in self.subCommands:
-                return IRCResponse(ResponseType.Say,
-                                   self._unrecognizedSubcommand(subCommand),
-                                   message.replyTo)
+                return IRCResponse(self._unrecognizedSubcommand(subCommand), message.replyTo)
             return self.subCommands[subCommand](self, message)
         else:
-            return IRCResponse(ResponseType.Say,
-                               self._helpText(),
-                               message.replyTo)
+            return IRCResponse(self._helpText(), message.replyTo)
 
 
 ignore = Ignore()

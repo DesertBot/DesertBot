@@ -21,18 +21,14 @@ class DBCalc(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
         if message.parameterList[0].lower() == 'hours':
-            return IRCResponse(ResponseType.Say,
-                               DBCalc.hours(message.parameterList[1]),
-                               message.replyTo)
+            return IRCResponse(DBCalc.hours(message.parameterList[1]), message.replyTo)
         elif message.parameterList[0].lower() == 'money':
-            return IRCResponse(ResponseType.Say,
-                               DBCalc.money(message.parameterList[1]),
-                               message.replyTo)
+            return IRCResponse(DBCalc.money(message.parameterList[1]), message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
     @classmethod
     def hours(cls, hours):

@@ -29,9 +29,9 @@ class LogSearch(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 1:
-            return IRCResponse(ResponseType.Say, 'Search what?', message.replyTo)
+            return IRCResponse('Search what?', message.replyTo)
 
-        return IRCResponse(ResponseType.Say, self._commands[message.command](self, message), message.replyTo)
+        return IRCResponse(self._commands[message.command](self, message), message.replyTo)
 
     def _getLogs(self, message):
         basePath = self.bot.logPath

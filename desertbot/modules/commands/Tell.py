@@ -49,11 +49,11 @@ class Tell(BotCommand):
         responses = []
         if message.command == "tell" or message.command == "tellafter":
             if len(params) == 0:
-                return IRCResponse(ResponseType.Say, "Tell who?", message.replyTo)
+                return IRCResponse("Tell who?", message.replyTo)
             elif len(params) == 1 and message.command == "tellafter":
-                return IRCResponse(ResponseType.Say, "Tell it when?", message.replyTo)
+                return IRCResponse("Tell it when?", message.replyTo)
             elif len(params) == 1 and message.command == "tell" or len(params) == 2 and message.command == "tellafter":
-                return IRCResponse(ResponseType.Say, "Tell {} what?".format(params[0]), message.replyTo)
+                return IRCResponse("Tell {} what?".format(params[0]), message.replyTo)
             sentTells = []
             if message.command == "tellafter":
                 try:
@@ -63,14 +63,13 @@ class Tell(BotCommand):
                         # if this fails, try parsing as a duration
                         date = now() + datetime.timedelta(seconds=timeparse(params[1]))
                 except TypeError:
-                    return IRCResponse(ResponseType.Say, "The given duration is invalid.", message.replyTo)
+                    return IRCResponse("The given duration is invalid.", message.replyTo)
             else:
                 date = now()
             for recep in params[0].split("&"):
                 if recep.lower() == self.bot.nick.lower():
-                    responses.append(IRCResponse(ResponseType.Say,
-                                                 "Thanks for telling me that, {}.".format(message.user.nick),
-                                                 message.replyTo))
+                    responses.append(
+                        IRCResponse("Thanks for telling me that, {}.".format(message.user.nick), message.replyTo))
                     continue
                 msg = {
                     "to": recep.lower(),
@@ -88,28 +87,26 @@ class Tell(BotCommand):
                                                                                    strftimeWithTimezone(date))
                 else:
                     m = "Okay, I'll tell {} that next time they speak.".format(" and ".join(sentTells))
-                responses.append(IRCResponse(ResponseType.Say, m, message.replyTo))
+                responses.append(IRCResponse(m, message.replyTo))
         elif message.command == "stells":
             for tell in self.storage["tells"]:
                 if tell["from"].lower() == message.user.nick.lower():
-                    responses.append(IRCResponse(ResponseType.Notice, _parseSentTell(tell), message.user.nick))
+                    responses.append(IRCResponse(_parseSentTell(tell), message.user.nick, ResponseType.Notice))
             if len(responses) == 0:
-                return IRCResponse(ResponseType.Notice,
-                                   "No undelivered messages sent by you were found.",
-                                   message.user.nick)
+                return IRCResponse("No undelivered messages sent by you were found.", message.user.nick,
+                                   ResponseType.Notice)
         elif message.command == "rtell":
             if len(params) == 0:
-                return IRCResponse(ResponseType.Say, "Remove what?", message.replyTo)
+                return IRCResponse("Remove what?", message.replyTo)
             tells = [x for x in self.storage["tells"] if x["from"].lower() == message.user.nick.lower()]
             for tell in tells:
                 if re2.search(" ".join(params), b64ToStr(tell["body"]), re2.IGNORECASE):
                     self.storage["tells"].remove(tell)
                     m = "Message {!r} was removed from the message database.".format(_parseSentTell(tell))
-                    return IRCResponse(ResponseType.Notice, m, message.user.nick)
+                    return IRCResponse(m, message.user.nick, ResponseType.Notice)
             else:
-                return IRCResponse(ResponseType.Notice,
-                                   "No tells matching {!r} were found.".format(" ".join(params)),
-                                   message.user.nick)
+                return IRCResponse("No tells matching {!r} were found.".format(" ".join(params)), message.user.nick,
+                                   ResponseType.Notice)
         return responses
 
     def _processTells(self, message: IRCMessage):
@@ -130,9 +127,9 @@ class Tell(BotCommand):
 
         responses = []
         for tell in chanTells:
-            responses.append(IRCResponse(ResponseType.Say, _parseTell(message.user.nick, tell), message.replyTo))
+            responses.append(IRCResponse(_parseTell(message.user.nick, tell), message.replyTo))
         for tell in pmTells:
-            responses.append(IRCResponse(ResponseType.Say, _parseTell(message.user.nick, tell), message.user.nick))
+            responses.append(IRCResponse(_parseTell(message.user.nick, tell), message.user.nick))
         return responses
 
 

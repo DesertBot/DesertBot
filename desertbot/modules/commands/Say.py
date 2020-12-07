@@ -22,14 +22,12 @@ class Say(BotCommand):
 
     def execute(self, message: IRCMessage):
         if not message.parameterList:
-            return IRCResponse(ResponseType.Say, 'Say what?', message.replyTo)
+            return IRCResponse('Say what?', message.replyTo)
 
         if message.parameterList[0] in self.bot.channels:
-            return IRCResponse(ResponseType.Say,
-                               " ".join(message.parameterList[1:]),
-                               message.parameterList[0])
+            return IRCResponse(" ".join(message.parameterList[1:]), message.parameterList[0])
 
-        return IRCResponse(ResponseType.Say, message.parameters, message.replyTo)
+        return IRCResponse(message.parameters, message.replyTo)
 
 
 say = Say()

@@ -60,9 +60,7 @@ class Tango(BotCommand):
 
         response = ' '.join(tang[letter.upper()] if letter.upper() in tang else letter
                             for letter in message.parameters)
-        return IRCResponse(ResponseType.Say,
-                           response,
-                           message.replyTo)
+        return IRCResponse(response, message.replyTo)
 
 
 tango = Tango()

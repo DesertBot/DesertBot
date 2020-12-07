@@ -21,15 +21,15 @@ class GeoLocation(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say, "You didn't give an address to look up", message.replyTo)
+            return IRCResponse("You didn't give an address to look up", message.replyTo)
 
         result = self.geolocationForPlace(message.parameters)
         if not result["success"]:
-            return IRCResponse(ResponseType.Say,"I don't think that's even a location in this multiverse...",
-                               message.replyTo)
+            return IRCResponse("I don't think that's even a location in this multiverse...", message.replyTo)
 
-        return IRCResponse(ResponseType.Say, "GPS coords for '{}' are: {},{}" .format(message.parameters,
-                           result["latitude"], result["longitude"]), message.replyTo)
+        return IRCResponse("GPS coords for '{}' are: {},{}".format(message.parameters,
+                                                                   result["latitude"], result["longitude"]),
+                           message.replyTo)
 
     def geolocationForLatLon(self, lat, lon):
         url = "https://nominatim.openstreetmap.org/reverse"

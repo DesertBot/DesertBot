@@ -22,24 +22,18 @@ class Help(BotCommand):
         if message.parameterList:
             helpStr = moduleHandler.runActionUntilValue('help', message.parameterList)
             if isinstance(helpStr, str):
-                return IRCResponse(ResponseType.Say, helpStr, message.replyTo)
+                return IRCResponse(helpStr, message.replyTo)
             elif isinstance(helpStr, list):
-                return [IRCResponse(ResponseType.Say, line, message.replyTo) for line in helpStr]
+                return [IRCResponse(line, message.replyTo) for line in helpStr]
             else:
-                return IRCResponse(ResponseType.Say,
-                                   '"{0}" not found, try "{1}" without parameters'
+                return IRCResponse('"{0}" not found, try "{1}" without parameters'
                                    ' to see a list of loaded module names'
-                                   .format(message.parameterList[0], message.command),
-                                   message.replyTo)
+                                   .format(message.parameterList[0], message.command), message.replyTo)
         else:
             modules = ', '.join(sorted(moduleHandler.modules, key=lambda s: s.lower()))
-            return [IRCResponse(ResponseType.Say,
-                                "Modules loaded are"
-                                " (use 'help <module>' to get help for that module):",
-                                message.replyTo),
-                    IRCResponse(ResponseType.Say,
-                                modules,
-                                message.replyTo)]
+            return [IRCResponse("Modules loaded are"
+                                " (use 'help <module>' to get help for that module):", message.replyTo),
+                    IRCResponse(modules, message.replyTo)]
 
 
 help = Help()

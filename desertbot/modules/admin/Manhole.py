@@ -48,9 +48,7 @@ class Manhole(BotCommand):
 
     @admin
     def execute(self, message: IRCMessage):
-        return IRCResponse(ResponseType.Notice,
-                           "Manhole port: {}".format(self.port),
-                           message.user.nick)
+        return IRCResponse("Manhole port: {}".format(self.port), message.user.nick, ResponseType.Notice)
 
 
 manhole = Manhole()

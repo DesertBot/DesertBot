@@ -19,11 +19,9 @@ def admin(func=None, msg=''):
         def wrapped_func(inst, message):
             if not inst.checkPermissions(message):
                 if msg:
-                    return IRCResponse(ResponseType.Say, msg, message.replyTo)
+                    return IRCResponse(msg, message.replyTo)
                 else:
-                    return IRCResponse(ResponseType.Say,
-                                       "Only my admins may use {!r}".format(message.command),
-                                       message.replyTo)
+                    return IRCResponse("Only my admins may use {!r}".format(message.command), message.replyTo)
             return func(inst, message)
 
         return wrapped_func
@@ -90,4 +88,4 @@ class BotCommand(BotModule):
         return True
 
     def execute(self, message: IRCMessage) -> Union[IRCResponse, List[IRCResponse]]:
-        return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.replyTo)
+        return IRCResponse('<command not yet implemented>', message.replyTo)

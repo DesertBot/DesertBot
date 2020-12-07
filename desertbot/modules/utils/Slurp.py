@@ -29,9 +29,7 @@ class Slurp(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 3:
-            return IRCResponse(ResponseType.Say,
-                               "Not enough parameters, usage: {}".format(self.help(None)),
-                               message.replyTo)
+            return IRCResponse("Not enough parameters, usage: {}".format(self.help(None)), message.replyTo)
 
         prop, url, selector = (message.parameterList[0],
                                message.parameterList[1],
@@ -45,17 +43,13 @@ class Slurp(BotCommand):
         else:
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             if not response:
-                return IRCResponse(ResponseType.Say,
-                                   "Problem fetching {}".format(url),
-                                   message.replyTo)
+                return IRCResponse("Problem fetching {}".format(url), message.replyTo)
             soup = BeautifulSoup(response.content, 'lxml')
 
         tag = soup.select_one(selector)
 
         if tag is None:
-            return IRCResponse(ResponseType.Say,
-                               "'{}' does not select a tag at {}".format(selector, url),
-                               message.replyTo)
+            return IRCResponse("'{}' does not select a tag at {}".format(selector, url), message.replyTo)
 
         specials = {
             'tagname': tag.name,
@@ -69,7 +63,7 @@ class Slurp(BotCommand):
         else:
             attrMissing = ("The tag selected by '{}' ({}) does not have attribute '{}'"
                            .format(selector, tag.name, prop))
-            return IRCResponse(ResponseType.Say, attrMissing, message.replyTo)
+            return IRCResponse(attrMissing, message.replyTo)
 
         if not isinstance(value, str):
             value = " ".join(value)
@@ -80,8 +74,7 @@ class Slurp(BotCommand):
         value = re.sub(r'\s+', ' ', value)
         value = unescape(value)
 
-        return IRCResponse(ResponseType.Say, value, message.replyTo,
-                           metadata={'slurp': {url: soup}, 'var': {'slurpURL': url}})
+        return IRCResponse(value, message.replyTo, metadata={'slurp': {url: soup}, 'var': {'slurpURL': url}})
 
 
 slurp = Slurp()

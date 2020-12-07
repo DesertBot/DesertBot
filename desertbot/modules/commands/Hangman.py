@@ -215,23 +215,15 @@ class Hangman(BotCommand):
         """start - starts a game of hangman!"""
         channel = message.replyTo.lower()
         if channel in self.gameStates:
-            return [IRCResponse(ResponseType.Say,
-                                '[Hangman] game is already in progress!',
-                                channel),
-                    IRCResponse(ResponseType.Say,
-                                self.gameStates[channel].render(),
-                                message.replyTo)]
+            return [IRCResponse('[Hangman] game is already in progress!', channel),
+                    IRCResponse(self.gameStates[channel].render(), message.replyTo)]
 
         responses = []
 
         word = self.phraseList.getWord()
         self.gameStates[channel] = GameState(word, self.maxBadGuesses)
-        responses.append(IRCResponse(ResponseType.Say,
-                                     '[Hangman] started!',
-                                     message.replyTo))
-        responses.append(IRCResponse(ResponseType.Say,
-                                     self.gameStates[channel].render(),
-                                     message.replyTo))
+        responses.append(IRCResponse('[Hangman] started!', message.replyTo))
+        responses.append(IRCResponse(self.gameStates[channel].render(), message.replyTo))
 
         return responses
 
@@ -239,16 +231,12 @@ class Hangman(BotCommand):
         """stop - stops the current game. Bot-admin only"""
         if not suppressMessage:
             if not self.checkPermissions(message):
-                return IRCResponse(ResponseType.Say,
-                                   '[Hangman] only my admins can stop games!',
-                                   message.replyTo)
+                return IRCResponse('[Hangman] only my admins can stop games!', message.replyTo)
         channel = message.replyTo.lower()
         if channel in self.gameStates:
             del self.gameStates[channel]
             if not suppressMessage:
-                return IRCResponse(ResponseType.Say,
-                                   '[Hangman] game stopped!',
-                                   message.replyTo)
+                return IRCResponse('[Hangman] game stopped!', message.replyTo)
 
     @admin("[Hangman] only my admins can set the maximum bad guesses!")
     def _setMaxBadGuesses(self, message):
@@ -263,20 +251,18 @@ class Hangman(BotCommand):
                 response = ('[Hangman] maximum bad guesses changed from {} to {}'
                             .format(self.maxBadGuesses, maxBadGuesses))
                 self.maxBadGuesses = maxBadGuesses
-                return IRCResponse(ResponseType.Say, response, message.replyTo)
+                return IRCResponse(response, message.replyTo)
             else:
                 raise ValueError
         except ValueError:
             maxBadMessage = '[Hangman] maximum bad guesses should be an integer between 1 and 20'
-            return IRCResponse(ResponseType.Say, maxBadMessage, message.replyTo)
+            return IRCResponse(maxBadMessage, message.replyTo)
 
     def _guess(self, message: IRCMessage) -> Union[IRCResponse, List[IRCResponse]]:
         channel = message.replyTo.lower()
         if channel not in self.gameStates:
-            return IRCResponse(ResponseType.Say,
-                               '[Hangman] no game running, use {}hangman start to begin!'
-                               .format(self.bot.commandChar),
-                               message.replyTo)
+            return IRCResponse('[Hangman] no game running, use {}hangman start to begin!'
+                               .format(self.bot.commandChar), message.replyTo)
 
         responses = []
         gs = self.gameStates[channel]
@@ -308,27 +294,22 @@ class Hangman(BotCommand):
             colUser = colour(A.normal[A.fg.green[colUser]])
         else:
             colUser = colour(A.normal[A.fg.red[colUser]])
-        responses.append(IRCResponse(ResponseType.Say,
-                                     '{} - {}'.format(gs.render(), colUser),
-                                     message.replyTo))
+        responses.append(IRCResponse('{} - {}'.format(gs.render(), colUser), message.replyTo))
 
         if gs.finished:
             if correct:
-                responses.append(IRCResponse(ResponseType.Say,
-                                             '[Hangman] Congratulations {}!'.format(user),
-                                             message.replyTo))
+                responses.append(
+                    IRCResponse('[Hangman] Congratulations {}!'.format(user), message.replyTo))
             else:
-                responses.append(IRCResponse(ResponseType.Say,
-                                             '[Hangman] {} blew up the bomb! The {} was {}'
-                                             .format(user, gs.wOrP(), gs.phrase),
-                                             message.replyTo))
+                responses.append(IRCResponse('[Hangman] {} blew up the bomb! The {} was {}'
+                                             .format(user, gs.wOrP(), gs.phrase), message.replyTo))
             self._stop(message, suppressMessage=True)
 
         return responses
 
     @staticmethod
     def _exceptionFormatter(exception, target):
-        return IRCResponse(ResponseType.Say, '[Hangman] {}'.format(exception.message), target)
+        return IRCResponse('[Hangman] {}'.format(exception.message), target)
 
     subCommands = OrderedDict([
         ('start', _start),

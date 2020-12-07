@@ -30,7 +30,7 @@ class Delay(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
         command = message.parameterList[1].lower()
         delay = timeparse(message.parameterList[0])
@@ -53,27 +53,19 @@ class Delay(BotCommand):
             d = task.deferLater(reactor, delay, module, newMessage)
             d.addCallback(self._activate)
             d.addErrback(self._deferredError)
-            return IRCResponse(ResponseType.Say,
-                               "OK, I'll execute that in {}".format(delayString),
-                               message.replyTo,
+            return IRCResponse("OK, I'll execute that in {}".format(delayString), message.replyTo,
                                metadata={'var': {'delay': delay, 'delayString': delayString}})
         else:
             if 'Alias' not in moduleHandler.commands:
-                return IRCResponse(ResponseType.Say,
-                                   "'{}' is not a recognized command".format(command),
-                                   message.replyTo)
+                return IRCResponse("'{}' is not a recognized command".format(command), message.replyTo)
 
             if command not in moduleHandler.commands['Alias'].aliases:
-                return IRCResponse(ResponseType.Say,
-                                   "'{}' is not a recognized command or alias".format(command),
-                                   message.replyTo)
+                return IRCResponse("'{}' is not a recognized command or alias".format(command), message.replyTo)
 
             d = task.deferLater(reactor, delay, moduleHandler.commands['Alias'].execute, newMessage)
             d.addCallback(self._activate)
             d.addErrback(self._deferredError)
-            return IRCResponse(ResponseType.Say,
-                               "OK, I'll execute that in {}".format(delayString),
-                               message.replyTo)
+            return IRCResponse("OK, I'll execute that in {}".format(delayString), message.replyTo)
 
     def _activate(self, response: IRCResponse):
         if not isinstance(response, list):

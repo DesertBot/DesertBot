@@ -22,9 +22,9 @@ class Reverse(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) > 0:
-            return IRCResponse(ResponseType.Say, message.parameters[::-1], message.replyTo)
+            return IRCResponse(message.parameters[::-1], message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, 'Reverse what?', message.replyTo)
+            return IRCResponse('Reverse what?', message.replyTo)
 
 
 reverse = Reverse()

@@ -46,9 +46,7 @@ class EightBall(BotCommand):
                    'Outlook not so good',
                    'Very doubtful']
 
-        return IRCResponse(ResponseType.Say,
-                           'The Magic 8-ball says... {}'.format(random.choice(answers)),
-                           message.replyTo)
+        return IRCResponse('The Magic 8-ball says... {}'.format(random.choice(answers)), message.replyTo)
 
 
 eightball = EightBall()

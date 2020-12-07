@@ -34,7 +34,7 @@ class Update(BotCommand):
         changes = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         if len(changes) == 0:
-            return IRCResponse(ResponseType.Say, 'The bot is already up to date', message.replyTo)
+            return IRCResponse('The bot is already up to date', message.replyTo)
 
         changes = list(reversed(changes))
         response = 'New commits: {}'.format(' | '.join(changes))
@@ -58,9 +58,7 @@ class Update(BotCommand):
         returnCode = subprocess.check_call(['git', 'merge', 'origin/master'])
 
         if returnCode != 0:
-            return IRCResponse(ResponseType.Say,
-                               'Merge after update failed, please merge manually',
-                               message.replyTo)
+            return IRCResponse('Merge after update failed, please merge manually', message.replyTo)
 
         if 'requirements.txt' in changedFiles:
             try:
@@ -140,9 +138,7 @@ class Update(BotCommand):
             if len(failures) > 0:
                 response += " | Failed to load new modules: {}".format(", ".join(failures))
 
-        return IRCResponse(ResponseType.Say,
-                           response,
-                           message.replyTo)
+        return IRCResponse(response, message.replyTo)
 
 
 update = Update()

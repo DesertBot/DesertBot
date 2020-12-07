@@ -27,9 +27,7 @@ class Urban(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give a word! Usage: {0}".format(self.help),
-                               message.replyTo)
+            return IRCResponse("You didn't give a word! Usage: {0}".format(self.help), message.replyTo)
 
         search = quote(message.parameters)
 
@@ -40,9 +38,7 @@ class Urban(BotCommand):
         j = response.json()
 
         if len(j['list']) == 0:
-            return IRCResponse(ResponseType.Say,
-                               "No entry found for '{0}'".format(message.parameters),
-                               message.replyTo)
+            return IRCResponse("No entry found for '{0}'".format(message.parameters), message.replyTo)
 
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
 
@@ -75,15 +71,9 @@ class Urban(BotCommand):
                                              A.fg.lightRed["-{2}"],
                                              graySplitter,
                                              "More defs: {3}"]))
-        responses = [IRCResponse(ResponseType.Say,
-                                 defFormatString.format(word, definition),
-                                 message.replyTo),
-                     IRCResponse(ResponseType.Say,
-                                 exampleFormatString.format(example),
-                                 message.replyTo),
-                     IRCResponse(ResponseType.Say,
-                                 byFormatString.format(author, up, down, more),
-                                 message.replyTo)]
+        responses = [IRCResponse(defFormatString.format(word, definition), message.replyTo),
+                     IRCResponse(exampleFormatString.format(example), message.replyTo),
+                     IRCResponse(byFormatString.format(author, up, down, more), message.replyTo)]
 
         return responses
 

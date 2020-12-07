@@ -25,13 +25,11 @@ class Var(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 1:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give a variable name!",
-                               message.replyTo)
+            return IRCResponse("You didn't give a variable name!", message.replyTo)
 
         varname = message.parameterList[0]
         value = ' '.join(message.parameters.split(' ')[1:])
-        return IRCResponse(ResponseType.Say, "", message.replyTo, metadata={'var': {varname: value}})
+        return IRCResponse("", message.replyTo, metadata={'var': {varname: value}})
 
 
 var = Var()

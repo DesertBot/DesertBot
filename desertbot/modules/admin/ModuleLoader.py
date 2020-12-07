@@ -23,10 +23,8 @@ class ModuleLoader(BotCommand):
     @admin
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't specify a module name! Usage: {0}"
-                               .format(self.help(None)),
-                               message.replyTo)
+            return IRCResponse("You didn't specify a module name! Usage: {0}"
+                               .format(self.help(None)), message.replyTo)
 
         command = {
             'load': self.load,
@@ -38,20 +36,14 @@ class ModuleLoader(BotCommand):
 
         responses = []
         if len(successes) > 0:
-            responses.append(IRCResponse(ResponseType.Say,
-                                         "'{}' {}ed successfully".format(', '.join(successes),
-                                                                         message.command.lower()),
-                                         message.replyTo))
+            responses.append(IRCResponse("'{}' {}ed successfully".format(', '.join(successes),
+                                                                         message.command.lower()), message.replyTo))
         if len(failures) > 0:
-            responses.append(IRCResponse(ResponseType.Say,
-                                         "'{}' failed to {}, or (they) do not exist"
-                                         .format(', '.join(failures), message.command.lower()),
-                                         message.replyTo))
+            responses.append(IRCResponse("'{}' failed to {}, or (they) do not exist"
+                                         .format(', '.join(failures), message.command.lower()), message.replyTo))
         if len(exceptions) > 0:
-            responses.append(IRCResponse(ResponseType.Say,
-                                         "'{}' threw an exception (printed to console)"
-                                         .format(', '.join(exceptions)),
-                                         message.replyTo))
+            responses.append(IRCResponse("'{}' threw an exception (printed to console)"
+                                         .format(', '.join(exceptions)), message.replyTo))
 
         return responses
 

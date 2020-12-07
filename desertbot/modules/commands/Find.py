@@ -30,14 +30,10 @@ class Find(BotCommand):
             results = self.bot.moduleHandler.runActionUntilValue('search-web', message.parameters)
 
             if not results:
-                return IRCResponse(ResponseType.Say,
-                                   '[google developer key missing]',
-                                   message.replyTo)
+                return IRCResponse('[google developer key missing]', message.replyTo)
 
             if 'items' not in results:
-                return IRCResponse(ResponseType.Say,
-                                   'No results found for query!',
-                                   message.replyTo)
+                return IRCResponse('No results found for query!', message.replyTo)
 
             firstResult = results['items'][0]
 
@@ -50,10 +46,10 @@ class Find(BotCommand):
             url = firstResult['link']
             replyText = '{1}{0}{2}{0}{3}'.format(string.graySplitter, title, content, url)
 
-            return IRCResponse(ResponseType.Say, replyText, message.replyTo)
+            return IRCResponse(replyText, message.replyTo)
         except Exception as x:
             self.logger.exception("Exception when finding a thing {}".format(message.parameters))
-            return IRCResponse(ResponseType.Say, str(x.args), message.replyTo)
+            return IRCResponse(str(x.args), message.replyTo)
 
 
 find = Find()

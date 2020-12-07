@@ -38,15 +38,11 @@ class Mtg(BotCommand):
         if name is None:
             searchResults = soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_searchResultsContainer'})
             if searchResults is None:
-                return IRCResponse(ResponseType.Say,
-                                   'No cards found: ' + searchTerm,
-                                   message.replyTo)
+                return IRCResponse('No cards found: ' + searchTerm, message.replyTo)
             else:
                 cardItems = searchResults.find_all(class_='cardItem')
                 # potentially return first item here
-                return IRCResponse(ResponseType.Say,
-                                   '{0} cards found: {1}'.format(len(cardItems), searchTerm),
-                                   message.replyTo)
+                return IRCResponse('{0} cards found: {1}'.format(len(cardItems), searchTerm), message.replyTo)
 
         name = name.find('div', 'value').text.strip()
         types = ' | T: ' + soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_typeRow'}).find('div', 'value').text.strip()
@@ -97,7 +93,7 @@ class Mtg(BotCommand):
 
         reply = name + manaCost + convCost + types + cardText + flavText + powTough + rarity
 
-        return IRCResponse(ResponseType.Say, reply, message.replyTo)
+        return IRCResponse(reply, message.replyTo)
 
     @classmethod
     def translateSymbols(cls, text):

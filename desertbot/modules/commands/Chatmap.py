@@ -35,19 +35,17 @@ class Chatmap(BotCommand):
 
     def execute(self, message: IRCMessage):
         if message.command == "chatmap":
-            return IRCResponse(ResponseType.Say, "Desert Bus Chatmap: {}".format(self.chatmapBaseUrl), message.replyTo)
+            return IRCResponse("Desert Bus Chatmap: {}".format(self.chatmapBaseUrl), message.replyTo)
         if not self.apiKey:
-            return IRCResponse(ResponseType.Say, "No Desert Bus Chatmap API key found.", message.replyTo)
+            return IRCResponse("No Desert Bus Chatmap API key found.", message.replyTo)
         if message.command == "addmap":
             loc = self.bot.moduleHandler.runActionUntilValue("userlocation", message.user.nick)
             if not loc or not loc["success"]:
-                return IRCResponse(ResponseType.Say, f"You do not have a location stored in {self.bot.nick}!", message.replyTo)
+                return IRCResponse(f"You do not have a location stored in {self.bot.nick}!", message.replyTo)
 
-            return IRCResponse(ResponseType.Say,
-                               self.setLocation(message.user.nick, loc["location"], False),
-                               message.replyTo)
+            return IRCResponse(self.setLocation(message.user.nick, loc["location"], False), message.replyTo)
         elif message.command == "remmap":
-            return IRCResponse(ResponseType.Say, self.deleteLocation(message.user.nick), message.replyTo)
+            return IRCResponse(self.deleteLocation(message.user.nick), message.replyTo)
 
     def setLocation(self, nick, location, checkExists=True):
         if not self.apiKey:

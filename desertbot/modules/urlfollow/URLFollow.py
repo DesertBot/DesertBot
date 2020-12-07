@@ -37,10 +37,10 @@ class URLFollow(BotCommand):
     def execute(self, message: IRCMessage):
         if message.parameterList[0].lower() == 'on':
             self.autoFollow = True
-            return IRCResponse(ResponseType.Say, 'Auto-follow on', message.replyTo)
+            return IRCResponse('Auto-follow on', message.replyTo)
         if message.parameterList[0].lower() == 'off':
             self.autoFollow = False
-            return IRCResponse(ResponseType.Say, 'Auto-follow off', message.replyTo)
+            return IRCResponse('Auto-follow off', message.replyTo)
 
         return self.handleURL(message, auto=False)
 
@@ -55,9 +55,7 @@ class URLFollow(BotCommand):
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.messageString, re.IGNORECASE)
         if not match:
             if not auto:
-                return IRCResponse(ResponseType.Say,
-                                   '[no url recognized]',
-                                   message.replyTo,
+                return IRCResponse('[no url recognized]', message.replyTo,
                                    metadata={'var': {'urlfollowURL': '[no url recognized]'}})
             return
 
@@ -65,15 +63,12 @@ class URLFollow(BotCommand):
         follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', message, url)
         if not follows:
             if not auto:
-                return IRCResponse(ResponseType.Say,
-                                   '[no follows worked for {}]'.format(url),
-                                   message.replyTo,
+                return IRCResponse('[no follows worked for {}]'.format(url), message.replyTo,
                                    metadata={'var': {'urlfollowURL': '[no follows worked for {}]'}})
             return
         text, url = follows
 
-        return IRCResponse(ResponseType.Say, text, message.replyTo,
-                           metadata={'var': {'urlfollowURL': url}})
+        return IRCResponse(text, message.replyTo, metadata={'var': {'urlfollowURL': url}})
 
     def dispatchToFollows(self, message: IRCMessage, url: str):
         if not re.search('\.(jpe?g|gif|png|bmp)$', url):

@@ -46,9 +46,7 @@ class Conversation(BotModule):
                           message.messageString,
                           re.IGNORECASE)
         if match:
-            return IRCResponse(ResponseType.Say,
-                               '{0} {1}'.format(match.group('greeting'), message.user.nick),
-                               message.replyTo)
+            return IRCResponse('{0} {1}'.format(match.group('greeting'), message.user.nick), message.replyTo)
 
 
 conversation = Conversation()

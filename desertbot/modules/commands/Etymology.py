@@ -29,9 +29,7 @@ class Etymology(BotCommand):
 
     def execute(self, message: IRCMessage):
         if not message.parameterList:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give a word! Usage: {}".format(self.help(None)),
-                               message.replyTo)
+            return IRCResponse("You didn't give a word! Usage: {}".format(self.help(None)), message.replyTo)
 
         mh = self.bot.moduleHandler
 
@@ -43,10 +41,8 @@ class Etymology(BotCommand):
                 if index < 0:
                     index = 0
             except ValueError:
-                return IRCResponse(ResponseType.Say,
-                                   'Index {!r} is not an integer! Usage: {}'
-                                   .format(message.parameterList[1], self.help(None)),
-                                   message.replyTo)
+                return IRCResponse('Index {!r} is not an integer! Usage: {}'
+                                   .format(message.parameterList[1], self.help(None)), message.replyTo)
         else:
             index = 0
 
@@ -56,9 +52,7 @@ class Etymology(BotCommand):
         soup = BeautifulSoup(results.content, 'lxml')
         words = soup.find_all(class_='word--C9UPa')
         if not words:
-            return IRCResponse(ResponseType.Say,
-                               'No results found for {!r}'.format(query),
-                               message.replyTo)
+            return IRCResponse('No results found for {!r}'.format(query), message.replyTo)
 
         totalResults = soup.find(class_='searchList__pageCount--2jQdB').text
         totalResults = int(re.sub(r'[^\d]', '', totalResults))
@@ -92,7 +86,7 @@ class Etymology(BotCommand):
                                    A.fg.gray[' | {} | '.format(displayIndex)],
                                    url])
 
-        return IRCResponse(ResponseType.Say, response, message.replyTo)
+        return IRCResponse(response, message.replyTo)
 
 
 etymology = Etymology()

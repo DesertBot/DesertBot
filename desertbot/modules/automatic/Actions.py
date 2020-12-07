@@ -25,10 +25,8 @@ class Actions(BotModule):
             message.messageString,
             re.IGNORECASE)
         if match:
-            return IRCResponse(ResponseType.Do,
-                               re.sub(self.bot.nick, message.user.nick, message.messageString,
-                                      flags=re.IGNORECASE),
-                               message.replyTo)
+            return IRCResponse(re.sub(self.bot.nick, message.user.nick, message.messageString,
+                                      flags=re.IGNORECASE), message.replyTo, ResponseType.Do)
 
 
 actions = Actions()

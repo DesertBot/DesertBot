@@ -64,13 +64,9 @@ int main() {{
             if lang in self.templates:
                 code = self.templates[lang].format(code=code)
             result = self._tio(lang, code)
-            return IRCResponse(ResponseType.Say,
-                               result.rstrip("\n").replace("\n", " "),
-                               message.replyTo)
+            return IRCResponse(result.rstrip("\n").replace("\n", " "), message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say,
-                               self.help(message.command),
-                               message.replyTo)
+            return IRCResponse(self.help(message.command), message.replyTo)
 
     def _langurl(self, message: IRCMessage):
         """langurl <lang> <url> <input> - evaluates the <code> at <url>
@@ -82,18 +78,12 @@ int main() {{
             userInput = " ".join(message.parameterList[2:])
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             if not response:
-                return IRCResponse(ResponseType.Say,
-                                   "Page not found at {!r}".format(url),
-                                   message.replyTo)
+                return IRCResponse("Page not found at {!r}".format(url), message.replyTo)
             code = response.content
             result = self._tio(lang, code, userInput)
-            return IRCResponse(ResponseType.Say,
-                               result.rstrip("\n").replace("\n", " "),
-                               message.replyTo)
+            return IRCResponse(result.rstrip("\n").replace("\n", " "), message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say,
-                               self.help(message.command),
-                               message.replyTo)
+            return IRCResponse(self.help(message.command), message.replyTo)
 
     commands = OrderedDict([
         ('lang', _lang),

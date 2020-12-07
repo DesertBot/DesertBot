@@ -43,14 +43,12 @@ class Dinner(BotCommand):
             link = self.bot.moduleHandler.runActionUntilValue('shorten-url', item['href'])
             item = item.text.strip()
 
-            return IRCResponse(ResponseType.Say,
-                               "{}... {} {}".format(phrase, item, link),
-                               message.replyTo)
+            return IRCResponse("{}... {} {}".format(phrase, item, link), message.replyTo)
 
         else:
             error = ("'{}' is not a recognized dinner type, please choose one of {}"
                      .format(option, '/'.join(options.keys())))
-            return IRCResponse(ResponseType.Say, error, message.replyTo)
+            return IRCResponse(error, message.replyTo)
 
 
 dinner = Dinner()

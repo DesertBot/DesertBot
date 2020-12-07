@@ -23,11 +23,9 @@ class Notice(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) > 1:
-            return IRCResponse(ResponseType.Notice,
-                               " ".join(message.parameterList[1:]),
-                               message.parameterList[0])
+            return IRCResponse(" ".join(message.parameterList[1:]), message.parameterList[0], ResponseType.Notice)
         else:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
 
 notice = Notice()

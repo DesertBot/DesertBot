@@ -28,9 +28,9 @@ class BotControl(BotCommand):
     def _nick(self, message):
         """nick - changes the bot's nickname"""
         if len(message.parameterList) > 0:
-            return IRCResponse(ResponseType.Raw, 'NICK {}'.format(message.parameterList[0]), '')
+            return IRCResponse('NICK {}'.format(message.parameterList[0]), '', ResponseType.Raw)
         else:
-            return IRCResponse(ResponseType.Say, 'Change my nickname to what?', message.replyTo)
+            return IRCResponse('Change my nickname to what?', message.replyTo)
 
     @admin
     def _restart(self, message):

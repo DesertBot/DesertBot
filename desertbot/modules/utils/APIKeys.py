@@ -27,7 +27,7 @@ class APIKeys(BotCommand):
     @admin("[APIKey] Only my admins may manage API keys!")
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 3:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
         command = message.parameterList[0].lower()
         key = message.parameterList.pop()
         keyname = " ".join(message.parameterList[1:])
@@ -37,23 +37,23 @@ class APIKeys(BotCommand):
                 self.storage[keyname] = key
             except Exception:
                 self.logger.exception(f"Failed to add API key {keyname}!")
-                return IRCResponse(ResponseType.Say, f"Failed to add API key {keyname} to the bot!", message.replyTo)
+                return IRCResponse(f"Failed to add API key {keyname} to the bot!", message.replyTo)
             else:
-                return IRCResponse(ResponseType.Say, f"Added the API key {keyname} to the bot.", message.replyTo)
+                return IRCResponse(f"Added the API key {keyname} to the bot.", message.replyTo)
         elif command == "remove":
             try:
                 if keyname in self.keys:
                     del self.storage[keyname]
                     self.storage.save()
                 else:
-                    return IRCResponse(ResponseType.Say, f"There is no API key named {keyname}!", message.replyTo)
+                    return IRCResponse(f"There is no API key named {keyname}!", message.replyTo)
             except Exception:
                 self.logger.exception(f"Failed to remove API key {keyname}!")
-                return IRCResponse(ResponseType.Say, f"Failed to remove API key {keyname} from the bot!", message.replyTo)
+                return IRCResponse(f"Failed to remove API key {keyname} from the bot!", message.replyTo)
             else:
-                return IRCResponse(ResponseType.Say, f"Removed the API key {keyname} from the bot.", message.replyTo)
+                return IRCResponse(f"Removed the API key {keyname} from the bot.", message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
     def getKey(self, name: str) -> Union[str, None]:
         """

@@ -75,22 +75,18 @@ class Dominotifications(BotModule):
         if not response:
             # tracking API didn't respond
             self._stopPizzaTracker(orderID)
-            self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                              "The pizza tracking page linked by {}"
+            self.bot.sendResponse(IRCResponse("The pizza tracking page linked by {}"
                                               " had some kind of error, tracking stopped"
-                                              .format(trackingDetails.orderer),
-                                              trackingDetails.channel.name))
+                                              .format(trackingDetails.orderer), trackingDetails.channel.name))
             return
 
         j = response.json()
 
         if j['customerName'] is None:
             self._stopPizzaTracker(orderID)
-            self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                              "There are no pizza tracking details"
+            self.bot.sendResponse(IRCResponse("There are no pizza tracking details"
                                               " at the page linked by {}."
-                                              .format(trackingDetails.orderer),
-                                              trackingDetails.channel.name))
+                                              .format(trackingDetails.orderer), trackingDetails.channel.name))
             return
 
         response = None
@@ -98,9 +94,7 @@ class Dominotifications(BotModule):
         step = j['statusId']
         if step != trackingDetails.step:
             trackingDetails.step = step
-            response = IRCResponse(ResponseType.Say,
-                                   steps[step].format(trackingDetails.orderer),
-                                   trackingDetails.channel.name)
+            response = IRCResponse(steps[step].format(trackingDetails.orderer), trackingDetails.channel.name)
 
         if step == 3:
             self._stopPizzaTracker(orderID)

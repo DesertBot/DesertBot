@@ -27,7 +27,7 @@ class Currency(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 3:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
         try:
             amount = float(message.parameterList[0])
@@ -48,23 +48,19 @@ class Currency(BotCommand):
             }
         response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, params=params)
         if response is None:
-            return IRCResponse(ResponseType.Say,
-                               "Sorry, the currency API returned no data. Check your currencies!",
-                               message.replyTo)
+            return IRCResponse("Sorry, the currency API returned no data. Check your currencies!", message.replyTo)
         j = response.json()
         rates = j['rates']
 
         if not rates:
-            return IRCResponse(ResponseType.Say,
-                               "Some or all of those currencies weren't recognized!",
-                               message.replyTo)
+            return IRCResponse("Some or all of those currencies weren't recognized!", message.replyTo)
 
         data = []
         for curr, rate in rates.items():
             data.append("{:.2f} {}".format(rate*amount, curr))
 
         graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
-        return IRCResponse(ResponseType.Say, graySplitter.join(data), message.replyTo)
+        return IRCResponse(graySplitter.join(data), message.replyTo)
 
 
 currency = Currency()

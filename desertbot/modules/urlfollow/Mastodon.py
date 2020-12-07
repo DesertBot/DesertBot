@@ -44,24 +44,18 @@ class Mastodon(BotCommand):
         # display contents of a toot with a content warning
         if message.command == 'cw':
             if not message.parameters:
-                return IRCResponse(ResponseType.Say,
-                                   self.help(['cw']),
-                                   message.replyTo)
+                return IRCResponse(self.help(['cw']), message.replyTo)
 
             match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)',
                               message.parameters,
                               re.IGNORECASE)
             if not match:
-                return IRCResponse(ResponseType.Say,
-                                   '{!r} is not a recognized URL format'.format(message.parameters),
-                                   message.replyTo)
+                return IRCResponse('{!r} is not a recognized URL format'.format(message.parameters), message.replyTo)
             follow = self.followURL(message, url=message.parameters, showContents=True)
             if not follow:
-                return IRCResponse(ResponseType.Say,
-                                   "Couldn't find a toot at {!r}".format(message.parameters),
-                                   message.replyTo)
+                return IRCResponse("Couldn't find a toot at {!r}".format(message.parameters), message.replyTo)
             toot, _ = follow
-            return IRCResponse(ResponseType.Say, toot, message.replyTo)
+            return IRCResponse(toot, message.replyTo)
 
     def followURL(self, _: IRCMessage, url: str, showContents: bool=False) -> [str, None]:
         # check this is actually a Mastodon instance we're looking at

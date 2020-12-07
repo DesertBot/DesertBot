@@ -36,22 +36,16 @@ class Source(BotCommand):
             elif command in mh.caseMap:
                 module = mh.modules[mh.caseMap[command]].__class__
             else:
-                return IRCResponse(ResponseType.Say,
-                                   f'"{command}" not recognized as a command or module name',
-                                   message.replyTo)
+                return IRCResponse(f'"{command}" not recognized as a command or module name', message.replyTo)
             fullModulePath = inspect.getsourcefile(module)
             relModulePath = os.path.relpath(fullModulePath)
 
             fullModuleURL = f"{rootSourceURL}blob/master/{relModulePath}"
             name = module.__name__
 
-            return IRCResponse(ResponseType.Say,
-                               f"Source of {name}: {fullModuleURL}",
-                               message.replyTo)
+            return IRCResponse(f"Source of {name}: {fullModuleURL}", message.replyTo)
 
-        return IRCResponse(ResponseType.Say,
-                           rootSourceURL,
-                           message.replyTo)
+        return IRCResponse(rootSourceURL, message.replyTo)
 
 
 source = Source()

@@ -38,12 +38,10 @@ class RedditImage(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0 or len(message.parameterList) > 2:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
         if not self.imgurClientID:
-            return IRCResponse(ResponseType.Say,
-                               '[imgur client ID not found]',
-                               message.replyTo)
+            return IRCResponse('[imgur client ID not found]', message.replyTo)
 
         subreddit = message.parameterList[0].lower()
         if len(message.parameterList) == 2:
@@ -55,9 +53,7 @@ class RedditImage(BotCommand):
                 if topRange < 0:
                     raise ValueError
             except ValueError:
-                return IRCResponse(ResponseType.Say,
-                                   "The range should be a positive integer!",
-                                   message.replyTo)
+                return IRCResponse("The range should be a positive integer!", message.replyTo)
         else:
             topRange = 100
 
@@ -68,18 +64,14 @@ class RedditImage(BotCommand):
                                                                   extraHeaders=self.headers)
             j = response.json()
         except json.JSONDecodeError:
-            return IRCResponse(ResponseType.Say,
-                               "[The imgur API doesn't appear to be responding correctly]",
-                               message.replyTo)
+            return IRCResponse("[The imgur API doesn't appear to be responding correctly]", message.replyTo)
 
         images = j['data']
 
         if not images:
-            return IRCResponse(ResponseType.Say,
-                               "The subreddit '{}' doesn't seem to have"
+            return IRCResponse("The subreddit '{}' doesn't seem to have"
                                " any images posted to it (or it doesn't exist!)"
-                               .format(subreddit),
-                               message.replyTo)
+                               .format(subreddit), message.replyTo)
 
         image = random.choice(images)
 
@@ -96,7 +88,7 @@ class RedditImage(BotCommand):
             data.append(image['link'])
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
-        return IRCResponse(ResponseType.Say, graySplitter.join(data), message.replyTo)
+        return IRCResponse(graySplitter.join(data), message.replyTo)
 
 
 redditImage = RedditImage()

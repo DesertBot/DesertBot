@@ -25,7 +25,7 @@ class Time(BotCommand):
 
     def execute(self, message: IRCMessage):
         if not self.apiKey:
-            return IRCResponse(ResponseType.Say, "No API key found.", message.replyTo)
+            return IRCResponse("No API key found.", message.replyTo)
 
         params = message.parameterList
 
@@ -42,13 +42,9 @@ class Time(BotCommand):
             lon = float(params[1])
             location = self.bot.moduleHandler.runActionUntilValue("geolocation-latlon", lat, lon)
             if not location:
-                return IRCResponse(ResponseType.Say,
-                                   "I can't determine locations at the moment. Try again later.",
-                                   message.replyTo)
+                return IRCResponse("I can't determine locations at the moment. Try again later.", message.replyTo)
             if not location["success"]:
-                return IRCResponse(ResponseType.Say,
-                                   "I don't think that's even a location in this multiverse...",
-                                   message.replyTo)
+                return IRCResponse("I don't think that's even a location in this multiverse...", message.replyTo)
             return self._handleCommandWithLocation(message, location)
         except (IndexError, ValueError):
             pass  # The user did not give a latlon, so continue using other methods
@@ -57,11 +53,9 @@ class Time(BotCommand):
         userLoc = self.bot.moduleHandler.runActionUntilValue("userlocation", params[0])
         if selfSearch:
             if not userLoc:
-                return IRCResponse(ResponseType.Say,
-                                   "I can't determine locations at the moment. Try again later.",
-                                   message.replyTo)
+                return IRCResponse("I can't determine locations at the moment. Try again later.", message.replyTo)
             elif not userLoc["success"]:
-                return IRCResponse(ResponseType.Say, userLoc["error"], message.replyTo)
+                return IRCResponse(userLoc["error"], message.replyTo)
         if userLoc and userLoc["success"]:
             if "lat" in userLoc:
                 location = self.bot.moduleHandler.runActionUntilValue("geolocation-latlon", userLoc["lat"],
@@ -69,29 +63,23 @@ class Time(BotCommand):
             else:
                 location = self.bot.moduleHandler.runActionUntilValue("geolocation-place", userLoc["location"])
             if not location:
-                return IRCResponse(ResponseType.Say, "I can't determine locations at the moment. Try again later.",
-                                   message.replyTo)
+                return IRCResponse("I can't determine locations at the moment. Try again later.", message.replyTo)
             if not location["success"]:
-                return IRCResponse(ResponseType.Say, "I don't think that's even a location in this multiverse...",
-                                   message.replyTo)
+                return IRCResponse("I don't think that's even a location in this multiverse...", message.replyTo)
             return self._handleCommandWithLocation(message, location)
 
         # Try to determine the location by the name of the place
         place = " ".join(params)
         location = self.bot.moduleHandler.runActionUntilValue("geolocation-place", place)
         if not location:
-            return IRCResponse(ResponseType.Say, "I can't determine locations at the moment. Try again later.",
-                               message.replyTo)
+            return IRCResponse("I can't determine locations at the moment. Try again later.", message.replyTo)
         if not location["success"]:
-            return IRCResponse(ResponseType.Say, "I don't think that's even a location in this multiverse...",
-                               message.replyTo)
+            return IRCResponse("I don't think that's even a location in this multiverse...", message.replyTo)
         return self._handleCommandWithLocation(message, location)
 
     def _handleCommandWithLocation(self, message, location):
         formattedTime = self._getTime(location["latitude"], location["longitude"])
-        return IRCResponse(ResponseType.Say,
-                           "Location: {} | {}".format(location["locality"], formattedTime),
-                           message.replyTo)
+        return IRCResponse("Location: {} | {}".format(location["locality"], formattedTime), message.replyTo)
 
     def _getTime(self, lat, lon):
         currentTime = timestamp(now())

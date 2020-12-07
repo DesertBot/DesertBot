@@ -25,10 +25,10 @@ class WolframAlpha(BotCommand):
 
     def execute(self, message: IRCMessage) -> Union[IRCResponse, List[IRCResponse]]:
         if not self.apiKey:
-            return IRCResponse(ResponseType.Say, "No API key found.", message.replyTo)
+            return IRCResponse("No API key found.", message.replyTo)
 
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say, "You didn't give me a search query.", message.replyTo)
+            return IRCResponse("You didn't give me a search query.", message.replyTo)
 
         params = {
             'input': message.parameters,
@@ -87,7 +87,7 @@ class WolframAlpha(BotCommand):
                 output = f'{output} | {shortenedUrl}'
             graySplitter = colour(A.normal['', A.fg.gray['|'], ''])
             output = re.sub('(\| )+', '| ', re.sub(' +', ' ', output)).replace('|', graySplitter)
-            return IRCResponse(ResponseType.Say, output, message.replyTo)
+            return IRCResponse(output, message.replyTo)
 
 
 wolframAlpha = WolframAlpha()

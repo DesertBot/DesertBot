@@ -74,9 +74,7 @@ class Splatoon(BotCommand):
             data += filter(None, [self._ranked(j, short=True)])
             data += filter(None, [self._league(j, short=True)])
             data += filter(None, [self._fest(j, short=True)])
-            return IRCResponse(ResponseType.Say,
-                               self.graySplitter.join(data),
-                               message.replyTo)
+            return IRCResponse(self.graySplitter.join(data), message.replyTo)
         else:
             subCommands = {
                 'regular': self._regular,
@@ -86,11 +84,9 @@ class Splatoon(BotCommand):
             }
             subCommand = message.parameterList[0].lower()
             if subCommand in subCommands:
-                return IRCResponse(ResponseType.Say,
-                                   subCommands[subCommand](j, short=False),
-                                   message.replyTo)
+                return IRCResponse(subCommands[subCommand](j, short=False), message.replyTo)
             else:
-                return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+                return IRCResponse(self.help(None), message.replyTo)
 
 
 splatoon = Splatoon()
