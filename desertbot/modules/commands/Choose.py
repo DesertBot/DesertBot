@@ -25,10 +25,8 @@ class Choose(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me any options to choose from! {}"
-                               .format(self.help(None)),
-                               message.replyTo)
+            return IRCResponse("You didn't give me any options to choose from! {}"
+                               .format(self.help(None)), message.replyTo)
 
         if ',' in message.parameters:
             options = message.parameters.split(',')
@@ -37,7 +35,7 @@ class Choose(BotCommand):
 
         choice = random.choice(options).strip()
 
-        return IRCResponse(ResponseType.Say, choice, message.replyTo, metadata={'var': {'chooseChoice': choice}})
+        return IRCResponse(choice, message.replyTo, metadata={'var': {'chooseChoice': choice}})
 
 
 choose = Choose()

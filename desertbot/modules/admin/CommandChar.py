@@ -26,13 +26,9 @@ class CommandChar(BotCommand):
             self.bot.commandChar = message.parameterList[0]
             self.bot.config['commandChar'] = self.bot.commandChar
             self.bot.config.writeConfig()
-            return IRCResponse(ResponseType.Say,
-                               'Command prefix char changed to {!r}!'.format(self.bot.commandChar),
-                               message.replyTo)
+            return IRCResponse('Command prefix char changed to {!r}!'.format(self.bot.commandChar), message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say,
-                               'Change my command character to what?',
-                               message.replyTo)
+            return IRCResponse('Change my command character to what?', message.replyTo)
 
 
 commandchar = CommandChar()

@@ -39,40 +39,32 @@ class Alias(BotCommand):
         You can specify where parameters given to the alias should be inserted with $1, $2, $n.\
         The whole parameter string is $0. $sender and $channel can also be used"""
         if len(message.parameterList) <= 2:
-            return IRCResponse(ResponseType.Say, "Alias what?", message.replyTo)
+            return IRCResponse("Alias what?", message.replyTo)
 
         alias = message.parameterList[1].lower()
         if alias in self.aliases:
-            return IRCResponse(ResponseType.Say,
-                               "'{}' is already an alias!".format(alias),
-                               message.replyTo)
+            return IRCResponse("'{}' is already an alias!".format(alias), message.replyTo)
 
         if alias in self.bot.moduleHandler.mappedTriggers:
-            return IRCResponse(ResponseType.Say,
-                               "'{}' is already a command!".format(alias),
-                               message.replyTo)
+            return IRCResponse("'{}' is already a command!".format(alias), message.replyTo)
 
         aliased = message.parameterList[2].lower()
         if aliased not in self.bot.moduleHandler.mappedTriggers:
-            return IRCResponse(ResponseType.Say,
-                               "'{}' is not a valid command or alias!".format(aliased),
-                               message.replyTo)
+            return IRCResponse("'{}' is not a valid command or alias!".format(aliased), message.replyTo)
 
         newAlias = message.parameterList[2:]
         newAlias[0] = newAlias[0].lower()
         self._newAlias(alias, ' '.join(newAlias))
         self._syncAliases()
 
-        return IRCResponse(ResponseType.Say,
-                           "Created a new alias '{}' for '{}'.".format(alias, " ".join(newAlias)),
-                           message.replyTo)
+        return IRCResponse("Created a new alias '{}' for '{}'.".format(alias, " ".join(newAlias)), message.replyTo)
 
     @admin("Only my admins may delete aliases!")
     def _del(self, message):
         """del <alias> - deletes the alias named <alias>.\
         You can list multiple aliases to delete (space separated)"""
         if len(message.parameterList) == 1:
-            return IRCResponse(ResponseType.Say, "Delete which alias?", message.replyTo)
+            return IRCResponse("Delete which alias?", message.replyTo)
 
         deleted = []
         skipped = []
@@ -83,61 +75,42 @@ class Alias(BotCommand):
 
             deleted.append(aliasName)
             self._delAlias(aliasName)
-        return IRCResponse(ResponseType.Say,
-                           "Deleted alias(es) '{}', {} skipped".format(", ".join(deleted),
+        return IRCResponse("Deleted alias(es) '{}', {} skipped".format(", ".join(deleted),
                                                                        len(skipped)),
                            message.replyTo)
 
     def _list(self, message):
         """list - lists all defined aliases"""
-        return IRCResponse(ResponseType.Say,
-                           "Current aliases: {}"
-                           .format(", ".join(sorted(self.aliases.keys()))),
-                           message.replyTo)
+        return IRCResponse("Current aliases: {}".format(", ".join(sorted(self.aliases.keys()))), message.replyTo)
 
     def _show(self, message):
         """show <alias> - shows the contents of the specified alias"""
         if len(message.parameterList) == 1:
-            return IRCResponse(ResponseType.Say,
-                               "Show which alias?",
-                               message.replyTo)
+            return IRCResponse("Show which alias?", message.replyTo)
         alias = message.parameterList[1].lower()
         if alias in self.aliases:
-            return IRCResponse(ResponseType.Say,
-                               "'{}' is aliased to: {}".format(alias, self.aliases[alias]),
-                               message.replyTo)
+            return IRCResponse("'{}' is aliased to: {}".format(alias, self.aliases[alias]), message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say,
-                               "'{}' is not a recognized alias".format(alias),
-                               message.replyTo)
+            return IRCResponse("'{}' is not a recognized alias".format(alias), message.replyTo)
 
     @admin("Only my admins may set alias help text!")
     def _help(self, message):
         """help <alias> <alias help> - defines the help text for the given alias"""
         if len(message.parameterList) == 1:
-            return IRCResponse(ResponseType.Say,
-                               "Set the help text for what alias to what?",
-                               message.replyTo)
+            return IRCResponse("Set the help text for what alias to what?", message.replyTo)
 
         alias = message.parameterList[1].lower()
         if alias not in self.aliases:
-            return IRCResponse(ResponseType.Say,
-                               "There is no alias called '{}'".format(alias),
-                               message.replyTo)
+            return IRCResponse("There is no alias called '{}'".format(alias), message.replyTo)
 
         if len(message.parameterList) == 2:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me any help text to set for {}!".format(alias),
-                               message.replyTo)
+            return IRCResponse("You didn't give me any help text to set for {}!".format(alias), message.replyTo)
 
         aliasHelp = " ".join(message.parameterList[2:])
         self._setAliasHelp(alias, aliasHelp)
         self._syncAliases()
 
-        return IRCResponse(ResponseType.Say,
-                           "'{}' help text set to '{}'"
-                           .format(alias, aliasHelp),
-                           message.replyTo)
+        return IRCResponse("'{}' help text set to '{}'".format(alias, aliasHelp), message.replyTo)
 
     def _export(self, message):
         """export [<alias name(s)] - exports all aliases - or the specified aliases - \
@@ -153,17 +126,13 @@ class Alias(BotCommand):
                          if alias in params}
 
             if len(aliases) == 0:
-                return IRCResponse(ResponseType.Say,
-                                   "I don't have any of the aliases listed for export",
-                                   message.replyTo)
+                return IRCResponse("I don't have any of the aliases listed for export", message.replyTo)
         else:
             aliases = self.aliases
             aliasHelp = self.aliasHelp
 
             if len(aliases) == 0:
-                return IRCResponse(ResponseType.Say,
-                                   "There are no aliases for me to export!",
-                                   message.replyTo)
+                return IRCResponse("There are no aliases for me to export!", message.replyTo)
 
         addCommands = ["{}alias add {} {}".format(self.bot.commandChar, name, command)
                        for name, command in aliases.items()]
@@ -175,8 +144,7 @@ class Alias(BotCommand):
 
         mh = self.bot.moduleHandler
         url = mh.runActionUntilValue('upload-dbco', export)
-        return IRCResponse(ResponseType.Say,
-                           "Exported {} aliases and {} help texts to {}".format(len(addCommands),
+        return IRCResponse("Exported {} aliases and {} help texts to {}".format(len(addCommands),
                                                                                 len(helpCommands),
                                                                                 url),
                            message.replyTo)
@@ -186,9 +154,7 @@ class Alias(BotCommand):
         """import <url> [<alias(es)>] -\
         imports all aliases from the given address, or only the listed aliases"""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give a url to import from!",
-                               message.replyTo)
+            return IRCResponse("You didn't give a url to import from!", message.replyTo)
 
         if len(message.parameterList) > 2:
             onlyListed = True
@@ -201,13 +167,9 @@ class Alias(BotCommand):
         try:
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         except ValueError:
-            return IRCResponse(ResponseType.Say,
-                               "'{}' is not a valid URL".format(url),
-                               message.replyTo)
+            return IRCResponse("'{}' is not a valid URL".format(url), message.replyTo)
         if not response:
-            return IRCResponse(ResponseType.Say,
-                               "Failed to open page at {}".format(url),
-                               message.replyTo)
+            return IRCResponse("Failed to open page at {}".format(url), message.replyTo)
 
         text = response.content
         text = UnicodeDammit(text).unicode_markup
@@ -223,12 +185,10 @@ class Alias(BotCommand):
                 notAlias = "Line {} at {} does not begin with {}alias".format(lineNumber,
                                                                               url,
                                                                               self.bot.commandChar)
-                return IRCResponse(ResponseType.Say, notAlias, message.replyTo)
+                return IRCResponse(notAlias, message.replyTo)
             subCommand = splitLine[1].lower()
             if subCommand not in ["add", "help"]:
-                return IRCResponse(ResponseType.Say,
-                                   "Line {} at {} is not an add or help command".format(lineNumber,
-                                                                                        url),
+                return IRCResponse("Line {} at {} is not an add or help command".format(lineNumber, url),
                                    message.replyTo)
 
             aliasName = splitLine[2].lower()
@@ -252,7 +212,7 @@ class Alias(BotCommand):
         importMessage = "Imported {} alias(es) and {} help string(s) from {}".format(numAliases,
                                                                                      numHelpTexts,
                                                                                      url)
-        return IRCResponse(ResponseType.Say, importMessage, message.replyTo)
+        return IRCResponse(importMessage, message.replyTo)
 
     subCommands = OrderedDict([
         ('add', _add),
@@ -293,14 +253,10 @@ class Alias(BotCommand):
             if len(message.parameterList) > 0:
                 subCommand = message.parameterList[0].lower()
                 if subCommand not in self.subCommands:
-                    return IRCResponse(ResponseType.Say,
-                                       self._unrecognizedSubcommand(subCommand),
-                                       message.replyTo)
+                    return IRCResponse(self._unrecognizedSubcommand(subCommand), message.replyTo)
                 return self.subCommands[subCommand](self, message)
             else:
-                return IRCResponse(ResponseType.Say,
-                                   self._helpText,
-                                   message.replyTo)
+                return IRCResponse(self._helpText, message.replyTo)
 
         elif message.command.lower() in self.aliases:
             newMessage = self._aliasedMessage(message)

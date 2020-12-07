@@ -66,16 +66,16 @@ class Comic(BotCommand):
         if message.command.lower() == "rendercomic":
             params = list(message.parameterList)
             if len(params) != 1:
-                return IRCResponse(ResponseType.Say, "You didn't give me a URL to load", message.replyTo)
+                return IRCResponse("You didn't give me a URL to load", message.replyTo)
             url = params[0]
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             if response is None:
-                return IRCResponse(ResponseType.Say, "Error fetching given URL", message.replyTo)
+                return IRCResponse("Error fetching given URL", message.replyTo)
             try:
                 comicInfo = response.json()
             except Exception:
-                return IRCResponse(ResponseType.Say, "URL contents were not valid JSON", message.replyTo)
-            return IRCResponse(ResponseType.Say, self.postComic(self.renderComic(comicInfo)), message.replyTo)
+                return IRCResponse("URL contents were not valid JSON", message.replyTo)
+            return IRCResponse(self.postComic(self.renderComic(comicInfo)), message.replyTo)
 
         # main command
         comicLimit = 8
@@ -88,13 +88,9 @@ class Comic(BotCommand):
             regex = re2.compile(" ".join(params), re2.IGNORECASE)
             matches = list(filter(regex.search, [msg[1] for msg in messages]))
             if len(matches) == 0:
-                return IRCResponse(ResponseType.Say,
-                                   "Sorry, that didn't match anything in my message buffer.",
-                                   message.replyTo)
+                return IRCResponse("Sorry, that didn't match anything in my message buffer.", message.replyTo)
             elif len(matches) > 1:
-                return IRCResponse(ResponseType.Say,
-                                   "Sorry, that matches too many lines in my message buffer.",
-                                   message.replyTo)
+                return IRCResponse("Sorry, that matches too many lines in my message buffer.", message.replyTo)
 
             index = [msg[1] for msg in messages].index(matches[0])
             lastIndex = index + comicLimit
@@ -105,9 +101,7 @@ class Comic(BotCommand):
             messages = messages[comicLimit * -1:]
 
         if not messages:
-            return IRCResponse(ResponseType.Say,
-                               "There are no messages in the buffer to create a comic with.",
-                               message.replyTo)
+            return IRCResponse("There are no messages in the buffer to create a comic with.", message.replyTo)
 
         comicInfo = self.generateComicInfo(messages)
         comicJSON = json.dumps(comicInfo, indent=2)
@@ -115,7 +109,7 @@ class Comic(BotCommand):
         comicLink = self.postComic(self.renderComic(comicInfo))
         response = f"{comicLink} (permanent JSON link: {jsonLink})"
 
-        return IRCResponse(ResponseType.Say, response, message.replyTo)
+        return IRCResponse(response, message.replyTo)
 
     def getMessages(self, channel: str):
         """

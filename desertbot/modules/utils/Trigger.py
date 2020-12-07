@@ -47,7 +47,7 @@ class Trigger(BotCommand):
     def execute(self, message: IRCMessage):
         if message.command.lower() in self.ownTriggers:
             if len(message.parameterList) < 1 or message.parameterList[0].lower() not in self.subCommands:
-                return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
+                return IRCResponse(self.help(message.parameterList), message.replyTo)
             else:
                 subCommand = message.parameterList[0].lower()
                 return self.subCommands[subCommand](self, message)
@@ -67,7 +67,7 @@ class Trigger(BotCommand):
     def _addTrigger(self, message: IRCMessage) -> IRCResponse:
         """add <triggerName> <regexTypePrefix>"<regex>" <command> - add a new trigger - valid regexTypePrefixes are t for text, n for nick - specifies what the regex should match against"""
         if len(message.parameterList) < 3:
-            return IRCResponse(ResponseType.Say, self.help(message.parameterList), message.replyTo)
+            return IRCResponse(self.help(message.parameterList), message.replyTo)
         else:
             triggerName = message.parameterList[1]
             regex = message.parameterList[2]
@@ -77,7 +77,7 @@ class Trigger(BotCommand):
             regexType = self._regexTypePrefixToTypeName(regex[0])
             regex = regex[2:-1]  # strip out leading regextype and quotemarks surrounding regex
             self._actuallyAddTrigger(triggerName, regex, regexType, command, True)
-            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} added and now enabled.", message.replyTo)
+            return IRCResponse(f"Trigger {triggerName} added and now enabled.", message.replyTo)
 
     def _actuallyAddTrigger(self, triggerName: str, regex: str, regexType: str, command: str, enabled: bool):
         # used by _addTrigger and _importTriggers
@@ -94,9 +94,9 @@ class Trigger(BotCommand):
         triggerName = message.parameterList[1]
         if triggerName in self.storage:
             del self.storage[triggerName]
-            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} deleted!", message.replyTo)
+            return IRCResponse(f"Trigger {triggerName} deleted!", message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
+            return IRCResponse(f"No trigger named {triggerName} exists.", message.replyTo)
 
     def _toggleTrigger(self, message: IRCMessage) -> IRCResponse:
         """toggle <triggerName> - turn specified trigger on or off"""
@@ -104,9 +104,9 @@ class Trigger(BotCommand):
         if triggerName in self.storage:
             self.storage[triggerName]["enabled"] = not self.storage[triggerName]["enabled"]
             currentStatus = "enabled" if self.storage[triggerName]["enabled"] else "disabled"
-            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} is now {currentStatus}", message.replyTo)
+            return IRCResponse(f"Trigger {triggerName} is now {currentStatus}", message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
+            return IRCResponse(f"No trigger named {triggerName} exists.", message.replyTo)
 
     def _listTriggerNames(self, message: IRCMessage) -> List[IRCResponse]:
         """list - list names of all triggers, and their current status"""
@@ -114,8 +114,8 @@ class Trigger(BotCommand):
         disableds = [triggerName for triggerName in self.storage if not self.storage[triggerName]['enabled']]
 
         return [
-            IRCResponse(ResponseType.Say, f"Enabled triggers: {', '.join(enableds)}", message.replyTo),
-            IRCResponse(ResponseType.Say, f"Disabled triggers: {', '.join(disableds)}", message.replyTo)
+            IRCResponse(f"Enabled triggers: {', '.join(enableds)}", message.replyTo),
+            IRCResponse(f"Disabled triggers: {', '.join(disableds)}", message.replyTo)
         ]
 
     def _showTrigger(self, message: IRCMessage) -> IRCResponse:
@@ -123,9 +123,11 @@ class Trigger(BotCommand):
         triggerName = message.parameterList[1]
         if triggerName in self.storage:
             triggerData = self.storage[triggerName]
-            return IRCResponse(ResponseType.Say, f"Trigger {triggerName} - {triggerData['regexType']}\"{triggerData['regex']}\" - {triggerData['command']}", message.replyTo)
+            return IRCResponse(
+                f"Trigger {triggerName} - {triggerData['regexType']}\"{triggerData['regex']}\" - {triggerData['command']}",
+                message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, f"No trigger named {triggerName} exists.", message.replyTo)
+            return IRCResponse(f"No trigger named {triggerName} exists.", message.replyTo)
 
     @admin(msg="Only my admins may export triggers!")
     def _exportTriggers(self, message: IRCMessage) -> IRCResponse:
@@ -138,7 +140,7 @@ class Trigger(BotCommand):
             triggers = self.storage
 
         if len(triggers) == 0:
-            return IRCResponse(ResponseType.Say, "There are no triggers to export!", message.replyTo)
+            return IRCResponse("There are no triggers to export!", message.replyTo)
 
         addCommands = []
         for triggerName, triggerData in triggers.items():
@@ -150,15 +152,13 @@ class Trigger(BotCommand):
         mh = self.bot.moduleHandler
         url = mh.runActionUntilValue('upload-dbco', exportText, expire=60*60)
 
-        return IRCResponse(ResponseType.Say,
-                           f"Exported {len(addCommands)} triggers to {url}",
-                           message.replyTo)
+        return IRCResponse(f"Exported {len(addCommands)} triggers to {url}", message.replyTo)
 
     @admin(msg="Only my admins may import triggers!")
     def _importTriggers(self, message: IRCMessage) -> IRCResponse:
         """import <url> [<trigger(s)>] - import all triggers from the specified URLs, or only the listed triggers"""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, "You didn't give a url to import from!", message.replyTo)
+            return IRCResponse("You didn't give a url to import from!", message.replyTo)
 
         if len(message.parameterList) > 2:
             onlyListed = True
@@ -171,9 +171,9 @@ class Trigger(BotCommand):
         try:
             response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         except ValueError:
-            return IRCResponse(ResponseType.Say, f"'{url}' is not a valid URL", message.replyTo)
+            return IRCResponse(f"'{url}' is not a valid URL", message.replyTo)
         if not response:
-            return IRCResponse(ResponseType.Say, f"Failed to open page at {url}", message.replyTo)
+            return IRCResponse(f"Failed to open page at {url}", message.replyTo)
 
         text = response.content
         text = UnicodeDammit(text).unicode_markup
@@ -186,10 +186,10 @@ class Trigger(BotCommand):
             splitLine = line.split()
             if splitLine[0].lower() != "{}trigger".format(self.bot.commandChar):
                 notAlias = f"Line {lineNumber} at {url} does not begin with {self.bot.commandChar}trigger"
-                return IRCResponse(ResponseType.Say, notAlias, message.replyTo)
+                return IRCResponse(notAlias, message.replyTo)
             subCommand = splitLine[1].lower()
             if subCommand != "add":
-                return IRCResponse(ResponseType.Say, f"Line {lineNumber} at {url} is not an add command", message.replyTo)
+                return IRCResponse(f"Line {lineNumber} at {url} is not an add command", message.replyTo)
 
             triggerName = splitLine[2]
             triggerRegexTypePrefix = splitLine[3][0]
@@ -205,7 +205,7 @@ class Trigger(BotCommand):
             numTriggers += 1
 
         importMessage = f"Imported {numTriggers} trigger(s) from {url}"
-        return IRCResponse(ResponseType.Say, importMessage, message.replyTo)
+        return IRCResponse(importMessage, message.replyTo)
 
     def _handleTriggerCommand(self, message: IRCMessage, triggerCommand: str) -> IRCResponse:
         self.logger.debug(f"{triggerCommand} executing from a trigger")

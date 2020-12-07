@@ -62,17 +62,14 @@ class Lists(BotCommand):
         verbose = message.command.lower() == "listv"  # include timestamp in IRCResponse if command is listv
 
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say, self.help(["lists"]), message.replyTo)
+            return IRCResponse(self.help(["lists"]), message.replyTo)
         elif len(message.parameterList) == 1:
             if message.parameterList[0].lower() in self.storage:
-                return IRCResponse(ResponseType.Say,
-                                   self._getRandomEntry(message.parameterList[0].lower(), printTimestamp=verbose),
+                return IRCResponse(self._getRandomEntry(message.parameterList[0].lower(), printTimestamp=verbose),
                                    message.replyTo)
             else:
-                return IRCResponse(ResponseType.Say,
-                                   "I don't have a list named {!r}"
-                                   .format(message.parameterList[0]),
-                                   message.replyTo)
+                return IRCResponse("I don't have a list named {!r}"
+                                   .format(message.parameterList[0]), message.replyTo)
         elif len(message.parameterList) >= 2:
             listName = message.parameterList[0].lower()
             subcommand = message.parameterList[1].lower()
@@ -111,9 +108,9 @@ class Lists(BotCommand):
                 except ValueError:
                     text = self.help(["lists"])
 
-            return IRCResponse(ResponseType.Say, text, message.replyTo)
+            return IRCResponse(text, message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, self.help(["lists"]), message.replyTo)
+            return IRCResponse(self.help(["lists"]), message.replyTo)
 
     def _getRandomEntry(self, listName, printTimestamp=False):
         """

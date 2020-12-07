@@ -30,63 +30,57 @@ class OutOfContext(BotCommand):
     def _add(self, message: IRCMessage):
         """add - Adds a quote to the OutOfContext log. The quote will be pulled from a message line buffer."""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, "Add what?", message.replyTo)
+            return IRCResponse("Add what?", message.replyTo)
         if message.targetType == TargetTypes.USER:
-            return IRCResponse(ResponseType.Say, "You can only add messages from channels.", message.replyTo)
+            return IRCResponse("You can only add messages from channels.", message.replyTo)
 
         regex = re2.compile(re2.escape(" ".join(message.parameterList[1:])), re2.IGNORECASE)
         if len(self.messageStore) == 0 or message.channel not in self.messageStore:
-            return IRCResponse(ResponseType.Say, "Sorry, there are no messages in my buffer.", message.replyTo)
+            return IRCResponse("Sorry, there are no messages in my buffer.", message.replyTo)
 
         matches = list(filter(regex.search, self.messageStore[message.channel]))
         if len(matches) == 0:
-            return IRCResponse(ResponseType.Say,
-                               "Sorry, that didn't match anything in my message buffer.",
-                               message.replyTo)
+            return IRCResponse("Sorry, that didn't match anything in my message buffer.", message.replyTo)
         if len(matches) > 1:
-            return IRCResponse(ResponseType.Say,
-                               "Sorry, that matches too many lines in my message buffer.",
-                               message.replyTo)
+            return IRCResponse("Sorry, that matches too many lines in my message buffer.", message.replyTo)
 
         todayDate = time.strftime("[%Y-%m-%d] [%H:%M]")
         quote = f"{todayDate} {matches[0]}"
         if message.replyTo not in self.storage:
             self.storage[message.replyTo] = []
         if len(self.storage[message.replyTo]) > 0 and self.storage[message.replyTo][-1] == quote:
-            return IRCResponse(ResponseType.Say, "That quote has already been added to the log!", message.replyTo)
+            return IRCResponse("That quote has already been added to the log!", message.replyTo)
         else:
             self.storage[message.replyTo].append(quote)
-            return IRCResponse(ResponseType.Say, f"Quote '{quote}' was added to the log!", message.replyTo)
+            return IRCResponse(f"Quote '{quote}' was added to the log!", message.replyTo)
 
     def _remove(self, message: IRCMessage):
         """remove <regex> - remove a quote from the OutOfContext log."""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, "Remove what?", message.replyTo)
+            return IRCResponse("Remove what?", message.replyTo)
         if len(self.storage) == 0 or message.replyTo not in self.storage:
-            return IRCResponse(ResponseType.Say, "There are no quotes in the log.", message.replyTo)
+            return IRCResponse("There are no quotes in the log.", message.replyTo)
         regex = re2.compile(" ".join(message.parameterList[1:]), re2.IGNORECASE)
         matches = list(filter(regex.search, self.storage[message.replyTo]))
         if len(matches) == 0:
-            return IRCResponse(ResponseType.Say, "That message is not in the log.", message.replyTo)
+            return IRCResponse("That message is not in the log.", message.replyTo)
         if len(matches) > 1:
-            return IRCResponse(ResponseType.Say,
-                               f"Unable to remove quote, {len(matches)} matches found.",
-                               message.replyTo)
+            return IRCResponse(f"Unable to remove quote, {len(matches)} matches found.", message.replyTo)
         return self._removeQuote(message.replyTo, matches[0])
 
     def _removebyid(self, message: IRCMessage):
         """removebyid <quoteid> - remove the quote with the specified ID from the OutOfContext log."""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, "Remove what?", message.replyTo)
+            return IRCResponse("Remove what?", message.replyTo)
         if not string.isNumber(message.parameterList[1]):
-            return IRCResponse(ResponseType.Say, "You didn't specify a valid ID.", message.replyTo)
+            return IRCResponse("You didn't specify a valid ID.", message.replyTo)
         if len(self.storage) == 0 or message.replyTo not in self.storage:
-            return IRCResponse(ResponseType.Say, "There are no quotes in the log.", message.replyTo)
+            return IRCResponse("There are no quotes in the log.", message.replyTo)
         index = int(message.parameterList[1]) - 1
         quotes = self.storage[message.replyTo]
         if index < len(quotes):
             return self._removeQuote(message.replyTo, quotes[index])
-        return IRCResponse(ResponseType.Say, "That message is not in the log.", message.replyTo)
+        return IRCResponse("That message is not in the log.", message.replyTo)
 
     def _list(self, message: IRCMessage):
         """list (<search/searchnick <regex>>) - post the OutOfContext log. A search regex can be provided to filter\
@@ -107,7 +101,7 @@ class OutOfContext(BotCommand):
         """search <regex> - look up quotes in the OutOfContext log. This search operation will look at \
         the content of the quotes."""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, "Search what?", message.replyTo)
+            return IRCResponse("Search what?", message.replyTo)
         return self._getQuote(message.replyTo, " ".join(message.parameterList[1:]), False, -1)
 
     def _searchnick(self, message: IRCMessage):
@@ -121,7 +115,7 @@ class OutOfContext(BotCommand):
     def _id(self, message: IRCMessage):
         """id <quoteid> - look up the quote that has the given ID."""
         if len(message.parameterList) < 2 or not string.isNumber(message.parameterList[1]):
-            return IRCResponse(ResponseType.Say, "You didn't specify a valid ID.", message.replyTo)
+            return IRCResponse("You didn't specify a valid ID.", message.replyTo)
         return self._getQuote(message.replyTo, "", False, int(message.parameterList[1]) - 1)
 
     def _random(self, message: IRCMessage):
@@ -130,11 +124,11 @@ class OutOfContext(BotCommand):
 
     def _removeQuote(self, source, quote):
         self.storage[source].remove(quote)
-        return IRCResponse(ResponseType.Say, f"Quote '{quote}' was removed from the log!", source)
+        return IRCResponse(f"Quote '{quote}' was removed from the log!", source)
 
     def _postList(self, source, searchString, searchNickname):
         if len(self.storage) == 0 or source not in self.storage:
-            return IRCResponse(ResponseType.Say, "There are no quotes in the log.", source)
+            return IRCResponse("There are no quotes in the log.", source)
         regex = re2.compile(searchString, re2.IGNORECASE)
         matches = []
         if searchNickname:
@@ -150,17 +144,17 @@ class OutOfContext(BotCommand):
                 if re2.search(regex, x[x.find(">") + 1:]):
                     matches.append(x)
         if len(matches) == 0:
-            return IRCResponse(ResponseType.Say, f"No matches for '{searchString}' found.", source)
+            return IRCResponse(f"No matches for '{searchString}' found.", source)
 
         pasteLink =  self.bot.moduleHandler.runActionUntilValue('upload-dbco',
                                                                 string.stripFormatting("\n".join(matches)),
                                                                 10 * 60)
 
-        return IRCResponse(ResponseType.Say, f"Link posted! (Expires in 10 minutes) {pasteLink}.", source)
+        return IRCResponse(f"Link posted! (Expires in 10 minutes) {pasteLink}.", source)
 
     def _getQuote(self, source, searchString, searchNickname, index):
         if len(self.storage) == 0 or source not in self.storage:
-            return IRCResponse(ResponseType.Say, "There are no quotes in the log.", source)
+            return IRCResponse("There are no quotes in the log.", source)
         regex = re2.compile(searchString, re2.IGNORECASE)
         matches = []
         if searchNickname:
@@ -176,10 +170,10 @@ class OutOfContext(BotCommand):
                 if re2.search(regex, x[x.find(">") + 1:]):
                     matches.append(x)
         if len(matches) == 0:
-            return IRCResponse(ResponseType.Say, f"No matches for '{searchString}' found.", source)
+            return IRCResponse(f"No matches for '{searchString}' found.", source)
         if index < 0 or index > len(matches) - 1:
             index = random.randint(0, len(matches) - 1)
-        return IRCResponse(ResponseType.Say, f"Quote #{index + 1}/{len(matches)}: {matches[index]}", source)
+        return IRCResponse(f"Quote #{index + 1}/{len(matches)}: {matches[index]}", source)
 
     def _unrecognizedSubcommand(self, subCommand):
         return (f"unrecognized subcommand f'{subCommand}', "
@@ -206,12 +200,10 @@ class OutOfContext(BotCommand):
         if len(message.parameterList) > 0:
             subCommand = message.parameterList[0].lower()
             if subCommand not in self.subCommands:
-                return IRCResponse(ResponseType.Say,
-                                   self._unrecognizedSubcommand(subCommand),
-                                   message.replyTo)
+                return IRCResponse(self._unrecognizedSubcommand(subCommand), message.replyTo)
             return self.subCommands[subCommand](self, message)
         else:
-            return IRCResponse(ResponseType.Say, self._helpText, message.replyTo)
+            return IRCResponse(self._helpText, message.replyTo)
 
     def storeMessage(self, message: IRCMessage):
         if message.command or message.targetType == TargetTypes.USER:

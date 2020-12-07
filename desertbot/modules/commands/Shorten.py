@@ -17,20 +17,16 @@ class Shorten(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give a URL to shorten!",
-                               message.replyTo)
+            return IRCResponse("You didn't give a URL to shorten!", message.replyTo)
 
         url = self.bot.moduleHandler.runActionUntilValue('shorten-url',
                                                          message.parameters)
 
         if not url:
-            return IRCResponse(ResponseType.Say,
-                               "No url returned from dbco.link, "
-                               "are both pb and mongodb running?",
-                               message.replyTo)
+            return IRCResponse("No url returned from dbco.link, "
+                               "are both pb and mongodb running?", message.replyTo)
 
-        return IRCResponse(ResponseType.Say, url, message.replyTo)
+        return IRCResponse(url, message.replyTo)
 
 
 shorten = Shorten()

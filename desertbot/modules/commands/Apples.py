@@ -27,22 +27,22 @@ class Apples(BotCommand):
             name = msgArr.pop(0).strip()
             cmd = " ".join(msgArr).strip()
             if cmd == "to Apples! You have 60 seconds to join.":
-                return IRCResponse(ResponseType.Say, "!join", message.replyTo)
+                return IRCResponse("!join", message.replyTo)
             elif name.lower() == self.bot.nick and cmd == "is judging.":
-                return IRCResponse(ResponseType.Say, "!pick 0", message.replyTo)
+                return IRCResponse("!pick 0", message.replyTo)
             elif name.lower() != self.bot.nick and (cmd == "is judging next."
                                                     or cmd == "is judging first."):
-                return IRCResponse(ResponseType.Say, "!play 0", message.replyTo)
+                return IRCResponse("!play 0", message.replyTo)
             elif cmd == "wins the game!" or name == "Sorry,":
                 self.playApples = 0
 
     def execute(self, message: IRCMessage):
         if message.command.lower() == "playapples":
             self.playApples = 1
-            return IRCResponse(ResponseType.Say, "!join", message.replyTo)
+            return IRCResponse("!join", message.replyTo)
         elif message.command.lower() == "stopapples":
             self.playApples = 0
-            return IRCResponse(ResponseType.Say, "!leave", message.replyTo)
+            return IRCResponse("!leave", message.replyTo)
 
 
 apples = Apples()

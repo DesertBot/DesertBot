@@ -57,9 +57,9 @@ class Flip(BotCommand):
         if len(message.parameterList) > 0:
             translated = message.parameters.translate(self.translation)
             reversed = translated[::-1]
-            return IRCResponse(ResponseType.Say, reversed, message.replyTo)
+            return IRCResponse(reversed, message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say, 'Flip what?', message.replyTo)
+            return IRCResponse('Flip what?', message.replyTo)
 
 
 flip = Flip()

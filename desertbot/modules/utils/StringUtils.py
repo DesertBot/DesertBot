@@ -30,15 +30,11 @@ class StringUtils(BotCommand):
 
     def _tojson(self, message: IRCMessage):
         """converts input string to json-escaped string"""
-        return IRCResponse(ResponseType.Say,
-                           json.dumps(message.parameters),
-                           message.replyTo)
+        return IRCResponse(json.dumps(message.parameters), message.replyTo)
 
     def _fromjson(self, message: IRCMessage):
         """un-escapes json strings"""
-        return IRCResponse(ResponseType.Say,
-                           str(json.loads(message.parameters)),
-                           message.replyTo)
+        return IRCResponse(str(json.loads(message.parameters)), message.replyTo)
 
     commands = OrderedDict([
         ('tojson', _tojson),
@@ -50,9 +46,7 @@ class StringUtils(BotCommand):
         if command in self.commands:
             return self.commands[command](self, message)
         else:
-            return IRCResponse(ResponseType.Say,
-                               f'"{message.command}" is not a recognized StringUtils command',
-                               message.replyTo)
+            return IRCResponse(f'"{message.command}" is not a recognized StringUtils command', message.replyTo)
 
     def help(self, query):
         command = query.lower()

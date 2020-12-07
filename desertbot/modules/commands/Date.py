@@ -40,7 +40,7 @@ class Date(BotCommand):
 
     def execute(self, message: IRCMessage):
         response = self._commands[message.command](self, message.parameters)
-        return IRCResponse(ResponseType.Say, response, message.replyTo)
+        return IRCResponse(response, message.replyTo)
 
 
 date = Date()

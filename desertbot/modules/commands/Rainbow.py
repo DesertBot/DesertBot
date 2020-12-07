@@ -62,9 +62,7 @@ class Rainbow(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me any text to rainbow!",
-                               message.replyTo)
+            return IRCResponse("You didn't give me any text to rainbow!", message.replyTo)
 
         if message.command == 'rainbow':
             fg = True
@@ -82,9 +80,7 @@ class Rainbow(BotCommand):
                 colList = [5, 7, 8, 3, 10, 2, 6]
 
         if not message.parameters[startPos:]:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me any text to rainbow after the colours!",
-                               message.replyTo)
+            return IRCResponse("You didn't give me any text to rainbow after the colours!", message.replyTo)
 
         outputMessage = u''
 
@@ -97,7 +93,7 @@ class Rainbow(BotCommand):
 
         outputMessage += colour(A.normal[''])
 
-        return IRCResponse(ResponseType.Say, outputMessage, message.replyTo)
+        return IRCResponse(outputMessage, message.replyTo)
 
 
 rainbow = Rainbow()

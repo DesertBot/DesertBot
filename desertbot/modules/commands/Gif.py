@@ -35,10 +35,10 @@ class Gif(BotCommand):
                 else:
                     raise ValueError
             except ValueError:
-                return IRCResponse(ResponseType.Say, invalid, message.replyTo)
+                return IRCResponse(invalid, message.replyTo)
 
             if year not in years:
-                return IRCResponse(ResponseType.Say, invalid, message.replyTo)
+                return IRCResponse(invalid, message.replyTo)
         else:
             year = random.choice(years)
 
@@ -48,9 +48,7 @@ class Gif(BotCommand):
 
         link = response.content
 
-        return IRCResponse(ResponseType.Say,
-                           "Random DB{} gif: {}".format(year, link),
-                           message.replyTo)
+        return IRCResponse("Random DB{} gif: {}".format(year, link), message.replyTo)
 
 
 gif = Gif()

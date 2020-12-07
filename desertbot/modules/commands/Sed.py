@@ -75,13 +75,11 @@ class Sed(BotCommand):
                 if response.type == 'ACTION':
                     responseType = ResponseType.Do
 
-                return IRCResponse(responseType, response.messageString, message.replyTo)
+                return IRCResponse(response.messageString, message.replyTo, responseType)
 
             else:
-                return IRCResponse(ResponseType.Say,
-                                   "No text matching '{}' found in the last {} messages"
-                                   .format(search, self.historySize),
-                                   message.replyTo)
+                return IRCResponse("No text matching '{}' found in the last {} messages"
+                                   .format(search, self.historySize), message.replyTo)
 
         else:
             self.storeMessage(message)

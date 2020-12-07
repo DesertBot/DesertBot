@@ -27,12 +27,10 @@ class Join(BotCommand):
                 channel = param
                 if not channel.startswith('#'):
                     channel = '#' + channel
-                responses.append(IRCResponse(ResponseType.Raw, 'JOIN {0}'.format(channel), ''))
+                responses.append(IRCResponse(f'JOIN {channel}', '', ResponseType.Raw))
             return responses
         else:
-            return IRCResponse(ResponseType.Say,
-                               "{0}, you didn't say where I should join".format(message.user.nick),
-                               message.replyTo)
+            return IRCResponse(f"{message.user.nick}, you didn't say where I should join", message.replyTo)
 
 
 join = Join()

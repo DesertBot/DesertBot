@@ -89,12 +89,8 @@ class Responses(BotCommand):
             enabled = sorted(enabled)
             disabled = sorted(disabled)
 
-            return [IRCResponse(ResponseType.Say,
-                                'Enabled responses: {}'.format(', '.join(enabled)),
-                                message.replyTo),
-                    IRCResponse(ResponseType.Say,
-                                'Disabled responses: {}'.format(', '.join(disabled)),
-                                message.replyTo)]
+            return [IRCResponse('Enabled responses: {}'.format(', '.join(enabled)), message.replyTo),
+                    IRCResponse('Disabled responses: {}'.format(', '.join(disabled)), message.replyTo)]
 
 
 class ResponseObject(object):
@@ -151,11 +147,11 @@ class ResponseObject(object):
     # toggle this ResponseObject on/off in response to an IRCMessage
     def toggle(self, message: IRCMessage) -> IRCResponse:
         self.enabled = not self.enabled
-        return IRCResponse(ResponseType.Say, f"Response {self.name!r} {'enabled' if self.enabled else 'disabled'}", message.replyTo)
+        return IRCResponse(f"Response {self.name!r} {'enabled' if self.enabled else 'disabled'}", message.replyTo)
 
     # construct and return IRCResponse objects for the responseMessages this ResponseObject has
     def talkwords(self, message: IRCMessage) -> List[IRCResponse]:
-        return [IRCResponse(self.responseType, response, message.replyTo) for response in self.responseMessages]
+        return [IRCResponse(response, message.replyTo, self.responseType) for response in self.responseMessages]
 
 
 responses = Responses()

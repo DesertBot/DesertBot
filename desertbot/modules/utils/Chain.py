@@ -42,10 +42,8 @@ class Chain(BotCommand):
             link = re.sub(r'\\\|', r'|', link)
             if response is not None:
                 if hasattr(response, '__iter__'):
-                    return IRCResponse(ResponseType.Say,
-                                       "Chain Error: segment before '{}' returned a list"
-                                       .format(link),
-                                       message.replyTo)
+                    return IRCResponse("Chain Error: segment before '{}' returned a list"
+                                       .format(link), message.replyTo)
                 # replace $output with output of previous command
                 link = link.replace('$output', response.response)
                 # merge response metadata back into our chain-global dict
@@ -77,10 +75,8 @@ class Chain(BotCommand):
                 command = self.bot.moduleHandler.mappedTriggers[inputMessage.command.lower()]
                 response = command.execute(inputMessage)
             else:
-                return IRCResponse(ResponseType.Say,
-                                   "{!r} is not a recognized command trigger"
-                                   .format(inputMessage.command),
-                                   message.replyTo)
+                return IRCResponse("{!r} is not a recognized command trigger"
+                                   .format(inputMessage.command), message.replyTo)
 
         if response.response is not None:
             # limit response length (chains can get pretty large)

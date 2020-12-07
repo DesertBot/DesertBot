@@ -22,7 +22,7 @@ class CheckURL(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 1:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
 
         urlToCheck = message.parameterList[0]
         apiKey = self.bot.moduleHandler.runActionUntilValue("get-api-key", "WebCargo")
@@ -36,30 +36,20 @@ class CheckURL(BotCommand):
 
         if not response:
             if response.status_code == 500:
-                return IRCResponse(ResponseType.Say,
-                                   "{!r} doesn't contain a valid TLD",
-                                   message.replyTo)
+                return IRCResponse("{!r} doesn't contain a valid TLD", message.replyTo)
 
-            return IRCResponse(ResponseType.Say,
-                               "[WebCargo domain checker failed to respond]",
-                               message.replyTo)
+            return IRCResponse("[WebCargo domain checker failed to respond]", message.replyTo)
 
         j = response.json()
 
         if "message" in j:
-            return IRCResponse(ResponseType.Say,
-                               "{!r} is not a valid url".format(urlToCheck),
-                               message.replyTo)
+            return IRCResponse("{!r} is not a valid url".format(urlToCheck), message.replyTo)
 
         if "is_available" in j:
             if j["is_available"]:
-                return IRCResponse(ResponseType.Say,
-                                   "{!r} is available!".format(urlToCheck),
-                                   message.replyTo)
+                return IRCResponse("{!r} is available!".format(urlToCheck), message.replyTo)
             else:
-                return IRCResponse(ResponseType.Say,
-                                   "{!r} is not available".format(urlToCheck),
-                                   message.replyTo)
+                return IRCResponse("{!r} is not available".format(urlToCheck), message.replyTo)
 
 
 checkURL = CheckURL()

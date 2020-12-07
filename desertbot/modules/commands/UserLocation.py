@@ -21,17 +21,17 @@ class UserLocation(BotCommand):
     def execute(self, message: IRCMessage):
         if message.command == "addloc":
             if len(message.parameterList) < 1:
-                return IRCResponse(ResponseType.Say, "No location was specified.", message.replyTo)
+                return IRCResponse("No location was specified.", message.replyTo)
             self.storage[message.user.nick.lower()] = message.parameters
             self.bot.moduleHandler.runGenericAction('userlocation-updated', message.user.nick, message.parameters)
-            return IRCResponse(ResponseType.Say, "Your location has been updated.", message.replyTo)
+            return IRCResponse("Your location has been updated.", message.replyTo)
         elif message.command == "remloc":
             if message.user.nick.lower() not in self.storage:
-                return IRCResponse(ResponseType.Say, "Your location is not registered!", message.replyTo)
+                return IRCResponse("Your location is not registered!", message.replyTo)
             else:
                 del self.storage[message.user.nick.lower()]
                 self.bot.moduleHandler.runGenericAction('userlocation-removed', message.user.nick)
-                return IRCResponse(ResponseType.Say, "Your location has been removed.", message.replyTo)
+                return IRCResponse("Your location has been removed.", message.replyTo)
 
     def lookUpLocation(self, nick: str):
         if nick.lower() not in self.storage:

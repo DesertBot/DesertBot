@@ -35,26 +35,20 @@ class Roll(BotCommand):
             verbose = True
             
         if not message.parameters.strip():
-            return IRCResponse(ResponseType.Say,
-                               ('Error: roll what? (roll expects #d# dice expressions, '
-                                f'see {self.bot.commandChar}help roll for details)'),
-                               message.replyTo)
+            return IRCResponse(('Error: roll what? (roll expects #d# dice expressions, '
+                                f'see {self.bot.commandChar}help roll for details)'), message.replyTo)
 
         try:
             result = self.roller.parse(message.parameters)
         except OverflowError:
-            return IRCResponse(ResponseType.Say,
-                               'Error: result too large to calculate',
-                               message.replyTo)
+            return IRCResponse('Error: result too large to calculate', message.replyTo)
         except (ZeroDivisionError,
                 dice.UnknownCharacterException,
                 dice.SyntaxErrorException,
                 dice.InvalidOperandsException,
                 RecursionError,
                 NotImplementedError) as e:
-            return IRCResponse(ResponseType.Say,
-                               'Error: {}'.format(e),
-                               message.replyTo)
+            return IRCResponse('Error: {}'.format(e), message.replyTo)
 
         if verbose:
             rollString = ' | '.join(result.strings())
@@ -70,8 +64,7 @@ class Roll(BotCommand):
         if result.description:
             response += ' {}'.format(result.description)
 
-        return IRCResponse(ResponseType.Say, response, message.replyTo,
-                           metadata={'var': {'rollTotal': result.result}})
+        return IRCResponse(response, message.replyTo, metadata={'var': {'rollTotal': result.result}})
 
 
 roll = Roll()

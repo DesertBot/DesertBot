@@ -33,7 +33,7 @@ class Storage(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say, self.help(["storage"]), message.replyTo)
+            return IRCResponse(self.help(["storage"]), message.replyTo)
         else:
             subcommand = message.parameterList[0].lower()
             if subcommand == "stopsync":
@@ -50,36 +50,32 @@ class Storage(BotCommand):
         moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
             self._stopDataSync(moduleName)
-        return IRCResponse(ResponseType.Say,
-                           f"Stopped storage sync for modules {', '.join(moduleNames)}. They will no longer periodically autosave to file!",
-                           message.replyTo)
+        return IRCResponse(
+            f"Stopped storage sync for modules {', '.join(moduleNames)}. They will no longer periodically autosave to file!",
+            message.replyTo)
 
     @admin("[Storage] Only my admins may start up my storage sync!")
     def startStorageSync(self, message: IRCMessage):
         moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
             self._startDataSync(moduleName)
-        return IRCResponse(ResponseType.Say,
-                           f"Started storage sync for modules {', '.join(moduleNames)}. They will periodically autosave to file.",
-                           message.replyTo)
+        return IRCResponse(
+            f"Started storage sync for modules {', '.join(moduleNames)}. They will periodically autosave to file.",
+            message.replyTo)
 
     @admin("[Storage] Only my admins can reload my storage file!")
     def loadStorage(self, message: IRCMessage):
         moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
             self._loadModuleData(moduleName)
-        return IRCResponse(ResponseType.Say,
-                           f"Reloaded storage from file for modules {', '.join(moduleNames)}.",
-                           message.replyTo)
+        return IRCResponse(f"Reloaded storage from file for modules {', '.join(moduleNames)}.", message.replyTo)
 
     @admin("[Storage] Only my admins can save my storage to file!")
     def saveStorage(self, message: IRCMessage):
         moduleNames = self._getValidModuleNames(message.parameterList[1:])
         for moduleName in moduleNames:
             self._saveModuleData(moduleName)
-        return IRCResponse(ResponseType.Say,
-                           f"Saved storage to file for modules {', '.join(moduleNames)}.",
-                           message.replyTo)
+        return IRCResponse(f"Saved storage to file for modules {', '.join(moduleNames)}.", message.replyTo)
 
     def _getValidModuleNames(self, parameterList):
         """

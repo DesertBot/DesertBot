@@ -50,9 +50,9 @@ class CTCP(BotModule):
 
     def _getResponse(self, target: str, ctcpType: str, reply: str) -> IRCResponse:
         if reply:
-            return IRCResponse(ResponseType.Notice, '\x01{} {}\x01'.format(ctcpType, reply), target)
+            return IRCResponse('\x01{} {}\x01'.format(ctcpType, reply), target, ResponseType.Notice)
         else:
-            return IRCResponse(ResponseType.Notice, '\x01{}\x01'.format(ctcpType), target)
+            return IRCResponse('\x01{}\x01'.format(ctcpType), target, ResponseType.Notice)
 
 
 ctcp = CTCP()

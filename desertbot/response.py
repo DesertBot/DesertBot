@@ -14,8 +14,8 @@ class IRCResponse(object):
     response = ''
     target = ''
 
-    def __init__(self, messageType: ResponseType, response: Union[str, bytes], target: Union[str, bytes],
-                 metadata: Dict=None):
+    def __init__(self, response: Union[str, bytes], target: Union[str, bytes],
+                 messageType: ResponseType = ResponseType.Say, metadata: Dict = None):
         if metadata is None:
             metadata = {}
         self.type = messageType

@@ -20,9 +20,7 @@ class Commands(BotCommand):
         for moduleName, module in self.bot.moduleHandler.modules.items():
             if isinstance(module, BotCommand):
                 commandsList += module.triggers()
-        return IRCResponse(ResponseType.Say,
-                           "Available commands: {}".format(", ".join(sorted(commandsList))),
-                           message.replyTo)
+        return IRCResponse("Available commands: {}".format(", ".join(sorted(commandsList))), message.replyTo)
 
 
 commandsCommand = Commands()

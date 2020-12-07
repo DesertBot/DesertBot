@@ -63,7 +63,7 @@ class Animals(BotModule):
                 # the reaction has placeholders, fill them out
                 reaction = reaction.format(user=message.user.nick, article=article, animal=animal)
 
-                return IRCResponse(ResponseType.Say, reaction, message.replyTo)
+                return IRCResponse(reaction, message.replyTo)
 
 
 animals = Animals()

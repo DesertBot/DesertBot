@@ -56,7 +56,7 @@ class RSS(BotCommand):
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0:
-            return IRCResponse(ResponseType.Say, self.help(["rss"]), message.replyTo)
+            return IRCResponse(self.help(["rss"]), message.replyTo)
         if message.parameterList[0].lower() == "channels":
             return self._setChannels(message)
         elif message.parameterList[0].lower() == "follow":
@@ -72,12 +72,10 @@ class RSS(BotCommand):
             latest = self._getLatest(feed)
             if latest is not None:
                 response = 'Latest {}: {} | {}'.format(latest["name"], latest["title"], latest["link"])
-                return IRCResponse(ResponseType.Say, response, message.replyTo)
+                return IRCResponse(response, message.replyTo)
             else:
-                return IRCResponse(ResponseType.Say,
-                                   "{} is not an RSS feed I monitor, leave a tell if you'd like it added!".format(
-                                       message.parameters.strip()),
-                                   message.replyTo)
+                return IRCResponse("{} is not an RSS feed I monitor, leave a tell if you'd like it added!".format(
+                    message.parameters.strip()), message.replyTo)
 
     def checkFeeds(self):
         responses = []
@@ -86,7 +84,7 @@ class RSS(BotCommand):
             if newPost and not feedDeets["suppress"]:
                 for channel in self.channels:
                     response = "New {}! Title: {} | {}".format(feedName, feedDeets["lastTitle"], feedDeets["lastLink"])
-                    responses.append(IRCResponse(ResponseType.Say, response, channel))
+                    responses.append(IRCResponse(response, channel))
         return responses
 
     def _updateFeed(self, feedName: str) -> bool:
@@ -159,9 +157,7 @@ class RSS(BotCommand):
     def _setChannels(self, message: IRCMessage):
         self.channels = message.parameterList[1:]
         self.storage["rss_channels"] = self.channels
-        return IRCResponse(ResponseType.Say,
-                           "RSS notifications will now be sent to: {}".format(self.channels),
-                           message.replyTo)
+        return IRCResponse("RSS notifications will now be sent to: {}".format(self.channels), message.replyTo)
 
     @admin("[RSS] Only my admins may follow new RSS feeds!")
     def _followFeed(self, message: IRCMessage):
@@ -179,17 +175,14 @@ class RSS(BotCommand):
             self.feeds[name] = feed_object
             self.storage["rss_feeds"] = self.feeds
             self._updateFeed(name)
-            return IRCResponse(ResponseType.Say,
-                               "Successfully followed {} at URL {}".format(name, url),
-                               message.replyTo)
+            return IRCResponse("Successfully followed {} at URL {}".format(name, url), message.replyTo)
         except Exception:
             self.logger.exception("Failed to follow RSS feed - {}".format(message.messageString))
             # clean up if it already got saved, and the error was in _updateFeed
             if name in self.feeds:
                 del self.feeds[name]
                 self.storage["rss_feeds"] = self.feeds
-            return IRCResponse(ResponseType.Say,
-                               "I couldn't quite parse that RSS follow, are you sure you did it right?",
+            return IRCResponse("I couldn't quite parse that RSS follow, are you sure you did it right?",
                                message.replyTo)
 
     @admin("[RSS] Only my admins may unfollow RSS feeds!")
@@ -198,13 +191,9 @@ class RSS(BotCommand):
         if name in self.feeds:
             del self.feeds[name]
             self.storage["rss_feeds"] = self.feeds
-            return IRCResponse(ResponseType.Say,
-                               "Sucessfully unfollowed {}".format(name),
-                               message.replyTo)
+            return IRCResponse("Sucessfully unfollowed {}".format(name), message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say,
-                               "I am not following any feed named {}".format(name),
-                               message.replyTo)
+            return IRCResponse("I am not following any feed named {}".format(name), message.replyTo)
 
     @admin("[RSS] Only my admins may turn RSS feeds on and off!")
     def _toggleFeedSuppress(self, message: IRCMessage):
@@ -212,18 +201,14 @@ class RSS(BotCommand):
         if name in self.feeds:
             self.feeds[name]["suppress"] = not self.feeds[name]["suppress"]
             self.storage["rss_feeds"] = self.feeds
-            return IRCResponse(ResponseType.Say,
-                               "Successfully {}ed {}".format("suppress" if self.feeds[name]["suppress"] else "unsupress", name),
-                               message.replyTo)
+            return IRCResponse(
+                "Successfully {}ed {}".format("suppress" if self.feeds[name]["suppress"] else "unsupress", name),
+                message.replyTo)
         else:
-            return IRCResponse(ResponseType.Say,
-                               "I am not following any feed named {}".format(name),
-                               message.replyTo)
+            return IRCResponse("I am not following any feed named {}".format(name), message.replyTo)
 
     def _listFeeds(self, message: IRCMessage):
-        return IRCResponse(ResponseType.Say,
-                           "Currently followed feeds are: {}".format(", ".join(self.feeds.keys())),
-                           message.replyTo)
+        return IRCResponse("Currently followed feeds are: {}".format(", ".join(self.feeds.keys())), message.replyTo)
 
 
 rss = RSS()

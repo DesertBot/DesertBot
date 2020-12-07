@@ -27,9 +27,7 @@ class Admin(BotCommand):
         Nick alone will be converted to a glob hostmask, eg: *!user@host"""
 
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me a user to add!",
-                               message.replyTo)
+            return IRCResponse("You didn't give me a user to add!", message.replyTo)
 
         for adminName in message.parameterList[1:]:
             if message.replyTo in self.bot.channels:
@@ -42,18 +40,14 @@ class Admin(BotCommand):
             self.bot.config['admins'] = admins
 
         self.bot.config.writeConfig()
-        return IRCResponse(ResponseType.Say,
-                           "Added specified users as bot admins!",
-                           message.replyTo)
+        return IRCResponse("Added specified users as bot admins!", message.replyTo)
 
     @admin("Only my admins may remove admins!")
     def _del(self, message):
         """del <full hostmask> - removes the specified user from the bot admins list.
         You can list multiple users to remove them all at once."""
         if len(message.parameterList) < 2:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me a user to remove!",
-                               message.replyTo)
+            return IRCResponse("You didn't give me a user to remove!", message.replyTo)
 
         deleted = []
         skipped = []
@@ -74,19 +68,15 @@ class Admin(BotCommand):
         self.bot.config['admins'] = admins
         self.bot.config.writeConfig()
 
-        return IRCResponse(ResponseType.Say,
-                           "Removed '{}' as admin(s), {} skipped"
-                           .format(', '.join(deleted), len(skipped)),
-                           message.replyTo)
+        return IRCResponse("Removed '{}' as admin(s), {} skipped"
+                           .format(', '.join(deleted), len(skipped)), message.replyTo)
 
     def _list(self, message):
         """list - lists all admins"""
         owners = self.bot.config.getWithDefault('owners', [])
         admins = self.bot.config.getWithDefault('admins', [])
-        return IRCResponse(ResponseType.Say,
-                           "Owners: {} | Admins: {}".format(', '.join(owners),
-                                                            ', '.join(admins)),
-                           message.replyTo)
+        return IRCResponse("Owners: {} | Admins: {}".format(', '.join(owners),
+                                                            ', '.join(admins)), message.replyTo)
 
     subCommands = OrderedDict([
         ('add', _add),
@@ -119,14 +109,10 @@ class Admin(BotCommand):
         if len(message.parameterList) > 0:
             subCommand = message.parameterList[0].lower()
             if subCommand not in self.subCommands:
-                return IRCResponse(ResponseType.Say,
-                                   self._unrecognizedSubcommand(subCommand),
-                                   message.replyTo)
+                return IRCResponse(self._unrecognizedSubcommand(subCommand), message.replyTo)
             return self.subCommands[subCommand](self, message)
         else:
-            return IRCResponse(ResponseType.Say,
-                               self._helpText(),
-                               message.replyTo)
+            return IRCResponse(self._helpText(), message.replyTo)
 
 
 adminCommand = Admin()

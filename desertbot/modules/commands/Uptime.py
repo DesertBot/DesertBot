@@ -28,9 +28,7 @@ class Uptime(BotCommand):
     def execute(self, message: IRCMessage):
         uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time())
 
-        return IRCResponse(ResponseType.Say,
-                           'Uptime: %s' % str(uptime).split('.')[0],
-                           message.replyTo)
+        return IRCResponse('Uptime: %s' % str(uptime).split('.')[0], message.replyTo)
 
 
 uptime = Uptime()

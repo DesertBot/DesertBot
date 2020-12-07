@@ -157,7 +157,7 @@ class Log(BotCommand):
 
     def execute(self, message):
         if message.targetType != TargetTypes.CHANNEL:
-            return IRCResponse(ResponseType.Say, "I don't keep logs for private messages.", message.replyTo)
+            return IRCResponse("I don't keep logs for private messages.", message.replyTo)
 
         basePath = self.bot.logPath
         error = 'The date specified is invalid.'
@@ -169,7 +169,7 @@ class Log(BotCommand):
             try:
                 delta = int(message.parameterList[0][1:])
             except ValueError:
-                return IRCResponse(ResponseType.Say, error, message.replyTo)
+                return IRCResponse(error, message.replyTo)
             logDate = datetime.date.today() - datetime.timedelta(delta)
         else:
             logDate = self.cal.parseDT(message.parameters)[0]
@@ -177,7 +177,7 @@ class Log(BotCommand):
         strLogDate = logDate.strftime("%Y-%m-%d")
         logPath = os.path.join(basePath, network, message.replyTo, f'{strLogDate}.log')
         if not os.path.exists(logPath):
-            return IRCResponse(ResponseType.Say, "I don't have that log.", message.replyTo)
+            return IRCResponse("I don't have that log.", message.replyTo)
 
         baseUrl = self.bot.config.getWithDefault('logurl', 'http://irc.example.com')
         channel = message.channel.name
@@ -186,7 +186,7 @@ class Log(BotCommand):
         shortUrl = self.bot.moduleHandler.runActionUntilValue('shorten-url', url)
         if not shortUrl:
             shortUrl = url
-        return IRCResponse(ResponseType.Say, f'Log for {channel} on {strLogDate}: {shortUrl}', message.replyTo)
+        return IRCResponse(f'Log for {channel} on {strLogDate}: {shortUrl}', message.replyTo)
 
 
 logger = Log()

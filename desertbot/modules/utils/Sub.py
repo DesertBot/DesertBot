@@ -55,10 +55,9 @@ class Sub(BotCommand):
                      + red + subString[e.column]
                      + normal + subString[e.column+1:])
             error = self._unmangleEscapes(error, False)
-            return [IRCResponse(ResponseType.Say,
-                                "Sub Error: {} (column {})".format(e.message, e.column),
-                                message.replyTo),
-                    IRCResponse(ResponseType.Say, error, message.replyTo)]
+            return [
+                IRCResponse("Sub Error: {} (column {})".format(e.message, e.column), message.replyTo),
+                IRCResponse(error, message.replyTo)]
 
         prevLevel = -1
         responseStack = []
@@ -94,10 +93,8 @@ class Sub(BotCommand):
                 response = module.execute(inputMessage)
                 """@type : IRCResponse"""
             else:
-                return IRCResponse(ResponseType.Say,
-                                   "'{}' is not a recognized command trigger"
-                                   .format(inputMessage.command),
-                                   message.replyTo)
+                return IRCResponse("'{}' is not a recognized command trigger"
+                                   .format(inputMessage.command), message.replyTo)
 
             # Push the response onto the stack
             responseStack.append((level, response.response, start, end))
@@ -108,7 +105,7 @@ class Sub(BotCommand):
 
         responseString = self._substituteResponses(subString, responseStack, -1, replaceVars, -1)
         responseString = self._unmangleEscapes(responseString)
-        return IRCResponse(ResponseType.Say, responseString, message.replyTo, metadata=metadata)
+        return IRCResponse(responseString, message.replyTo, metadata=metadata)
 
     @staticmethod
     def _parseSubcommandTree(string):

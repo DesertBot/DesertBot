@@ -202,22 +202,18 @@ class Style(BotCommand):
 
     def execute(self, message: IRCMessage):
         if not message.parameterList:
-            return IRCResponse(ResponseType.Say, self.help(None), message.replyTo)
+            return IRCResponse(self.help(None), message.replyTo)
         style = message.parameterList[0].lower()
         if style not in self.styles:
-            return IRCResponse(ResponseType.Say,
-                               "{!r} is not a known text style"
-                               .format(message.parameterList[0]),
-                               message.replyTo)
+            return IRCResponse("{!r} is not a known text style"
+                               .format(message.parameterList[0]), message.replyTo)
         if len(message.parameterList) == 1:
-            return IRCResponse(ResponseType.Say,
-                               "You didn't give me any text to style with {!r}"
-                               .format(message.parameterList[0]),
-                               message.replyTo)
+            return IRCResponse("You didn't give me any text to style with {!r}"
+                               .format(message.parameterList[0]), message.replyTo)
 
         text = ' '.join(message.parameterList[1:])
         styled = text.translate(self.styles[style])
-        return IRCResponse(ResponseType.Say, styled, message.replyTo)
+        return IRCResponse(styled, message.replyTo)
 
 
 style = Style()

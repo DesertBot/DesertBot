@@ -62,7 +62,7 @@ class AsterFix(BotModule):
             else:
                 responseType = ResponseType.Say
 
-            return IRCResponse(responseType, response, message.replyTo)
+            return IRCResponse(response, message.replyTo, responseType)
 
     def storeMessage(self, message):
         self.messages[message.user.nick] = message
