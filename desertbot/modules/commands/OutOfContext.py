@@ -1,14 +1,17 @@
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
-from desertbot.message import IRCMessage, TargetTypes
-from desertbot.response import IRCResponse, ResponseType
-from desertbot.utils import string
-from zope.interface import implementer
+import random
+import time
 from collections import OrderedDict
 from typing import List, Union
 from weakref import WeakKeyDictionary
-import random, time
+
+from twisted.plugin import IPlugin
+from zope.interface import implementer
+
+from desertbot.message import IRCMessage, TargetTypes
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
+from desertbot.utils import string
 
 try:
     import re2

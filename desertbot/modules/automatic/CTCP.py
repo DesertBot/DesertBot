@@ -1,12 +1,13 @@
+import subprocess
+from datetime import datetime
+from platform import platform
+
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, BotModule, ignore
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule, BotModule, ignore
 from desertbot.response import IRCResponse, ResponseType
-from datetime import datetime
-from platform import platform
-import subprocess
 
 
 @implementer(IPlugin, IModule)

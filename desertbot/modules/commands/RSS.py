@@ -1,13 +1,14 @@
 import datetime
+
 import dateutil.parser as dparser
 import feedparser
-from zope.interface import implementer
 from twisted.plugin import IPlugin
+from zope.interface import implementer
 
 from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import admin, BotCommand
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

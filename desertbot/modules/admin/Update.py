@@ -3,18 +3,18 @@ Created on Dec 07, 2013
 
 @author: StarlitGhost
 """
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand, admin
-from zope.interface import implementer
+import os
+import subprocess
+import sys
 from typing import List
 
-from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from twisted.plugin import IPlugin
+from zope.interface import implementer
 
-import subprocess
-import os
-import sys
+from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand, admin
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

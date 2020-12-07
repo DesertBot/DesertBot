@@ -3,20 +3,19 @@ Created on Jan 25, 2014
 
 @author: StarlitGhost
 """
+import base64
+import html
+import json
+import re
+import time
+
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
-
-from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
-
-import re
-import time
-import base64
-import json
-import html
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 
 
 @implementer(IPlugin, IModule)

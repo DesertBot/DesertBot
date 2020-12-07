@@ -3,21 +3,20 @@ Created on Jan 23, 2017
 
 @author: StarlitGhost
 """
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand, admin
-from zope.interface import implementer
-
 import random
 import re
 from collections import OrderedDict
-from unicodedata import category as unicodeCategory
 from typing import List, Union
+from unicodedata import category as unicodeCategory
 
+from twisted.plugin import IPlugin
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
+from zope.interface import implementer
 
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand, admin
+from desertbot.response import IRCResponse
 
 
 class AlreadyGuessedException(Exception):

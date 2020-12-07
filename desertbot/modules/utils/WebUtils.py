@@ -3,24 +3,22 @@ Created on Mar 5, 2018
 
 @author: StarlitGhost
 """
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, BotModule
-from zope.interface import implementer
-
-import requests
-from requests import Response
-from bs4 import BeautifulSoup
-
 import html
 import ipaddress
-import socket
-from urllib.parse import urlparse
-import re
 import json
-
+import re
+import socket
 from typing import Any, Dict, Optional
+from urllib.parse import urlparse
 
+import requests
 from apiclient.discovery import build
+from bs4 import BeautifulSoup
+from requests import Response
+from twisted.plugin import IPlugin
+from zope.interface import implementer
+
+from desertbot.moduleinterface import IModule, BotModule
 
 
 @implementer(IPlugin, IModule)

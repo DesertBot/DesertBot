@@ -1,9 +1,9 @@
+import re
 from enum import Enum
 from typing import Dict, Optional, TYPE_CHECKING
-import re
 
-from desertbot.user import IRCUser
 from desertbot.channel import IRCChannel
+from desertbot.user import IRCUser
 
 if TYPE_CHECKING:
     from desertbot.desertbot import DesertBot

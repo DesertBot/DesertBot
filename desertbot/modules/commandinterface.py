@@ -10,7 +10,7 @@ from typing import Callable, List, Optional, Tuple, Union
 
 from desertbot.message import IRCMessage
 from desertbot.moduleinterface import BotModule
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.response import IRCResponse
 
 
 def admin(func=None, msg=''):

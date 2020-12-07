@@ -1,13 +1,13 @@
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand, admin
-from zope.interface import implementer
-
 from typing import List, Tuple
+
+from twisted.plugin import IPlugin
+from zope.interface import implementer
 
 from desertbot.message import IRCMessage
 from desertbot.modulehandler import ModuleHandler
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand, admin
+from desertbot.response import IRCResponse
 
 ReturnTuple = Tuple[List[str], List[str], List[str]]
 

@@ -3,20 +3,18 @@ Created on Sep 01, 2017
 
 @author: StarlitGhost
 """
+import datetime
+import time
+
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
+from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 from zope.interface import implementer
 
-import time
-import datetime
-
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
-
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 from desertbot.utils import string
-
-from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
 @implementer(IPlugin, IModule)

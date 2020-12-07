@@ -1,14 +1,17 @@
-from twisted.plugin import IPlugin
-from desertbot.message import IRCMessage
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
-from desertbot.response import IRCResponse, ResponseType
-from zope.interface import implementer
+import os.path
 from collections import OrderedDict
 from os import walk
 from time import strftime
 from typing import Union
-import os.path
+
+from twisted.plugin import IPlugin
+from zope.interface import implementer
+
+from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
+
 try:
     import re2
 except ImportError:

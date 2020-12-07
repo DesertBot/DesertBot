@@ -1,9 +1,11 @@
 import logging
 import os
 from datetime import datetime
+from typing import Dict, Optional, List, TYPE_CHECKING
+from weakref import WeakValueDictionary
 
-from twisted.internet.interfaces import ISSLTransport
 from twisted.internet import reactor
+from twisted.internet.interfaces import ISSLTransport
 
 from desertbot.config import Config
 from desertbot.input import InputHandler
@@ -12,9 +14,6 @@ from desertbot.modulehandler import ModuleHandler
 from desertbot.output import OutputHandler
 from desertbot.support import ISupport
 from desertbot.utils.string import isNumber
-
-from typing import Dict, Optional, List, TYPE_CHECKING
-from weakref import WeakValueDictionary
 
 if TYPE_CHECKING:
     from desertbot.factory import DesertBotFactory

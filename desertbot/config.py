@@ -4,7 +4,6 @@ from typing import Any, Dict
 
 from ruamel.yaml import YAML
 
-
 _required = ['server']
 
 

@@ -3,18 +3,17 @@ Created on Mar 14, 2019
 
 @author: StarlitGhost
 """
+import json
+import re
+
+from bs4 import BeautifulSoup
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
-
-from bs4 import BeautifulSoup
-from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
-
-import json
-import re
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 
 
 @implementer(IPlugin, IModule)

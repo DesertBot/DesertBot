@@ -1,6 +1,6 @@
-from twisted.plugin import pluginPackagePaths
 import os
 
+from twisted.plugin import pluginPackagePaths
 
 # From txircd:
 # https://github.com/ElementalAlchemist/txircd/blob/8832098149b7c5f9b0708efe5c836c8160b0c7e6/txircd/modules/__init__.py

@@ -3,21 +3,20 @@ Created on Mar 27, 2018
 
 @author: StarlitGhost
 """
+import re
+import zlib
+from collections import OrderedDict
+from typing import List
+
+import requests
+from twisted.internet import threads
 from twisted.plugin import IPlugin
+from zope.interface import implementer
+
 from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
-from zope.interface import implementer
-from typing import List
-
-import zlib
-from collections import OrderedDict
-import re
-
-from twisted.internet import threads
-import requests
-
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

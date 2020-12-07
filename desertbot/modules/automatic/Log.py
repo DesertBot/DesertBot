@@ -4,19 +4,18 @@ Created on May 11, 2014
 @author: StarlitGhost
 """
 
+import codecs
+import datetime
+import os
+
+import parsedatetime
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import datetime
-import codecs
-import os
-import parsedatetime
-
 from desertbot.message import IRCMessage, TargetTypes
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
-
 
 logFuncs = {
     'PRIVMSG': lambda m: formatPrivmsg(m),

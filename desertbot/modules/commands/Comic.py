@@ -17,7 +17,7 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.response import IRCResponse
 from desertbot.utils import string
 
 try:

@@ -3,21 +3,20 @@ Created on Jan 27, 2013
 
 @author: StarlitGhost
 """
+import datetime
+import re
+
+import dateutil.parser
+import dateutil.tz
+from isodate import parse_duration
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 from desertbot.utils import string
-
-from isodate import parse_duration
-import dateutil.parser
-import dateutil.tz
-from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
-
-import datetime
-import re
 
 
 @implementer(IPlugin, IModule)

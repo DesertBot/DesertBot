@@ -1,13 +1,13 @@
+import urllib.parse
+
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
-from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
 from zope.interface import implementer
 
+from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 from desertbot.utils.string import formatColour, colour as c, formatBold, formatReverse
-
-import urllib.parse
 
 
 @implementer(IPlugin, IModule)

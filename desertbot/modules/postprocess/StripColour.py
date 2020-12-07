@@ -5,10 +5,10 @@ Created on May 11, 2014
 """
 
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, BotModule
-from desertbot.response import IRCResponse
 from zope.interface import implementer
 
+from desertbot.moduleinterface import IModule, BotModule
+from desertbot.response import IRCResponse
 from desertbot.utils import string
 
 

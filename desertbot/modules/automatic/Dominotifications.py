@@ -3,18 +3,17 @@ Created on May 27, 2014
 
 @author: StarlitGhost
 """
-from twisted.plugin import IPlugin
-from desertbot.channel import IRCChannel
-from desertbot.moduleinterface import IModule, BotModule
-from zope.interface import implementer
+import re
 from typing import Dict
 
-import re
-
 from twisted.internet import task, threads
+from twisted.plugin import IPlugin
+from zope.interface import implementer
 
+from desertbot.channel import IRCChannel
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule, BotModule
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)
