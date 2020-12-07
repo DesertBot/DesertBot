@@ -3,18 +3,18 @@ Created on Oct 08, 2018
 
 @author: StarlitGhost
 """
+import collections
+import re
+from json import JSONDecodeError
+
+import jsonpath_ng
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-from json import JSONDecodeError
-import jsonpath_ng
-import re
-import collections
-
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

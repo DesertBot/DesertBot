@@ -26,10 +26,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-from enum import Enum
-from twisted.protocols.basic import LineOnlyReceiver
-from typing import Any, Dict, List, Optional, Tuple, Union
 import unicodedata
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+from twisted.protocols.basic import LineOnlyReceiver
 
 
 class ModeType(Enum):

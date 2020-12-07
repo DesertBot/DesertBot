@@ -1,13 +1,12 @@
+import re
 from base64 import b64decode, b64encode
 from collections import OrderedDict
-from html.entities import name2codepoint
 from datetime import timedelta
-from dateutil.parser import parse
 from enum import Enum
-import re
+from html.entities import name2codepoint
 
+from dateutil.parser import parse
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
-
 
 graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
 

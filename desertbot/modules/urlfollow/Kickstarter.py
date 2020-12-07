@@ -3,22 +3,21 @@ Created on Mar 13, 2014
 
 @author: StarlitGhost
 """
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
-from zope.interface import implementer
-
-from desertbot.message import IRCMessage
-
-from bs4 import BeautifulSoup
-from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
-
 import datetime
-from datetime import timezone
 import html
 import json
 import math
 import re
+from datetime import timezone
+
+from bs4 import BeautifulSoup
+from twisted.plugin import IPlugin
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
+from zope.interface import implementer
+
+from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 
 
 @implementer(IPlugin, IModule)

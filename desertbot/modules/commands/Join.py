@@ -4,11 +4,11 @@ Created on Dec 20, 2011
 @author: StarlitGhost
 """
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
 
 

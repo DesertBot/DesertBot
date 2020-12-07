@@ -3,15 +3,14 @@ Created on Jul 31, 2013
 
 @author: StarlitGhost, Emily
 """
+from bs4 import BeautifulSoup
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-from bs4 import BeautifulSoup
-
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

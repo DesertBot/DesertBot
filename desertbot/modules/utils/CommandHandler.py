@@ -5,8 +5,9 @@ Created on Feb 28, 2018
 """
 
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, BotModule
 from zope.interface import implementer
+
+from desertbot.moduleinterface import IModule, BotModule
 
 
 @implementer(IPlugin, IModule)

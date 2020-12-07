@@ -3,16 +3,16 @@ Created on Jan 27, 2013
 
 @author: StarlitGhost
 """
+import re
+from urllib.parse import urlparse
+
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-from urllib.parse import urlparse
-import re
-
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

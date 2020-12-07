@@ -3,18 +3,17 @@ Created on Jan 20, 2017
 
 @author: StarlitGhost
 """
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
-from zope.interface import implementer
+from collections import OrderedDict
 from typing import List
 
-from collections import OrderedDict
+import parsedatetime
+from twisted.plugin import IPlugin
+from zope.interface import implementer
 
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
-
-import parsedatetime
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

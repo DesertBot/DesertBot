@@ -4,14 +4,13 @@ Created on Dec 06, 2016
 @author: StarlitGhost
 """
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
+from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 from zope.interface import implementer
 
-from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
-
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

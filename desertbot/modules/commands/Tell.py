@@ -1,15 +1,17 @@
+import datetime
+from fnmatch import fnmatch
+
+from dateutil.parser import isoparse
+from pytimeparse.timeparse import timeparse
 from twisted.plugin import IPlugin
+from zope.interface import implementer
+
 from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
 from desertbot.utils.string import b64ToStr, strftimeWithTimezone, strToB64, timeDeltaString
 from desertbot.utils.timeutils import now
-from zope.interface import implementer
-import datetime
-from dateutil.parser import isoparse
-from fnmatch import fnmatch
-from pytimeparse.timeparse import timeparse
 
 try:
     import re2

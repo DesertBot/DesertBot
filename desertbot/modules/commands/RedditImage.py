@@ -3,18 +3,17 @@ Created on Mar 03, 2015
 
 @author: StarlitGhost
 """
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule
-from desertbot.modules.commandinterface import BotCommand
-from zope.interface import implementer
-
 import json
 import random
 
-from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
-
+from twisted.plugin import IPlugin
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+from zope.interface import implementer
+
+from desertbot.message import IRCMessage
+from desertbot.moduleinterface import IModule
+from desertbot.modules.commandinterface import BotCommand
+from desertbot.response import IRCResponse
 
 
 # Idea for this initially taken from Heufneutje's RE_HeufyBot Aww module,

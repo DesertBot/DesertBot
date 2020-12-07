@@ -1,20 +1,20 @@
-from enum import Enum
 import importlib
 import inspect
 import logging
 import os
+from enum import Enum
+from typing import Any, List, TYPE_CHECKING
 
+from twisted.internet import reactor
+from twisted.internet import threads
 from twisted.plugin import getPlugins
 from twisted.python.rebuild import rebuild
-from twisted.internet import threads
-from twisted.internet import reactor
 
-from desertbot.moduleinterface import IModule
 import desertbot.modules
 from desertbot.message import IRCMessage, TargetTypes
+from desertbot.moduleinterface import IModule
 from desertbot.response import ResponseType
 
-from typing import Any, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from desertbot.desertbot import DesertBot
 

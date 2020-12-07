@@ -1,14 +1,14 @@
-from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, BotModule, ignore
-from desertbot.modules.commandinterface import admin
-from zope.interface import implementer
-
 import datetime
 import random
 import re
 
+from twisted.plugin import IPlugin
+from zope.interface import implementer
+
 from desertbot.message import IRCMessage
-from desertbot.response import IRCResponse, ResponseType
+from desertbot.moduleinterface import IModule, BotModule, ignore
+from desertbot.modules.commandinterface import admin
+from desertbot.response import IRCResponse
 
 
 @implementer(IPlugin, IModule)

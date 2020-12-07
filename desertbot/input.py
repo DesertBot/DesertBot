@@ -1,10 +1,11 @@
+from base64 import b64encode
+from datetime import datetime
+from typing import List, Optional, Tuple, TYPE_CHECKING
+
 from desertbot.channel import IRCChannel
 from desertbot.ircbase import ModeType
 from desertbot.message import IRCMessage
 from desertbot.user import IRCUser
-from base64 import b64encode
-from datetime import datetime
-from typing import List, Optional, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from desertbot.desertbot import DesertBot

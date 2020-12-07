@@ -3,12 +3,14 @@ Created on Feb 14, 2014
 
 @author: StarlitGhost
 """
+import copy
+
 from twisted.plugin import IPlugin
-from desertbot.moduleinterface import IModule, ignore
-from desertbot.modules.commandinterface import BotCommand
 from zope.interface import implementer
 
-import copy
+from desertbot.moduleinterface import IModule, ignore
+from desertbot.modules.commandinterface import BotCommand
+
 try:
     import re2
 except ImportError:
