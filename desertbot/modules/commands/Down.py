@@ -1,4 +1,5 @@
 from twisted.plugin import IPlugin
+from urllib3.exceptions import LocationParseError
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
@@ -21,12 +22,22 @@ class Down(BotCommand):
         if not message.parameterList:
             return IRCResponse("You didn't give me a URL to check!", message.replyTo)
 
-        res = requests.get(message.parameterList[0])
+        url = message.parameterList[0].strip()
+
+        if not url.startswith("http://") or url.startswith("https://"):
+            url = f"http://{url}"
+
+        try:
+            res = requests.get(url, timeout=10)
+        except requests.exceptions.Timeout:
+            return IRCResponse(f"{url} looks to be down! It timed out after 10 seconds.", message.replyTo)
+        except LocationParseError:
+            return IRCResponse("I don't know how to parse that URL!", message.replyTo)
 
         if res.ok:
-            return IRCResponse(f"{message.parameterList[0]} looks up to me! It returned {res.status_code}.", message.replyTo)
+            return IRCResponse(f"{url} looks up to me! It returned {res.status_code}.", message.replyTo)
         else:
-            return IRCResponse(f"{message.parameterList[0]} looks to be down! It returned {res.status_code}.", message.replyTo)
+            return IRCResponse(f"{url} looks to be down! It returned {res.status_code}.", message.replyTo)
 
 
 down = Down()
