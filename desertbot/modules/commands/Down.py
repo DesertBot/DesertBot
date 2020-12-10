@@ -24,7 +24,7 @@ class Down(BotCommand):
 
         url = message.parameterList[0].strip()
 
-        if not url.startswith("http://") or url.startswith("https://"):
+        if not url.startswith("http://") or not url.startswith("https://"):
             url = f"http://{url}"
 
         try:
