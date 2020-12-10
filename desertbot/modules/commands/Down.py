@@ -7,6 +7,7 @@ from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 
 import requests
+import http.client
 from urllib3.exceptions import LocationParseError
 
 
@@ -41,9 +42,9 @@ class Down(BotCommand):
             return IRCResponse(f"{url} looks to be down? requests broke on it. Send help.", message.replyTo)
 
         if res.ok:
-            return IRCResponse(f"{url} looks up to me! It returned {res.status_code}.", message.replyTo)
+            return IRCResponse(f"{url} looks up to me! It returned {res.status_code} ({http.client.responses[res.status_code]}).", message.replyTo)
         else:
-            return IRCResponse(f"{url} looks to be down! It returned {res.status_code}.", message.replyTo)
+            return IRCResponse(f"{url} looks to be down! It returned {res.status_code} ({http.client.responses[res.status_code]}).", message.replyTo)
 
 
 down = Down()
