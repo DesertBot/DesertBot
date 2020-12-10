@@ -1,5 +1,4 @@
 from twisted.plugin import IPlugin
-from urllib3.exceptions import LocationParseError
 from zope.interface import implementer
 
 from desertbot.message import IRCMessage
@@ -8,6 +7,7 @@ from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 
 import requests
+from urllib3.exceptions import LocationParseError
 
 
 @implementer(IPlugin, IModule)
@@ -29,10 +29,16 @@ class Down(BotCommand):
 
         try:
             res = requests.get(url, timeout=10)
-        except requests.exceptions.Timeout:
-            return IRCResponse(f"{url} looks to be down! It timed out after 10 seconds.", message.replyTo)
         except LocationParseError:
             return IRCResponse("I don't know how to parse that URL!", message.replyTo)
+        except requests.exceptions.Timeout:
+            return IRCResponse(f"{url} looks to be down! It timed out after 10 seconds.", message.replyTo)
+        except requests.exceptions.SSLError:
+            return IRCResponse(f"{url} looks to be down! SSL verification failed.", message.replyTo)
+        except requests.exceptions.ConnectionError:
+            return IRCResponse(f"{url} looks to be down! I failed to connect to it.", message.replyTo)
+        except Exception:
+            return IRCResponse(f"{url} looks to be down? requests broke on it. Send help.", message.replyTo)
 
         if res.ok:
             return IRCResponse(f"{url} looks up to me! It returned {res.status_code}.", message.replyTo)
