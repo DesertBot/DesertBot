@@ -180,7 +180,7 @@ class OutOfContext(BotCommand):
 
     def _unrecognizedSubcommand(self, subCommand):
         return (f"unrecognized subcommand f'{subCommand}', "
-                f"available subcommands for alias are: {', '.join(self.subCommands.keys())}")
+                f"available subcommands for outofcontext are: {', '.join(self.subCommands.keys())}")
 
     def onLoad(self) -> None:
         self.messageStore = WeakKeyDictionary()
