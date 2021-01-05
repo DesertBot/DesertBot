@@ -29,7 +29,7 @@ class Down(BotCommand):
             url = f"http://{url}"
 
         try:
-            res = requests.get(url, timeout=10)
+            res = self.bot.moduleHandler.runActionUntilValue("fetch-url", url, handleErrors=False)
         except LocationParseError:
             return IRCResponse("I don't know how to parse that URL!", message.replyTo)
         except requests.exceptions.Timeout:
@@ -38,7 +38,8 @@ class Down(BotCommand):
             return IRCResponse(f"{url} looks to be down! SSL verification failed.", message.replyTo)
         except requests.exceptions.ConnectionError:
             return IRCResponse(f"{url} looks to be down! I failed to connect to it.", message.replyTo)
-        except Exception:
+        except Exception as e:
+            self.logger.exception(e)
             return IRCResponse(f"{url} looks to be down? requests broke on it. Send help.", message.replyTo)
 
         if res.ok:
