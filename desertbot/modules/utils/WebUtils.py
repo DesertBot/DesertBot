@@ -47,7 +47,8 @@ class WebUtils(BotModule):
 
     def fetchURL(self, url: str,
                  params: Any=None,
-                 extraHeaders: Optional[Dict[str, str]]=None) -> Optional[Response]:
+                 extraHeaders: Optional[Dict[str, str]]=None,
+                 handleErrors: bool=True) -> Optional[Response]:
         # check the requested url is public
         if not self.isPublicURL(url):
             self.logger.info(f'non-public url {url} ignored')
@@ -75,8 +76,10 @@ class WebUtils(BotModule):
             else:
                 response.close()
 
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as e:
             self.logger.exception("GET from {!r} failed!".format(url))
+            if not handleErrors:
+                raise e
 
     # mostly taken directly from Heufneutje's PyHeufyBot
     # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L43
