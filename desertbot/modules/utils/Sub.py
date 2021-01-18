@@ -99,6 +99,10 @@ class Sub(BotCommand):
             responseStack.append((level, response.response, start, end))
             # merge response metadata back into our sub-global dict
             metadata = dictutils.recursiveMerge(metadata, response.Metadata)
+            # update the replaceVars in case this is the outermost segment
+            # (and therefore we won't be looping again to pick them up)
+            if 'var' in metadata:
+                replaceVars = metadata['var']
 
             prevLevel = level
 
