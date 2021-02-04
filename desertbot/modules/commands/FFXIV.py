@@ -68,7 +68,7 @@ class FFXIV(BotCommand):
             else:
                 FC = None
 
-            if char['Character']['GrandCompany']:
+            if char['Character']['GrandCompany']['Name']:
                 GCName = char['Character']['GrandCompany']['Company']['Name']
                 GCRank = char['Character']['GrandCompany']['Rank']['Name']
                 GC = f"{GCRank}{formatColour(' of the ', f=c.grey)}{GCName}"
