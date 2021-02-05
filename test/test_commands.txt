@@ -53,6 +53,10 @@
 :server PRIVMSG DesertBot :!outofcontext search boop
 :server PRIVMSG DesertBot :!outofcontext remove Imma boop you
 
+:server PRIVMSG DesertBot :!epic check
+:server PRIVMSG DesertBot :!epic
+:server PRIVMSG DesertBot :!epic next
+
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
 :server PRIVMSG DesertBot :!shutdown
