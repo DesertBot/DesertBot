@@ -22,7 +22,7 @@ import jq
 
 @implementer(IPlugin, IModule)
 class Epic(BotCommand):
-    url = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US')"
+    url = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US"
     query = jq.compile("""
         def e(f): if f == "[]" then null else f end;
         [ .data.Catalog.searchStore.elements[] |
