@@ -20,3 +20,6 @@ requests==2.25.1
 ruamel.yaml==0.16.12
 Twisted[tls]==20.3.0
 jq==1.1.2
+pymediawiki==0.7.0
+furl==2.1.0
+regex==2020.7.14
