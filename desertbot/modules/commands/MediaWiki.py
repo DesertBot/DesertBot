@@ -40,6 +40,9 @@ class MediaWiki(BotCommand):
     def triggers(self):
         return ["mediawiki", "wiki"]
 
+    def actions(self):
+        return super(MediaWiki, self).actions() + [('wikipedia', 1, self.wikipedia)]
+
     def onLoad(self):
         self.wikihandlers["en.wikipedia.org"] = mw.MediaWiki(user_agent=USER_AGENT)
 
@@ -105,6 +108,17 @@ class MediaWiki(BotCommand):
             return IRCResponse("Not a valid MediaWiki API at the URL specified", message.replyTo)
         except MediaWikiBaseException as error:
             return IRCResponse("MediaWiki query failed with {}".format(error), message.replyTo)
+
+    def wikipedia(self, title):
+        wiki = self.wikihandlers["en.wikipedia.org"]
+
+        try:
+            page = wiki.page(title, preload=False, auto_suggest=False)
+            return self._format_page(wiki, page, link=False)
+        except DisambiguationError as disambiguation:
+            return self._format_disambiguation(wiki, disambiguation, link=False)
+        except PageError:
+            return
 
     def random(self, *, wiki):
         wiki = self._get_or_create_wiki_handler(wiki)
@@ -186,7 +200,7 @@ class MediaWiki(BotCommand):
 
         return self.wikihandlers[url.netloc]
 
-    def _format_page(self, wiki, page):
+    def _format_page(self, wiki, page, link=True):
         title = page.title
 
         # We need to clean up the summary a bit to make it more useful on IRC
@@ -214,7 +228,20 @@ class MediaWiki(BotCommand):
         else:
             response += colour(A.normal[A.bold[f"{title}"], f": {summary}"])
 
-        response += " - " + self.bot.moduleHandler.runActionUntilValue("shorten-url", page.url)
+        if link:
+            response += " - " + self.bot.moduleHandler.runActionUntilValue("shorten-url", page.url)
+        return response
+
+    def _format_disambiguation(self, wiki, disambiguation, link=False):
+        response = self._format_wiki(wiki)
+        response += colour(A.normal[A.bold[disambiguation.title], ": "])
+        response += "; ".join(disambiguation.options[0:SEARCH_RETURNED_RESULTS])
+        if len(disambiguation.options) > SEARCH_RETURNED_RESULTS:
+            response += " and others"
+
+        if link:
+            response += " - " + self.bot.moduleHandler.runActionUntilValue("shorten-url", disambiguation.url)
+
         return response
 
     def _format_search(self, wiki, results, intentional=False):
