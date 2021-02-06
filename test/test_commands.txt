@@ -60,6 +60,17 @@
 :server PRIVMSG DesertBot :!epic
 :server PRIVMSG DesertBot :!epic next
 
+:server PRIVMSG DesertBot :!wiki randomness
+:server PRIVMSG DesertBot :!wiki Appel
+:server PRIVMSG DesertBot :!wiki search Banana
+:server PRIVMSG DesertBot :!wiki random
+
+:server PRIVMSG DesertBot :!mediawiki de.wikipedia.org wiki
+:server PRIVMSG DesertBot :!mediawiki de.wikipedia.org random
+
+:server PRIVMSG DesertBot :https://en.wikipedia.org/wiki/Appel
+:server PRIVMSG DesertBot :https://en.wikipedia.org/wiki/Google
+
 :server PRIVMSG DesertBot :!help
 :server PRIVMSG DesertBot :!commands
 :server PRIVMSG DesertBot :!shutdown
