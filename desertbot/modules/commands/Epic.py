@@ -98,21 +98,22 @@ class Epic(BotCommand):
 
         fresh = []
         for (pid, game) in result.items():
+            game["active"] = self._active(game)
+
             if pid in self.storage:
                 if game["url"]:
                     if "shortUrl" in self.storage[pid]:
                         game["shortUrl"] = self.storage[pid]["shortUrl"]
                     else:
                         game["shortUrl"] = self.bot.moduleHandler.runActionUntilValue("shorten-url", game["url"])
-                if "active" not in self.storage[pid] and self._active(game):
+                if "active" not in self.storage[pid] and game["active"]:
                     fresh.append(game)
             else:
                 if game["url"]:
                     game["shortUrl"] = self.bot.moduleHandler.runActionUntilValue("shorten-url", game["url"])
-                if self._active(game):
+                if game["active"]:
                     fresh.append(game)
 
-            game["active"] = self._active(game)
             self.storage[pid] = game
 
         # Clean up our storage
