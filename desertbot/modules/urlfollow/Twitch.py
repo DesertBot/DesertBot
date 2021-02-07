@@ -45,7 +45,7 @@ class Twitch(BotCommand):
         if not match:
             return
 
-        channel = match.group('twitchChannel')
+        channel = match.group('twitchChannel').lower()
 
         #if self.twitchClientID is None:
         #    return '[Twitch Client ID not found]'
