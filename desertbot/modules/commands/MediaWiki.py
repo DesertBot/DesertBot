@@ -300,7 +300,7 @@ class MediaWiki(BotCommand):
         name = furl(wiki.base_url).netloc
         if name == "en.wikipedia.org":
             name = "Wikipedia"
-        return colour(A.normal[A.fg.gray[A.bold["[", A.fg.white[f"{name}"], "]"]], A.normal[" "]])
+        return colour(A.normal[A.bold[A.fg.gray["["],f"{name}", A.fg.gray["]"]], " "])
 
 
 mediawiki = MediaWiki()
