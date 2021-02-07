@@ -118,34 +118,32 @@ class Twitch(BotCommand):
 
     @staticmethod
     def _format_stream(stream):
-        output = []
         if stream["since"]:
-            name = colour(A.normal[A.fg.green['{}'.format(stream['name'])]])
+            highlight = A.fg.green
         else:
-            name = colour(A.normal[A.fg.red['{}'.format(stream['name'])]])
-        output.append(name)
-        graySplitter = colour(A.normal[' ', A.fg.gray['|'], ' '])
-        title = ' "{}"'.format(re.sub(r'[\r\n]+', graySplitter, stream['title'].strip()))
-        output.append(title)
-        if stream['game'] is not None:
+            highlight = A.fg.red
+
+        title = re.sub(r'[\r\n]+', colour(A.normal[' ', A.fg.gray['|'], ' ']), stream["title"].strip())
+        output = colour(A.normal[highlight[f"{stream['name']}"], f" \"{title}\""])
+
+        if stream["game"] is not None:
             if stream["since"]:
-                game = colour(A.normal[A.fg.gray[', playing '], '{}'.format(stream['game'])])
+                output += colour(A.normal[A.fg.gray[', playing'], ' '])
             else:
-                game = colour(A.normal[A.fg.gray[', was last playing '], '{}'.format(stream['game'])])
-            output.append(game)
-        if stream['mature']:
-            mature = colour(A.normal[A.fg.lightRed[' [Mature]']])
-            output.append(mature)
+                output += colour(A.normal[A.fg.gray[', was last playing'], ' '])
+            output += f"{stream['game']} "
+
+        if stream["mature"]:
+            output += colour(A.normal[A.fg.lightRed[' [Mature]'], ' '])
+
         if stream["viewers"] and stream["since"]:
-            viewers = stream['viewers']
             timedelta = datetime.now(tz=timezone.utc) - dparser.isoparse(stream["since"])
             timedelta = deltaTimeToString(timedelta)
-            status = colour(A.normal[A.fg.green[' (Live with {0:,d} viewers, for {1})'.format(viewers, timedelta)]])
+            output += colour(A.normal[A.fg.green[f"(Live with {stream['viewers']} viewers, for {timedelta})"]])
         else:
-            status = colour(A.normal[A.fg.red[' (Offline)']])
-        output.append(status)
+            output += colour(A.normal[A.fg.red["(Offline)"]])
 
-        return ''.join(output)
+        return output
 
 
 twitch = Twitch()
