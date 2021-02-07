@@ -6,31 +6,33 @@ from twisted.plugin import IPlugin
 from twisted.words.protocols.irc import assembleFormattedText as colour, attributes as A
 from zope.interface import implementer
 
-import regex
-from furl import furl
 from bs4 import BeautifulSoup
+from furl import furl
+from json import JSONDecodeError
+import regex
 
 import mediawiki as mw
 from mediawiki.exceptions import MediaWikiAPIURLError, MediaWikiBaseException
 from mediawiki.exceptions import PageError, DisambiguationError
-from simplejson.errors import JSONDecodeError
 
 from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 
-
 USER_AGENT = 'DesertBot'
 STRIP_PARENTHESIS = regex.compile(r"(\((?:[^()]++|(?1))*\))")
 SEARCH_RETURNED_RESULTS = 12
 SUMMARY_LENGTH = 350
 
+
 def _strip_parenthesis(string):
     return STRIP_PARENTHESIS.sub("", string)
 
+
 class URIError(ValueError):
     pass
+
 
 @implementer(IPlugin, IModule)
 class MediaWiki(BotCommand):
@@ -128,12 +130,11 @@ class MediaWiki(BotCommand):
     def search(self, *, wiki, query):
         wiki = self._get_or_create_wiki_handler(wiki)
         query = " ".join(query)
-        search = wiki.search(query, results=SEARCH_RETURNED_RESULTS*2)
+        search = wiki.search(query, results=SEARCH_RETURNED_RESULTS * 2)
         if search:
             return self._format_search(wiki, search, intentional=True)
         else:
             return self._format_wiki(wiki) + "No pages found"
-
 
     # The logic for chosing what result to give is complex
     # Try it as an actual page, then a suggestion, then a search result
@@ -188,7 +189,6 @@ class MediaWiki(BotCommand):
 
         if url.scheme != 'https' and url.scheme != 'http':
             raise URIError("Bad scheme given")
-
 
         if not self.bot.moduleHandler.runActionUntilValue("is-public-url", str(url)):
             raise URIError("Not a public URL")
@@ -283,5 +283,6 @@ class MediaWiki(BotCommand):
         if name == "en.wikipedia.org":
             name = "Wikipedia"
         return colour(A.normal[A.fg.gray[A.bold["[", A.fg.white[f"{name}"], "]"]], A.normal[" "]])
+
 
 mediawiki = MediaWiki()
