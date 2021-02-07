@@ -68,6 +68,8 @@
 :server PRIVMSG DesertBot :!mediawiki de.wikipedia.org wiki
 :server PRIVMSG DesertBot :!mediawiki de.wikipedia.org random
 
+:server PRIVMSG DesertBot :!mediawiki wiki.loadingreadyrun.com Matt Wiggins
+
 :server PRIVMSG DesertBot :https://en.wikipedia.org/wiki/Appel
 :server PRIVMSG DesertBot :https://en.wikipedia.org/wiki/Google
 
