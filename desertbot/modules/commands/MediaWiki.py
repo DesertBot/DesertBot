@@ -21,14 +21,17 @@ from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 
 USER_AGENT = 'DesertBot'
-STRIP_PARENTHESIS = regex.compile(r"(\((?:[^()]++|(?1))*\))")
 SEARCH_RETURNED_RESULTS = 12
 SUMMARY_LENGTH = 350
 
+STRIP_PARENTHESIS = regex.compile(r"(\((?:[^()]++|(?1))*\))")
+STRIP_NON_ALNUM = regex.compile(r'\W+', regex.UNICODE)
 
 def _strip_parenthesis(string):
     return STRIP_PARENTHESIS.sub("", string)
 
+def _strip_non_alnum(string):
+    return STRIP_NON_ALNUM.sub("", string)
 
 class URIError(ValueError):
     pass
@@ -106,7 +109,7 @@ class MediaWiki(BotCommand):
             return False
 
         except PageError:
-            return IRCResponse("Did not get any valid MediaWiki page, giving up", message.repyTo)
+            return IRCResponse("Did not get any valid MediaWiki page, giving up", message.replyTo)
         except URIError:
             return IRCResponse("Not a valid MediaWiki URL specified", message.replyTo)
         except (MediaWikiAPIURLError, JSONDecodeError, ConnectionError):
@@ -159,14 +162,25 @@ class MediaWiki(BotCommand):
         except DisambiguationError:
             disambiguation = True
 
-
         search = wiki.search(query, results=SEARCH_RETURNED_RESULTS * 2)
 
-        if disambiguation:
-            search = [item for item in search if item.lower() != query.lower()]
         if not search:
             return self._format_wiki(wiki) + "No pages found"
-        elif len(search) == 1:
+
+        if not disambiguation:
+            for result in search:
+                clean_query = _strip_non_alnum(query.lower())
+                if clean_query == _strip_non_alnum(result.lower()):
+                    try:
+                        page = wiki.page(result, preload=False, auto_suggest=False, redirect=True)
+                        return self._format_page(wiki, page)
+                    except DisambiguationError:
+                        disambiguation = True
+
+        if disambiguation:
+            search = [item for item in search if _strip_non_alnum(item.lower()) != _strip_non_alnum(query.lower())]
+
+        if len(search) == 1:
             try:
                 page = wiki.page(search[0], preload=False, auto_suggest=False, redirect=True)
                 return self._format_page(wiki, page)
