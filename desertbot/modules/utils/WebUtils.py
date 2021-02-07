@@ -24,7 +24,8 @@ from desertbot.moduleinterface import IModule, BotModule
 @implementer(IPlugin, IModule)
 class WebUtils(BotModule):
     def actions(self):
-        return super(WebUtils, self).actions() + [('fetch-url', 1, self.fetchURL),
+        return super(WebUtils, self).actions() + [('is-public-url', 1, self.isPublicURL),
+                                                  ('fetch-url', 1, self.fetchURL),
                                                   ('post-url', 1, self.postURL),
                                                   ('get-html-title', 1, self.getPageTitle),
                                                   ('shorten-url', 1, self.shortenURL),
