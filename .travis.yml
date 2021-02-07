@@ -4,7 +4,7 @@ python:
   - "3.6"
 before_install:
   - "if [[ -n $encrypted_3e74cccdb852_key || -n $encrypted_3e74cccdb852_iv ]]; then mkdir -p data/servers/localhost && openssl aes-256-cbc -K $encrypted_3e74cccdb852_key -iv $encrypted_3e74cccdb852_iv -in test/api_keys.json.enc -out data/servers/localhost/APIKeys.json -d; fi"
-  - "sudo apt-get install libre2-dev -y"
+  - "sudo apt-get install libre2-dev rustc cargo -y"
 install:
   - "pip install pyflakes"
   - "git clone -b desertbot --single-branch https://github.com/DesertBot/weercd.git"
