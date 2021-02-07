@@ -5,7 +5,9 @@ RUN apt-get update && \
     apt-get install -y \
     build-essential \
     git \
-    libre2-dev
+    libre2-dev \
+	cargo \
+	rustc
 COPY requirements.txt /
 RUN pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r /requirements.txt
