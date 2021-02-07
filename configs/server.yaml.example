@@ -26,6 +26,3 @@ admins:
 
 # url where the logs are served
 logurl: 'http://irc.example.com'
-
-# database engine to use for data storage http://docs.sqlalchemy.org/en/latest/core/engines.html
-database_engine: 'sqlite:///data/server.org/data.db'
