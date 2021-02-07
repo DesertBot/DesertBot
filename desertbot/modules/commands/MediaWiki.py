@@ -116,7 +116,7 @@ class MediaWiki(BotCommand):
         wiki = self.wikihandlers["en.wikipedia.org"]
 
         try:
-            page = wiki.page(title, preload=False, auto_suggest=False)
+            page = wiki.page(title, preload=False, auto_suggest=False, redirect=True)
             return self._format_page(wiki, page, link=False)
         except DisambiguationError as disambiguation:
             return self._format_disambiguation(wiki, disambiguation, link=False)
@@ -145,7 +145,7 @@ class MediaWiki(BotCommand):
         query = " ".join(query)
 
         try:
-            page = wiki.page(query, preload=False, auto_suggest=False)
+            page = wiki.page(query, preload=False, auto_suggest=False, redirect=True)
             return self._format_page(wiki, page)
         except (DisambiguationError, PageError):
             pass
@@ -153,7 +153,7 @@ class MediaWiki(BotCommand):
         suggest = wiki.suggest(query)
         if suggest:
             try:
-                page = wiki.page(suggest, preload=False, auto_suggest=False)
+                page = wiki.page(suggest, preload=False, auto_suggest=False, redirect=True)
                 return self._format_page(wiki, page)
             except DisambiguationError:
                 pass
@@ -164,7 +164,7 @@ class MediaWiki(BotCommand):
             return self._format_wiki(wiki) + "No pages found"
         elif len(search) == 1:
             try:
-                page = wiki.page(search[0], preload=False, auto_suggest=False)
+                page = wiki.page(search[0], preload=False, auto_suggest=False, redirect=True)
                 return self._format_page(wiki, page)
             except DisambiguationError as disambiguation:
                 return self._format_search(wiki, disambiguation.options)
@@ -221,7 +221,7 @@ class MediaWiki(BotCommand):
 
         if not summary:
             soup = BeautifulSoup(page.html, 'lxml')
-            for tag in soup.find_all(class_="infobox"):
+            for tag in soup.find_all(class_=["toc", "infobox", regex.compile("^mw-")]):
                 tag.clear()
             summary = soup.get_text()
 
@@ -231,9 +231,10 @@ class MediaWiki(BotCommand):
         summary_length = len(summary)
         summary = _strip_parenthesis(summary)
         summary = summary.replace("\n", " ")
-        summary = summary.replace("  ", " ")
+        summary = regex.sub("\s+", " ", summary)
         summary = summary.replace(" ,", ",")
         summary = summary[0:SUMMARY_LENGTH].rstrip(" ,")
+        summary = summary.strip()
 
         if len(summary) < summary_length:
             summary += "..."
