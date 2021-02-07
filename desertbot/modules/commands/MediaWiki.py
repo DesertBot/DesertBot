@@ -105,6 +105,8 @@ class MediaWiki(BotCommand):
                 return IRCResponse(response, message.replyTo)
             return False
 
+        except PageError:
+            return IRCResponse("Did not get any valid MediaWiki page, giving up", message.repyTo)
         except URIError:
             return IRCResponse("Not a valid MediaWiki URL specified", message.replyTo)
         except (MediaWikiAPIURLError, JSONDecodeError, ConnectionError):
@@ -125,7 +127,12 @@ class MediaWiki(BotCommand):
 
     def random(self, *, wiki):
         wiki = self._get_or_create_wiki_handler(wiki)
-        return self._format_page(wiki, wiki.page(wiki.random(pages=1)))
+        try:
+            page = wiki.page(wiki.random(pages=1))
+        except DisambiguationError as disambiguation:
+            # Sneakily just return the first result, people want something
+            page = wiki.page(disambiguation.options[0])
+        return self._format_page(wiki, page)
 
     def search(self, *, wiki, query):
         wiki = self._get_or_create_wiki_handler(wiki)
