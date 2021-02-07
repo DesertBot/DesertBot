@@ -218,12 +218,14 @@ class MediaWiki(BotCommand):
                 summary = page.content
             except MediaWikiBaseException:
                 pass
+
         if not summary:
             soup = BeautifulSoup(page.html, 'lxml')
             for tag in soup.find_all(class_="infobox"):
                 tag.clear()
             summary = soup.get_text()
-        else:
+
+        if not summary:
             summary = ""
 
         summary_length = len(summary)
