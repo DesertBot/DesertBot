@@ -132,7 +132,7 @@ class MediaWiki(BotCommand):
         query = " ".join(query)
         search = wiki.search(query, results=SEARCH_RETURNED_RESULTS * 2)
         if search:
-            return self._format_search(wiki, search, intentional=True)
+            return self._format_search(wiki, search)
         else:
             return self._format_wiki(wiki) + "No pages found"
 
@@ -147,19 +147,16 @@ class MediaWiki(BotCommand):
         try:
             page = wiki.page(query, preload=False, auto_suggest=False, redirect=True)
             return self._format_page(wiki, page)
-        except (DisambiguationError, PageError):
-            pass
+        except PageError:
+            disambiguation = False
+        except DisambiguationError:
+            disambiguation = True
 
-        suggest = wiki.suggest(query)
-        if suggest:
-            try:
-                page = wiki.page(suggest, preload=False, auto_suggest=False, redirect=True)
-                return self._format_page(wiki, page)
-            except DisambiguationError:
-                pass
 
         search = wiki.search(query, results=SEARCH_RETURNED_RESULTS * 2)
-        search = [item for item in search if item.lower() != query.lower()]
+
+        if disambiguation:
+            search = [item for item in search if item.lower() != query.lower()]
         if not search:
             return self._format_wiki(wiki) + "No pages found"
         elif len(search) == 1:
@@ -265,13 +262,10 @@ class MediaWiki(BotCommand):
 
         return response
 
-    def _format_search(self, wiki, results, intentional=False):
+    def _format_search(self, wiki, results):
         response = self._format_wiki(wiki)
 
-        if intentional:
-            response += "Search results: "
-        else:
-            response += "No single page matches, did you mean: "
+        response += "Search results: "
         response += "; ".join(results[0:SEARCH_RETURNED_RESULTS])
 
         if len(results) > (SEARCH_RETURNED_RESULTS * 2 - 2):
