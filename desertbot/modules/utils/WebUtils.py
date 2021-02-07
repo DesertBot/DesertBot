@@ -38,6 +38,7 @@ class WebUtils(BotModule):
                        "application/xml, application/xhtml+xml, "
                        "application/rss+xml, application/atom+xml, application/rdf+xml, "
                        "application/json")
+        self.lang = "en-US"
 
     def isPublicURL(self, url: str) -> bool:
         parsed = urlparse(url)
@@ -54,7 +55,7 @@ class WebUtils(BotModule):
             self.logger.info(f'non-public url {url} ignored')
             return
 
-        headers = {"User-agent": self.ua, "Accept": self.accept}
+        headers = {"User-agent": self.ua, "Accept": self.accept, "Accept-Language": self.lang}
         # Make sure we don't download any unwanted things
         check = (r"^("
                  r"text/.*|"  # text

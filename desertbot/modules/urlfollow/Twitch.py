@@ -51,16 +51,15 @@ class Twitch(BotCommand):
         #    return '[Twitch Client ID not found]'
 
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36",
             "Accept": "*/*",
-            "Accept-Language": "en-US",
             "Referer": "https://www.twitch.tv/",
             "Client-Id": "\x6b\x69\x6d\x6e\x65\x37\x38\x6b\x78\x33\x6e\x63\x78\x36\x62\x72\x67\x6f\x34\x6d\x76\x36\x77\x6b\x69\x35\x68\x31\x6b\x6f",
             # self.twitchClientID
             "Content-Type": "text/plain;charset=UTF-8",
             "Origin": "https://www.twitch.tv",
             "DNT": "1",
-            "Connection": "keep-alive"
+            "Connection": "keep-alive",
+            "X-Device-Id": "JpeOrSX7gT6ioDjBZvNc0weXAOgFiWEC"
         }
 
         query = [
