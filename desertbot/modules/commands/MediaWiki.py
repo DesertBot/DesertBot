@@ -8,6 +8,7 @@ from zope.interface import implementer
 
 import regex
 from furl import furl
+from bs4 import BeautifulSoup
 
 import mediawiki as mw
 from mediawiki.exceptions import MediaWikiAPIURLError, MediaWikiBaseException
@@ -209,8 +210,22 @@ class MediaWiki(BotCommand):
         # We need to clean up the summary a bit to make it more useful on IRC
         # parenthesis get removed to get rid of pronounciation, etc, then clean
         # up some oddities that this leaves behind and just quirks and limit
-        # length.
+        # length. Also handle cases where summary or text extensions are not
+        # installed.
         summary = page.summarize(chars=SUMMARY_LENGTH * 2)
+        if not summary:
+            try:
+                summary = page.content
+            except MediaWikiBaseException:
+                pass
+        if not summary:
+            soup = BeautifulSoup(page.html, 'lxml')
+            for tag in soup.find_all(class_="infobox"):
+                tag.clear()
+            summary = soup.get_text()
+        else:
+            summary = ""
+
         summary_length = len(summary)
         summary = _strip_parenthesis(summary)
         summary = summary.replace("\n", " ")
