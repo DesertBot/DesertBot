@@ -189,6 +189,9 @@ class MediaWiki(BotCommand):
             raise URIError("Bad scheme given")
 
 
+        if not self.bot.moduleHandler.runActionUntilValue("is-public-url", str(url)):
+            raise URIError("Not a public URL")
+
         # API can either be under /api.php or /w/api.php
         url.path.add("api.php")
 
