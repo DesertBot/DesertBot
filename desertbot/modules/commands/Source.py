@@ -31,6 +31,11 @@ class Source(BotCommand):
         if message.parameterList:
             command = message.parameterList[0].lower()
             mh = self.bot.moduleHandler
+
+            customSource = mh.runActionUntilValue('fetch-command-source', command)
+            if customSource:
+                return IRCResponse(customSource, message.replyTo)
+
             if command in mh.mappedTriggers:
                 module = mh.mappedTriggers[command].__class__
             elif command in mh.caseMap:

@@ -18,6 +18,9 @@ from desertbot.response import IRCResponse
 
 @implementer(IPlugin, IModule)
 class Alias(BotCommand):
+    def actions(self):
+        return super(Alias, self).actions() + [('fetch-command-source', 1, self.lookupAlias)]
+
     def triggers(self):
         return self.ownTriggers + list(self.aliases.keys())
 
@@ -87,10 +90,12 @@ class Alias(BotCommand):
         if len(message.parameterList) == 1:
             return IRCResponse("Show which alias?", message.replyTo)
         alias = message.parameterList[1].lower()
-        if alias in self.aliases:
-            return IRCResponse("'{}' is aliased to: {}".format(alias, self.aliases[alias]), message.replyTo)
+
+        aliasSource = self.lookupAlias(alias)
+        if aliasSource:
+            return IRCResponse(aliasSource, message.replyTo)
         else:
-            return IRCResponse("'{}' is not a recognized alias".format(alias), message.replyTo)
+            return IRCResponse(f"'{alias}' is not a recognized alias", message.replyTo)
 
     @admin("Only my admins may set alias help text!")
     def _help(self, message):
@@ -239,7 +244,13 @@ class Alias(BotCommand):
             if command in self.aliasHelp:
                 return self.aliasHelp[command]
             else:
-                return "'{}' is an alias for: {}".format(command, self.aliases[command])
+                return self.lookupAlias(command)
+
+    def lookupAlias(self, alias):
+        if alias in self.aliases:
+            return f"'{alias}' is an alias for: {self.aliases[alias]}"
+        else:
+            return
 
     def _unrecognizedSubcommand(self, subCommand):
         return ("unrecognized subcommand '{0}', "
