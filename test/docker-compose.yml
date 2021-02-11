@@ -5,7 +5,7 @@ services:
     image: starlitghost/desertbot:latest
     container_name: desertbot
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     command: ["-c", "/test_config.yaml", "-l", "DEBUG"]
     network_mode: host  # needed since weercd runs on host and test config says to connect to localhost
