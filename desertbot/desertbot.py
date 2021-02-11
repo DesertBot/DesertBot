@@ -75,9 +75,10 @@ class DesertBot(IRCBase, object):
         self.startTime = datetime.utcnow()
 
     def cleanup(self) -> None:
-        self.config.writeConfig()
-        self.moduleHandler.saveAllModuleData()
-        self.logger.info('Saved config and data.')
+        if self.config.getWithDefault("save_on_exit", True):
+            self.config.writeConfig()
+            self.moduleHandler.saveAllModuleData()
+            self.logger.info('Saved config and data.')
 
     def connectionMade(self) -> None:
         # Connection finalizing.

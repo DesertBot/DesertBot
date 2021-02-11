@@ -30,12 +30,12 @@ jobs:
         with:
           python-version: 3.6
 
-      # Install pyflakes linter, pillow dependency for comics test script, and fetch testing IRCd
-      - name: Install python dependencies
+      # Install pyflakes linter, pillow dependency for comics test script, and build image for IRCd used in tests
+      - name: Install testing dependencies
         run: |
           pip install pyflakes
           pip install pillow
-          git clone -b desertbot --single-branch https://github.com/DesertBot/weercd.git
+          docker-compose build weercd
 
       # Lint entire project
       - name: Lint with pyflakes
@@ -56,12 +56,17 @@ jobs:
         if: env.GPG_PASSPHRASE != null
         run: gpg --batch --passphrase "$GPG_PASSPHRASE" --output test/APIKeys.json --decrypt test/api_keys.json.enc
 
-      # Run tests against weercd
-      # TODO: maybe just run weercd also in docker?
+      # make a dummy file to make docker-compose play nice if secrets not available
+      - name: Work around lack of test API keys
+        env:
+          GPG_PASSPHRASE: ${{ secrets.API_KEY_GPG_PASSPHRASE }}
+        if: env.GPG_PASSPHRASE == null
+        run: echo "{}" > test/APIKeys.json
+
+      # Run tests
       - name: Docker tests
         run: |
-          python weercd/weercd.py --file test/test_commands.txt -w 25.0 -s 0.25 &
-          docker-compose up desertbot
+          docker-compose run --rm desertbot
 
       # Login to docker hub if this is a push to master
       - name: Docker login

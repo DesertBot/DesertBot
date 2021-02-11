@@ -1,7 +1,9 @@
-server: 'localhost'
+commandChar: '!'
+server: weercd
 port: 7777
-tls: False
+tls: false
 channels:
   '#dev': null
 admins:
   - '*'
+save_on_exit: false

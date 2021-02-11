@@ -1,78 +1,78 @@
-:server PRIVMSG DesertBot :!do wakes up
-:server PRIVMSG DesertBot :hi DesertBot
-:server PRIVMSG DesertBot :s/DesertBot/Test Server/
-:server PRIVMSG DesertBot :!tell .*&.* Testing tells is important.
-:server PRIVMSG DesertBot :Imma boop you now to see what happens
-:server PRIVMSG DesertBot :And again
+:server PRIVMSG #dev :!do wakes up
+:server PRIVMSG #dev :hi DesertBot
+:server PRIVMSG #dev :s/DesertBot/Test Server/
+:server PRIVMSG #dev :!tell .*&.* Testing tells is important.
+:server PRIVMSG #dev :Imma boop you now to see what happens
+:server PRIVMSG #dev :And again
 
-:server PRIVMSG DesertBot :!alias add alias_test sub {{var stat 4d6dl}}{{rollv $stat + $stat + $stat + $stat + $stat + $stat}}
-:server PRIVMSG DesertBot :!alias_test
-:server PRIVMSG DesertBot :!reload alias
-:server PRIVMSG DesertBot :!alias_test
+:server PRIVMSG #dev :!alias add alias_test sub {{var stat 4d6dl}}{{rollv $stat + $stat + $stat + $stat + $stat + $stat}}
+:server PRIVMSG #dev :!alias_test
+:server PRIVMSG #dev :!reload alias
+:server PRIVMSG #dev :!alias_test
 
-:server PRIVMSG DesertBot :!list testlist add "But what if it doesn't work?"
-:server PRIVMSG DesertBot :!list testlist
-:server PRIVMSG DesertBot :!listv testlist
-:server PRIVMSG DesertBot :!reload lists
-:server PRIVMSG DesertBot :!list testlist 1
-:server PRIVMSG DesertBot :!listv testlist 1
+:server PRIVMSG #dev :!list testlist add "But what if it doesn't work?"
+:server PRIVMSG #dev :!list testlist
+:server PRIVMSG #dev :!listv testlist
+:server PRIVMSG #dev :!reload lists
+:server PRIVMSG #dev :!list testlist 1
+:server PRIVMSG #dev :!listv testlist 1
 
-:server PRIVMSG DesertBot :!setpron they/them
-:server PRIVMSG DesertBot :!pronouns
+:server PRIVMSG #dev :!setpron they/them
+:server PRIVMSG #dev :!pronouns
 
-:server PRIVMSG DesertBot :!addloc new york
-:server PRIVMSG DesertBot :!weather
-:server PRIVMSG DesertBot :!forecast
-:server PRIVMSG DesertBot :!weather antarctica
-:server PRIVMSG DesertBot :!time antarctica
+:server PRIVMSG #dev :!addloc new york
+:server PRIVMSG #dev :!weather
+:server PRIVMSG #dev :!forecast
+:server PRIVMSG #dev :!weather antarctica
+:server PRIVMSG #dev :!time antarctica
 
-:server PRIVMSG DesertBot :!wolframalpha 20 euros in dollars
+:server PRIVMSG #dev :!wolframalpha 20 euros in dollars
 
-:server PRIVMSG DesertBot :HONK
-:server PRIVMSG DesertBot :nyaa~
-:server PRIVMSG DesertBot :Everything is fine.
-:server PRIVMSG DesertBot :As is tradition.
-:server PRIVMSG DesertBot :!responses
-:server PRIVMSG DesertBot :!responses pokemon
-:server PRIVMSG DesertBot :Pokemon are a thing. This is a sentence about pokemon.
+:server PRIVMSG #dev :HONK
+:server PRIVMSG #dev :nyaa~
+:server PRIVMSG #dev :Everything is fine.
+:server PRIVMSG #dev :As is tradition.
+:server PRIVMSG #dev :!responses
+:server PRIVMSG #dev :!responses pokemon
+:server PRIVMSG #dev :Pokemon are a thing. This is a sentence about pokemon.
 
-:server PRIVMSG DesertBot :!help trigger
-:server PRIVMSG DesertBot :!trigger fartbarts
-:server PRIVMSG DesertBot :!trigger list
-:server PRIVMSG DesertBot :!help trigger toggle
-:server PRIVMSG DesertBot :!trigger toggle example
-:server PRIVMSG DesertBot :hey, reboop things, bot
-:server PRIVMSG DesertBot :!trigger add test t".*attack.*" roll 1d20
-:server PRIVMSG DesertBot :Hey, attack me, bot!
-:server PRIVMSG DesertBot :!trigger export
-:server PRIVMSG DesertBot :!trigger list
-:server PRIVMSG DesertBot :!trigger del example
-:server PRIVMSG DesertBot :!trigger list
-:server PRIVMSG DesertBot :!outofcontext add Imma boop you
-:server PRIVMSG DesertBot :!outofcontext id 1
-:server PRIVMSG DesertBot :!outofcontext search boop
-:server PRIVMSG DesertBot :!outofcontext remove Imma boop you
+:server PRIVMSG #dev :!help trigger
+:server PRIVMSG #dev :!trigger fartbarts
+:server PRIVMSG #dev :!trigger list
+:server PRIVMSG #dev :!help trigger toggle
+:server PRIVMSG #dev :!trigger toggle example
+:server PRIVMSG #dev :hey, reboop things, bot
+:server PRIVMSG #dev :!trigger add test t".*attack.*" roll 1d20
+:server PRIVMSG #dev :Hey, attack me, bot!
+:server PRIVMSG #dev :!trigger export
+:server PRIVMSG #dev :!trigger list
+:server PRIVMSG #dev :!trigger del example
+:server PRIVMSG #dev :!trigger list
+:server PRIVMSG #dev :!outofcontext add Imma boop you
+:server PRIVMSG #dev :!outofcontext id 1
+:server PRIVMSG #dev :!outofcontext search boop
+:server PRIVMSG #dev :!outofcontext remove Imma boop you
 
-:server PRIVMSG DesertBot :https://twitch.tv/bobross
-:server PRIVMSG DesertBot :https://twitch.tv/loadingreadyrun
+:server PRIVMSG #dev :https://twitch.tv/bobross
+:server PRIVMSG #dev :https://twitch.tv/loadingreadyrun
 
-:server PRIVMSG DesertBot :!epic check
-:server PRIVMSG DesertBot :!epic
-:server PRIVMSG DesertBot :!epic next
+:server PRIVMSG #dev :!epic check
+:server PRIVMSG #dev :!epic
+:server PRIVMSG #dev :!epic next
 
-:server PRIVMSG DesertBot :!wiki randomness
-:server PRIVMSG DesertBot :!wiki Appel
-:server PRIVMSG DesertBot :!wiki search Banana
-:server PRIVMSG DesertBot :!wiki random
+:server PRIVMSG #dev :!wiki randomness
+:server PRIVMSG #dev :!wiki Appel
+:server PRIVMSG #dev :!wiki search Banana
+:server PRIVMSG #dev :!wiki random
 
-:server PRIVMSG DesertBot :!mediawiki de.wikipedia.org wiki
-:server PRIVMSG DesertBot :!mediawiki de.wikipedia.org random
+:server PRIVMSG #dev :!mediawiki de.wikipedia.org wiki
+:server PRIVMSG #dev :!mediawiki de.wikipedia.org random
 
-:server PRIVMSG DesertBot :!mediawiki wiki.loadingreadyrun.com Matt Wiggins
+:server PRIVMSG #dev :!mediawiki wiki.loadingreadyrun.com Matt Wiggins
 
-:server PRIVMSG DesertBot :https://en.wikipedia.org/wiki/Appel
-:server PRIVMSG DesertBot :https://en.wikipedia.org/wiki/Google
+:server PRIVMSG #dev :https://en.wikipedia.org/wiki/Appel
+:server PRIVMSG #dev :https://en.wikipedia.org/wiki/Google
 
-:server PRIVMSG DesertBot :!help
-:server PRIVMSG DesertBot :!commands
-:server PRIVMSG DesertBot :!shutdown
+:server PRIVMSG #dev :!help
+:server PRIVMSG #dev :!commands
+:server PRIVMSG #dev :!shutdown

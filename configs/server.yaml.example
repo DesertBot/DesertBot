@@ -26,3 +26,7 @@ admins:
 
 # url where the logs are served
 logurl: 'http://irc.example.com'
+
+# whether or not to save configs to file on shutdown
+# this should generally be true, but it can be useful to set to false in testing and/or CI
+save_on_exit: true

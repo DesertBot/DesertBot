@@ -1,15 +1,23 @@
 version: '3'
 
 services:
+  weercd:
+    build:
+      context: .
+      dockerfile: weercd.Dockerfile
+    command: ["--file", "/test_commands.txt", "-s", "0.25", "--wait", "10.1"]  # gotta wait >10s before flooding, otherwise !shutdown does nothing
+    container_name: weercd
+    volumes:
+      - ./test_commands.txt:/test_commands.txt
   desertbot:
     image: starlitghost/desertbot:latest
-    container_name: desertbot
     build:
       context: ..
       dockerfile: Dockerfile
     command: ["-c", "/test_config.yaml", "-l", "DEBUG"]
-    network_mode: host  # needed since weercd runs on host and test config says to connect to localhost
+    container_name: desertbot
+    depends_on:
+      - weercd
     volumes:
-      - ./APIKeys.json:/app/data/servers/localhost/APIKeys.json
+      - ./APIKeys.json:/app/data/servers/weercd/APIKeys.json
       - ./test_config.yaml:/test_config.yaml
-# TODO weercd service
