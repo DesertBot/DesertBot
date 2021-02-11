@@ -49,10 +49,11 @@ jobs:
       - name: Docker build
         run: docker-compose build
 
-      # Decrypt test API keys using gpg
+      # Decrypt test API keys using gpg if secrets available
       - name: Decrypt test API keys
         env:
           GPG_PASSPHRASE: ${{ secrets.API_KEY_GPG_PASSPHRASE }}
+        if: env.GPG_PASSPHRASE != null
         run: gpg --batch --passphrase "$GPG_PASSPHRASE" --output test/APIKeys.json --decrypt test/api_keys.json.enc
 
       # Run tests against weercd
@@ -62,14 +63,15 @@ jobs:
           python weercd/weercd.py --file test/test_commands.txt -w 25.0 -s 0.25 &
           docker-compose up desertbot
 
-      # TODO: Login to docker hub, needs credentials added to github repo secrets
-      #- name: Docker login
-      #  uses: docker/login-action@v1
-      #  with:
-      #    username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #    password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      # Login to docker hub if this is a push to master
+      - name: Docker login
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      # TODO: Push image to docker hub
-      #- name: Docker push
-      #  run: |
-      #    docker push starlitghost/desertbot:latest
+      # Push image to docker hub if this is a push to master
+      - name: Docker push
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: docker-compose push desertbot
