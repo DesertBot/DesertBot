@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  desertbot:
+    image: starlitghost/desertbot:latest
+    container_name: desertbot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["-c", "/test_config.yaml", "-l", "DEBUG"]
+    network_mode: host  # needed since weercd runs on host and test config says to connect to localhost
+    volumes:
+#      - ./APIKeys.json:/app/data/servers/localhost/APIKeys.json
+      - ./test_config.yaml:/test_config.yaml
+# TODO weercd service
