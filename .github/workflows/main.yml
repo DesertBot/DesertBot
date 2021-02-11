@@ -34,10 +34,11 @@ jobs:
         with:
           install: true
           
-      # Install pyflakes linter and fetch testing IRCd
+      # Install pyflakes linter, pillow dependency for comics test script, and fetch testing IRCd
       - name: Install python dependencies
         run: |
           pip install pyflakes
+          pip install pillow
           git clone -b desertbot --single-branch https://github.com/DesertBot/weercd.git
 
       # Lint entire project
