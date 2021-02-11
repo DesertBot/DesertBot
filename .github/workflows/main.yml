@@ -52,9 +52,15 @@ jobs:
       - name: Docker build
         run: docker-compose build
 
+      # Decrypt test API keys using gpg
+      - name: Decrypt test API keys
+        env:
+          GPG_PASSPHRASE: ${{ secrets.API_KEY_GPG_PASSPHRASE }}
+        run: gpg --output test/APIKeys.json --decrypt --passphrase="$GPG_PASSPHRASE" test/api_keys.json.enc
+
       # Run tests against weercd
       # TODO: maybe just run weercd also in docker?
-      - name: Docker build & tests
+      - name: Docker tests
         run: |
           python weercd/weercd.py --file test/test_commands.txt -w 25.0 -s 0.25 &
           docker-compose up desertbot
