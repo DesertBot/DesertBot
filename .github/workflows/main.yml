@@ -45,9 +45,6 @@ jobs:
       - name: Comics test
         run: python test/comics.py
 
-      # TODO decrypt test/api_keys.json.enc, needs something added to github secrets to decrypt with
-
-
       # Build desertbot docker image
       - name: Docker build
         run: docker-compose build
@@ -56,7 +53,7 @@ jobs:
       - name: Decrypt test API keys
         env:
           GPG_PASSPHRASE: ${{ secrets.API_KEY_GPG_PASSPHRASE }}
-        run: gpg --output test/APIKeys.json --decrypt --passphrase="$GPG_PASSPHRASE" test/api_keys.json.enc
+        run: gpg --batch --passphrase "$GPG_PASSPHRASE" --output test/APIKeys.json --decrypt test/api_keys.json.enc
 
       # Run tests against weercd
       # TODO: maybe just run weercd also in docker?
