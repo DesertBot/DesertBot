@@ -1,4 +1,4 @@
-DesertBot [![Build Status](https://travis-ci.com/DesertBot/DesertBot.svg?branch=master)](https://travis-ci.com/DesertBot/DesertBot) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/starlitghost/desertbot.svg)](https://hub.docker.com/r/starlitghost/desertbot) [![Updates](https://pyup.io/repos/github/DesertBot/DesertBot/shield.svg)](https://pyup.io/repos/github/DesertBot/DesertBot/)
+DesertBot [![Build & Test Status](https://github.com/DesertBot/DesertBot/workflows/Build%20and%20test%20Docker%20image/badge.svg)](https://github.com/DesertBot/DesertBot/actions?query=workflow%3A%22Build+and+test+Docker+image%22+branch%3Amaster) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/starlitghost/desertbot?label=docker%20hub&logo=docker) [![Updates](https://pyup.io/repos/github/DesertBot/DesertBot/shield.svg)](https://pyup.io/repos/github/DesertBot/DesertBot/)
 =========
 
 A modular IRC bot with extensive aliasing capabilities, written in Python.
@@ -13,7 +13,7 @@ Features
 * Use [Sub](desertbot/modules/utils/Sub.py) or [Chain](desertbot/modules/utils/Chain.py) to link multiple modules together
   * and use [Var](desertbot/modules/utils/Var.py) to store data for use within the same command (eg, a URL you want to slurp multiple times)
 * [Follows URLs](desertbot/modules/urlfollow/URLFollow.py) posted in chat to see where they lead (following all redirects), responding with the page title and final hostname
-  * with specialised follows to get extra relevant information from Imgur, KickStarter, Steam, Twitch, Twitter, and YouTube links
+  * with [specialised follows](desertbot/modules/urlfollow) to get extra relevant information from Imgur, KickStarter, Steam, Twitch, Twitter, and YouTube links
 * Recognizes [sed-like](desertbot/modules/commands/Sed.py) patterns in chat and replaces the most recent match in the last 20 messages
 * Also recognizes [`*correction`](desertbot/modules/automatic/AsterFix.py) style corrections and replaces the most likely candidate word in that user's previous message
 * [AutoPaste](desertbot/modules/postprocess/AutoPaste.py) detects when single responses are longer than ~2 IRC messages, and submits them to a pastebin service instead, replacing the response with a link
