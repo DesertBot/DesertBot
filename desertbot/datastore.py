@@ -42,7 +42,7 @@ class DataStore(object):
     def __setitem__(self, key, value):
         self.data[key] = value
         self.save()
-    
+ 
     def __contains__(self, key):
         return key in self.data
 
@@ -60,3 +60,8 @@ class DataStore(object):
 
     def get(self, key, defaultValue=None):
         return self.data.get(key, defaultValue)
+
+    def pop(self, key):
+        data = self.data.pop(key)
+        self.save()
+        return data
