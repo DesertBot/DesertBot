@@ -116,8 +116,9 @@ class Epic(BotCommand):
 
             self.storage[pid] = game
 
-        # Clean up our storage
-        for pid in self.storage.keys():
+        # Clean up our storage, work on a copy, don't do dict comprehension
+        # because of the implementation of the underlying data storage.
+        for pid in list(self.storage.keys()):
             if pid not in result:
                 self.storage.pop(pid)
 
