@@ -119,7 +119,7 @@ class Epic(BotCommand):
         # Clean up our storage
         for pid in self.storage.keys():
             if pid not in result:
-                del(self.storage, pid)
+                self.storage.pop(pid)
 
         return [IRCResponse(self._format(g, True), message.replyTo) for g in fresh]
 
