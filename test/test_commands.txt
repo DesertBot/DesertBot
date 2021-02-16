@@ -73,6 +73,9 @@
 :server PRIVMSG #dev :https://en.wikipedia.org/wiki/Appel
 :server PRIVMSG #dev :https://en.wikipedia.org/wiki/Google
 
+:server PRIVMSG #dev :you've gotta have a longer message, like this one
+:server PRIVMSG #dev :**ones
+
 :server PRIVMSG #dev :!help
 :server PRIVMSG #dev :!commands
 :server PRIVMSG #dev :!shutdown
