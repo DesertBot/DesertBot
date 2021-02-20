@@ -117,12 +117,12 @@ class MediaWiki(BotCommand):
         except MediaWikiBaseException as error:
             return IRCResponse("MediaWiki query failed with {}".format(error), message.replyTo)
 
-    def wikipedia(self, title):
+    def wikipedia(self, title, section):
         wiki = self.wikihandlers["en.wikipedia.org"]
 
         try:
             page = wiki.page(title, preload=False, auto_suggest=False, redirect=True)
-            return self._format_page(wiki, page, link=False)
+            return self._format_page(wiki, page, section=section, link=False)
         except DisambiguationError as disambiguation:
             return self._format_disambiguation(wiki, disambiguation, link=False)
         except PageError:
@@ -222,15 +222,32 @@ class MediaWiki(BotCommand):
 
         return self.wikihandlers[url.netloc]
 
-    def _format_page(self, wiki, page, link=True):
+    def _format_page(self, wiki, page, section=None, link=True):
         title = page.title
 
         # We need to clean up the summary a bit to make it more useful on IRC
         # parenthesis get removed to get rid of pronounciation, etc, then clean
         # up some oddities that this leaves behind and just quirks and limit
         # length. Also handle cases where summary or text extensions are not
-        # installed.
-        summary = page.summarize(chars=SUMMARY_LENGTH * 2)
+        # installed. And this is one hell of an ugly mess of `if summary:` due
+        # to how many potential data sources there are in the API.
+
+        summary = None
+
+        if section:
+            section = section.replace("_", " ")
+            try:
+                summary = page.section(section)
+            except:
+                # Super generic catch as this can throw basically ANY Exception
+                # as the library does not have good error handling.
+                pass
+
+        if not summary:
+            summary = page.summarize(chars=SUMMARY_LENGTH * 2)
+            # If we didn't grab a summary by section, pretend we didn't get asked for one
+            section = None
+
         if not summary:
             try:
                 summary = page.content
@@ -259,13 +276,16 @@ class MediaWiki(BotCommand):
 
         response = self._format_wiki(wiki)
 
-        if title.lower() in summary.lower():
-            title_pos = summary.lower().index(title.lower())
-            response += summary[0:title_pos]
-            response += colour(A.normal[A.bold[summary[title_pos:title_pos + len(title)]], ""])
-            response += summary[title_pos + len(title):]
+        if section:
+            response += colour(A.normal[A.bold[f"{title}/{section}"], f": {summary}"])
         else:
-            response += colour(A.normal[A.bold[f"{title}"], f": {summary}"])
+            if title.lower() in summary.lower():
+                title_pos = summary.lower().index(title.lower())
+                response += summary[0:title_pos]
+                response += colour(A.normal[A.bold[summary[title_pos:title_pos + len(title)]], ""])
+                response += summary[title_pos + len(title):]
+            else:
+                response += colour(A.normal[A.bold[f"{title}"], f": {summary}"])
 
         if link:
             response += " - " + self.bot.moduleHandler.runActionUntilValue("shorten-url", page.url)
