@@ -4,7 +4,6 @@ croniter==1.0.6
 Cython==0.29.22
 feedparser==6.0.2
 furl==2.1.0
-pyre2==0.3.3
 google-api-python-client==1.12.8
 isodate==0.6.0
 jq==1.1.2
@@ -14,9 +13,10 @@ Pillow==8.1.0
 parsedatetime==2.6
 psutil==5.8.0
 pyhedrals==0.2.0
+pymediawiki==0.7.0
+pyre2==0.3.3
 python-dateutil==2.8.1
 pytimeparse==1.1.8
-pymediawiki==0.7.0
 pyxDamerauLevenshtein==1.7.0
 regex==2020.11.13
 requests==2.25.1
