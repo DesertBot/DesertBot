@@ -4,7 +4,7 @@ croniter==1.0.6
 Cython==0.29.22
 feedparser==6.0.2
 furl==2.1.0
-git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
+pyre2==0.3.3
 google-api-python-client==1.12.8
 isodate==0.6.0
 jq==1.1.2
