@@ -1,7 +1,7 @@
 :server PRIVMSG #dev :!do wakes up
 :server PRIVMSG #dev :hi DesertBot
 :server PRIVMSG #dev :s/DesertBot/Test Server/
-:server PRIVMSG #dev :!tell .*&.* Testing tells is important.
+:server PRIVMSG #dev :!tell *&* Testing tells is important.
 :server PRIVMSG #dev :Imma boop you now to see what happens
 :server PRIVMSG #dev :And again
 
