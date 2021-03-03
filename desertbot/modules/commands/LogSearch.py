@@ -11,6 +11,7 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
+from desertbot.utils import string
 
 try:
     import re2
@@ -21,7 +22,12 @@ except ImportError:
 @implementer(IPlugin, IModule)
 class LogSearch(BotCommand):
     def triggers(self):
-        return ['firstseen', 'lastseen', 'lastsaw', 'firstsaid', 'lastsaid', 'saidbeforetoday']
+        return [
+            'firstseen', 'lastseen', 'lastsaw',
+            'allseen', 'allsaw',
+            'firstsaid', 'lastsaid', 'saidbeforetoday',
+            'allsaid', 'allsaidbeforetoday'
+        ]
 
     def help(self, query: Union[str, None]) -> str:
         command = query[0].lower()
@@ -49,40 +55,97 @@ class LogSearch(BotCommand):
     def _firstseen(self, message: IRCMessage):
         """firstseen <nick> | Search for the first line someone with the given nick spoke."""
         logPath, logs = self._getLogs(message)
-        return self._search(message.parameters, logPath, logs, True, True, False)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=True,
+                            includeToday=True,
+                            reverse=True)
 
     def _lastseen(self, message: IRCMessage):
         """lastseen <nick> | Search for the last line someone with the given nick spoke. Includes today."""
         logPath, logs = self._getLogs(message)
-        return self._search(message.parameters, logPath, logs, True, True, True)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=True,
+                            includeToday=True,
+                            reverse=True)
 
     def _lastsaw(self, message: IRCMessage):
         """lastsaw <nick> | Search for the last line someone with the given nick spoke. Does not include today."""
         logPath, logs = self._getLogs(message)
-        return self._search(message.parameters, logPath, logs, True, False, True)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=True,
+                            includeToday=False,
+                            reverse=True)
+
+    def _allseen(self, message: IRCMessage):
+        """allseen <nick> | Search the logs for all lines said by someone with the given nick. Includes today."""
+        logPath, logs = self._getLogs(message)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=True,
+                            includeToday=True,
+                            reverse=False,
+                            getAll=True)
+
+    def _allsaw(self, message: IRCMessage):
+        """allsaw <nick> | Search the logs for all lines said by someone with the given nick. Does not include today."""
+        logPath, logs = self._getLogs(message)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=True,
+                            includeToday=False,
+                            reverse=False,
+                            getAll=True)
 
     def _firstsaid(self, message: IRCMessage):
         """firstsaid <messagepart> | Search for the first time a given thing was said."""
         logPath, logs = self._getLogs(message)
-        return self._search(message.parameters, logPath, logs, False, True, False)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=False,
+                            includeToday=True,
+                            reverse=False)
 
     def _lastsaid(self, message: IRCMessage):
         """lastsaid <messagepart> | Search for the last time a given thing was said."""
         logPath, logs = self._getLogs(message)
-        return self._search(message.parameters, logPath, logs, False, True, True)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=False,
+                            includeToday=True,
+                            reverse=True)
 
     def _saidbeforetoday(self, message: IRCMessage):
         """saidbeforetoday <messagepart> | Search for the last time a given thing was said, before today."""
         logPath, logs = self._getLogs(message)
-        return self._search(message.parameters, logPath, logs, False, False, True)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=False,
+                            includeToday=False,
+                            reverse=True)
 
-    def _search(self, searchTerms, logPath, files, searchForNick, includeToday, reverse):
+    def _allsaid(self, message: IRCMessage):
+        """allsaid <nick> | Search the logs for all lines matching a given thing. Includes today."""
+        logPath, logs = self._getLogs(message)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=False,
+                            includeToday=True,
+                            reverse=False,
+                            getAll=True)
+
+    def _allsaidbeforetoday(self, message: IRCMessage):
+        """allsaidbeforetoday <nick> | Search the logs for all lines matching a given thing. Does not include today."""
+        logPath, logs = self._getLogs(message)
+        return self._search(message.parameters, logPath, logs,
+                            searchForNick=False,
+                            includeToday=False,
+                            reverse=False,
+                            getAll=True)
+
+    def _search(self, searchTerms, logPath, files, searchForNick, includeToday, reverse, getAll: bool = False):
         candidatePattern = re2.compile(searchTerms, re2.IGNORECASE)
         if searchForNick:
             fullPattern = re2.compile(fr"^\[[^]]+\]\s+<(.?{searchTerms})>\s+.*", re2.IGNORECASE)
         else:
             fullPattern = re2.compile(fr'.*<.*> .*({searchTerms}).*', re2.IGNORECASE)
-        found = None
+        if not getAll:
+            found = None
+        else:
+            found = []
 
         today = f"{strftime('%Y-%m-%d')}.log"
         if today in files and not includeToday:
@@ -98,17 +161,28 @@ class LogSearch(BotCommand):
             # If they do, we move on to the more expensive line search.
             if not candidatePattern.search(contents):
                 continue
-            lines = contents.rstrip().split('\n') # remove trailing newline or we end up with a blank line in the list
+            lines = contents.rstrip().split('\n')  # remove trailing newline or we end up with a blank line in the list
             if reverse:
                 lines = reversed(lines)
             if reverse and includeToday and filename == today:
                 lines = list(lines)[1:]
             for line in lines:
                 if fullPattern.match(line.rstrip()):
-                    found = line.rstrip()
-                    break
-            if found:
-                return f'[{filename[:10]}] {found}'
+                    if not getAll:
+                        # if we're searching for a single result, just return it and break
+                        found = f'[{filename[:10]}] {line.rstrip()}'
+                        break
+                    else:
+                        # if we're searching for all results, add formatted line to results and continue to next file
+                        found.append(f'[{filename[:10]}] {line.rstrip()}')
+                        continue
+            if not getAll and found:
+                return found
+            elif getAll and len(found) >= 0:
+                pasteLink = self.bot.moduleHandler.runActionUntilValue('upload-dbco',
+                                                                       string.stripFormatting("\n".join(found)),
+                                                                       10 * 60)
+                return f"Link posted! (Expires in 10 minutes) {pasteLink}."
         return 'Nothing that matches your search terms has been found in the log.'
 
     _commands = OrderedDict([
