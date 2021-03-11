@@ -189,9 +189,13 @@ class LogSearch(BotCommand):
         ('firstseen', _firstseen),
         ('lastseen', _lastseen),
         ('lastsaw', _lastsaw),
+        ('allseen', _allseen),
+        ('allsaw', _allsaw),
         ('firstsaid', _firstsaid),
         ('lastsaid', _lastsaid),
-        ('saidbeforetoday', _saidbeforetoday)
+        ('saidbeforetoday', _saidbeforetoday),
+        ('allsaid', _allsaid),
+        ('allsaidbeforetoday', _allsaidbeforetoday)
     ])
 
 
