@@ -173,17 +173,23 @@ class LogSearch(BotCommand):
                         found = f'[{filename[:10]}] {line.rstrip()}'
                         break
                     else:
-                        # if we're searching for all results, add formatted line to results and continue to next file
+                        # if we're searching for all results, add formatted line to results and continue to next line
                         found.append(f'[{filename[:10]}] {line.rstrip()}')
                         continue
             if not getAll and found:
+                # if this is not a getAll, we return what we found
                 return found
-            elif getAll and len(found) > 0:
-                pasteLink = self.bot.moduleHandler.runActionUntilValue('upload-dbco',
-                                                                       string.stripFormatting("\n".join(found)),
-                                                                       10 * 60)
-                return f"Link posted! (Expires in 10 minutes) {pasteLink}."
-        return 'Nothing that matches your search terms has been found in the log.'
+            else:
+                # otherwise, continue to the next file
+                continue
+        # we should only reach this stage if this is a getAll, or if it's not a getAll and we found nothing
+        if getAll and len(found) > 0:
+            pasteLink = self.bot.moduleHandler.runActionUntilValue('upload-dbco',
+                                                                   string.stripFormatting("\n".join(found)),
+                                                                   10 * 60)
+            return f"Link posted! (Expires in 10 minutes) {pasteLink}."
+        else:
+            return 'Nothing that matches your search terms has been found in the log.'
 
     _commands = OrderedDict([
         ('firstseen', _firstseen),
