@@ -178,7 +178,7 @@ class LogSearch(BotCommand):
                         continue
             if not getAll and found:
                 return found
-            elif getAll and len(found) >= 0:
+            elif getAll and len(found) > 0:
                 pasteLink = self.bot.moduleHandler.runActionUntilValue('upload-dbco',
                                                                        string.stripFormatting("\n".join(found)),
                                                                        10 * 60)
