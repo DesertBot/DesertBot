@@ -1,15 +1,15 @@
 beautifulsoup4==4.9.3
 bcrypt==3.2.0
-croniter==1.0.6
+croniter==1.0.8
 Cython==0.29.22
 feedparser==6.0.2
 furl==2.1.0
-google-api-python-client==1.12.8
+google-api-python-client==2.0.2
 isodate==0.6.0
 jq==1.1.2
 jsonpath-ng==1.5.2
 lxml==4.6.2
-Pillow==8.1.0
+Pillow==8.1.2
 parsedatetime==2.6
 psutil==5.8.0
 pyhedrals==0.2.0
@@ -20,5 +20,5 @@ pytimeparse==1.1.8
 pyxDamerauLevenshtein==1.7.0
 regex==2020.11.13
 requests==2.25.1
-ruamel.yaml==0.16.12
+ruamel.yaml==0.16.13
 Twisted[tls]==21.2.0
