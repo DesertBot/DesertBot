@@ -255,10 +255,14 @@ class MediaWiki(BotCommand):
                 pass
 
         if not summary:
-            soup = BeautifulSoup(page.html, 'lxml')
-            for tag in soup.find_all(class_=["toc", "infobox", regex.compile("^mw-")]):
-                tag.clear()
-            summary = soup.get_text()
+            try:
+                soup = BeautifulSoup(page.html, 'lxml')
+                for tag in soup.find_all(class_=["toc", "infobox", regex.compile("^mw-")]):
+                    tag.clear()
+                summary = soup.get_text()
+            except Exception:
+                self.logger.exception("Failed to get summary for page!")
+                summary = "Failed to fetch summary for page. Site may be down, or broken."
 
         if not summary:
             summary = ""
