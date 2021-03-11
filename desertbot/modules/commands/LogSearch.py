@@ -119,7 +119,7 @@ class LogSearch(BotCommand):
                             reverse=True)
 
     def _allsaid(self, message: IRCMessage):
-        """allsaid <nick> | Search the logs for all lines matching a given thing. Includes today."""
+        """allsaid <messagepart> | Search the logs for all lines matching a given thing. Includes today."""
         logPath, logs = self._getLogs(message)
         return self._search(message.parameters, logPath, logs,
                             searchForNick=False,
@@ -128,7 +128,7 @@ class LogSearch(BotCommand):
                             getAll=True)
 
     def _allsaidbeforetoday(self, message: IRCMessage):
-        """allsaidbeforetoday <nick> | Search the logs for all lines matching a given thing. Does not include today."""
+        """allsaidbeforetoday <messagepart> | Search the logs for all lines matching a given thing. Does not include today."""
         logPath, logs = self._getLogs(message)
         return self._search(message.parameters, logPath, logs,
                             searchForNick=False,
