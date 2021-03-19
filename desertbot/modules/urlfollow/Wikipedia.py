@@ -11,7 +11,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 import re2 as re
 
-WIKIPEDIA_URL_RE = re.compile(r"(?i)en\.wikipedia\.org/wiki/(?P<title>[^#\s]+)(?:#(?P<section>\S+))?")
+WIKIPEDIA_URL_RE = re.compile(r"(?i)en\.(?:m.)?wikipedia\.org/wiki/(?P<title>[^#\s]+)(?:#(?P<section>\S+))?")
 @implementer(IPlugin, IModule)
 class Wikipedia(BotCommand):
     def actions(self):
