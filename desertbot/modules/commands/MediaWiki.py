@@ -26,12 +26,18 @@ SUMMARY_LENGTH = 350
 
 STRIP_PARENTHESIS = regex.compile(r"(\((?:[^()]++|(?1))*\))")
 STRIP_NON_ALNUM = regex.compile(r'\W+', regex.UNICODE)
+WIKIMARKUP_IRC_HEADERS = regex.compile(r'(=+)\s*(?<string>[^=]+?)\s*\1')
+WIKIMARKUP_IRC_BOLDITALICS = regex.compile(r"(''+)\s*(?<string>[^']+?)\s*\1")
 
 def _strip_parenthesis(string):
     return STRIP_PARENTHESIS.sub("", string)
 
 def _strip_non_alnum(string):
     return STRIP_NON_ALNUM.sub("", string)
+
+def _wikimarkup_irc(string):
+    string = WIKIMARKUP_IRC_HEADERS.subf(colour(A.normal[A.underline["{string}:"],""]), string)
+    return WIKIMARKUP_IRC_BOLDITALICS.subf(colour(A.normal[A.underline["{string}"],""]), string)
 
 class URIError(ValueError):
     pass
@@ -269,6 +275,7 @@ class MediaWiki(BotCommand):
 
         summary_length = len(summary)
         summary = _strip_parenthesis(summary)
+        summary = _wikimarkup_irc(summary)
         summary = summary.replace("\n", " ")
         summary = regex.sub("\s+", " ", summary)
         summary = summary.replace(" ,", ",")
