@@ -169,8 +169,8 @@ class MediaWiki(BotCommand):
 
         if not disambiguation:
             for result in search:
-                clean_query = _strip_non_alnum(query.lower())
-                if clean_query == _strip_non_alnum(result.lower()):
+                clean_query = _strip_non_alnum(query.casefold())
+                if clean_query == _strip_non_alnum(result.casefold()):
                     try:
                         page = wiki.page(result, preload=False, auto_suggest=False, redirect=True)
                         return self._format_page(wiki, page)
@@ -178,7 +178,7 @@ class MediaWiki(BotCommand):
                         disambiguation = True
 
         if disambiguation:
-            search = [item for item in search if _strip_non_alnum(item.lower()) != _strip_non_alnum(query.lower())]
+            search = [item for item in search if _strip_non_alnum(item.casefold()) != _strip_non_alnum(query.casefold())]
 
         if len(search) == 1:
             try:
