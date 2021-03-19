@@ -257,7 +257,7 @@ class MediaWiki(BotCommand):
         if not summary:
             try:
                 soup = BeautifulSoup(page.html, 'lxml')
-                for tag in soup.find_all(class_=["toc", "infobox", regex.compile("^mw-")]):
+                for tag in soup.find_all(class_=["toc", "infobox", regex.compile("^mw-(?!parser-output)")]):
                     tag.clear()
                 summary = soup.get_text()
             except Exception:
@@ -288,7 +288,7 @@ class MediaWiki(BotCommand):
             if title_highlight.search(summary):
                 response += title_highlight.sub(colour(A.normal[A.bold[r"\1"], ""]), summary, count=1)
             else:
-                response += colour(A.normal[A.bold[f"{title}"], f": {summary}"])
+                response += colour(A.normal[A.bold[f"{title}"], f": {summary}" if summary else ""])
 
         if link:
             response += " - " + self.bot.moduleHandler.runActionUntilValue("shorten-url", page.url)
