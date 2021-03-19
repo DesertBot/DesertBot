@@ -283,11 +283,10 @@ class MediaWiki(BotCommand):
         if section:
             response += colour(A.normal[A.bold[f"{title}/{section}"], f": {summary}"])
         else:
-            if title.lower() in summary.lower():
-                title_pos = summary.lower().index(title.lower())
-                response += summary[0:title_pos]
-                response += colour(A.normal[A.bold[summary[title_pos:title_pos + len(title)]], ""])
-                response += summary[title_pos + len(title):]
+            # Have to use a regex to get case independent replacement
+            title_highlight = regex.compile(rf"(?i)({regex.escape(title)})")
+            if title_highlight.search(summary):
+                response += title_highlight.sub(colour(A.normal[A.bold[r"\1"], ""]), summary, count=1)
             else:
                 response += colour(A.normal[A.bold[f"{title}"], f": {summary}"])
 
