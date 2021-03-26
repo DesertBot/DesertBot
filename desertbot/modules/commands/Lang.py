@@ -50,7 +50,14 @@ int main() {{
 """#include <iostream>
 int main() {{
     std::cout << ({code}) << std::endl;
-}}"""
+}}""",
+            'cobol-gnu':
+"""PROGRAM-ID.H.PROCEDURE
+{code}
+"""
+        }
+        self.cflags = {
+            'cobol-gnu': ['-free'],
         }
 
     def _lang(self, message: IRCMessage):
@@ -115,7 +122,13 @@ int main() {{
             return "[Language {!r} unknown on tio.run. Perhaps you want: {}]".format(lang,
                                                                                      langString)
 
+        if lang in self.cflags:
+            cflags = self.cflags[lang]
+        else:
+            cflags = ['']
+
         request = [{'command': 'V', 'payload': {'lang': [lang]}},
+                   {'command': 'V', 'payload': {'TIO_CFLAGS': cflags}},
                    {'command': 'F', 'payload': {'.code.tio': code}},
                    {'command': 'F', 'payload': {'.input.tio': userInput}},
                    {'command': 'RC'}]
