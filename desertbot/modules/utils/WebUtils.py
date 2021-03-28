@@ -56,7 +56,12 @@ class WebUtils(BotModule):
             self.logger.info(f'non-public url {url} ignored')
             return
 
-        headers = {"User-agent": self.ua, "Accept": self.accept, "Accept-Language": self.lang}
+        headers = {
+            "User-agent": self.ua, 
+            "Accept": self.accept, 
+            "Accept-Language": self.lang,
+            "Cache-Control": "no-cache"
+        }
         # Make sure we don't download any unwanted things
         check = (r"^("
                  r"text/.*|"  # text
