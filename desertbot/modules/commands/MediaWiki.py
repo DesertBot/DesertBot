@@ -8,7 +8,6 @@ from zope.interface import implementer
 
 from bs4 import BeautifulSoup
 from furl import furl
-from json import JSONDecodeError
 import regex
 
 import mediawiki as mw
@@ -118,7 +117,7 @@ class MediaWiki(BotCommand):
             return IRCResponse("Did not get any valid MediaWiki page, giving up", message.replyTo)
         except URIError:
             return IRCResponse("Not a valid MediaWiki URL specified", message.replyTo)
-        except (MediaWikiAPIURLError, JSONDecodeError, ConnectionError):
+        except (MediaWikiAPIURLError, ValueError, ConnectionError):
             return IRCResponse("Not a valid MediaWiki API at the URL specified", message.replyTo)
         except MediaWikiBaseException as error:
             return IRCResponse("MediaWiki query failed with {}".format(error), message.replyTo)
@@ -222,7 +221,7 @@ class MediaWiki(BotCommand):
 
         try:
             self.wikihandlers[url.netloc] = mw.MediaWiki(url=str(url))
-        except (MediaWikiAPIURLError, JSONDecodeError):
+        except (MediaWikiAPIURLError, ValueError):
             url.path.segments.insert(0, "w")
             self.wikihandlers[url.netloc] = mw.MediaWiki(url=str(url))
 
