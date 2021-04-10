@@ -153,11 +153,11 @@ class WebUtils(BotModule):
             responseJson = response.json()
             return responseJson['url']
         except requests.exceptions.RequestException:
-            self.logger.exception("dbco.link POST url error {}"
-                                  .format(url))
+            self.logger.exception("dbco.link POST url error {}".format(url))
+            return url
         except json.decoder.JSONDecodeError:
-            self.logger.exception("dbco.link json response decode error, {} (at {})"
-                                  .format(response.content, url))
+            self.logger.exception("dbco.link json response decode error, {} (at {})".format(response.content, url))
+            return url
 
     def googleSearch(self, query: str) -> Optional[Dict[str, Any]]:
         googleKey = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'Google')
