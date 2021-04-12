@@ -1,6 +1,6 @@
 beautifulsoup4==4.9.3
 bcrypt==3.2.0
-croniter==1.0.10
+croniter==1.0.11
 Cython==0.29.22
 feedparser==6.0.2
 furl==2.1.0
