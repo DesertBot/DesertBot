@@ -34,7 +34,7 @@ class WebUtils(BotModule):
                                                   ('upload-dbco', 1, self.pasteDBCO)]
 
     def onLoad(self):
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/88.0"
         self.accept = ("text/*, "
                        "application/xml, application/xhtml+xml, "
                        "application/rss+xml, application/atom+xml, application/rdf+xml, "
