@@ -28,8 +28,8 @@ class IRCResponse(object):
         except TypeError:  # Already utf-8?
             self.target = target
 
-        # remove CTCP chars
+        # remove CTCP chars and other stuff that breaks messages
         if not self.type == ResponseType.Raw:
-            self.response = self.response.replace('\x01', '')
+            self.response = self.response.replace('\x01', '').replace('\r', '').replace('\n', ' ')
 
         self.Metadata = metadata
