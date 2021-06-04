@@ -58,7 +58,7 @@ class LogSearch(BotCommand):
         return self._search(message.parameters, logPath, logs,
                             searchForNick=True,
                             includeToday=True,
-                            reverse=True)
+                            reverse=False)
 
     def _lastseen(self, message: IRCMessage):
         """lastseen <nick> | Search for the last line someone with the given nick spoke. Includes today."""
