@@ -327,9 +327,9 @@ class Alias(BotCommand):
 
         metadata = message.metadata
         if 'tracking' in metadata:
-            metadata['tracking'].append('Alias')
+            metadata['tracking'].add('Alias')
         else:
-            metadata['tracking'] = ['Alias']
+            metadata['tracking'] = set('Alias')
 
         return IRCMessage(message.type, message.user, message.channel, newMsg, self.bot, metadata=metadata)
 

@@ -63,9 +63,9 @@ class Sub(BotCommand):
         metadata = message.metadata
 
         if 'tracking' in metadata:
-            metadata['tracking'].append('Sub')
+            metadata['tracking'].add('Sub')
         else:
-            metadata['tracking'] = ['Sub']
+            metadata['tracking'] = set('Sub')
 
         for segment in segments:
             (level, command, start, end) = segment
