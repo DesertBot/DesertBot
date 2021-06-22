@@ -167,6 +167,11 @@ class Sed(BotCommand):
         return None
 
     def storeMessage(self, message, unmodified=True):
+        if 'tracking' in message.metadata:
+            # ignore internal messages from alias processing
+            if any(m in message.metadata['tracking'] for m in ['Sub', 'Chain', 'Alias']):
+                return
+
         if message.replyTo not in self.messages:
             self.messages[message.replyTo] = []
             self.unmodifiedMessages[message.replyTo] = []

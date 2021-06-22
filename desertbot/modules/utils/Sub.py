@@ -62,6 +62,11 @@ class Sub(BotCommand):
         responseStack = []
         metadata = message.metadata
 
+        if 'tracking' in metadata:
+            metadata['tracking'].append('Sub')
+        else:
+            metadata['tracking'] = ['Sub']
+
         for segment in segments:
             (level, command, start, end) = segment
 

@@ -35,6 +35,10 @@ class Chain(BotCommand):
 
         response = None
         metadata = message.metadata
+        if 'tracking' in metadata:
+            metadata['tracking'].append('Chain')
+        else:
+            metadata['tracking'] = ['Chain']
 
         for link in chain:
             link = link.strip()

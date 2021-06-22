@@ -325,7 +325,13 @@ class Alias(BotCommand):
 
         newMsg = self._unmangleReplacementPoints(newMsg)
 
-        return IRCMessage(message.type, message.user, message.channel, newMsg, self.bot, metadata=message.metadata)
+        metadata = message.metadata
+        if 'tracking' in metadata:
+            metadata['tracking'].append('Alias')
+        else:
+            metadata['tracking'] = ['Alias']
+
+        return IRCMessage(message.type, message.user, message.channel, newMsg, self.bot, metadata=metadata)
 
     @staticmethod
     def _mangleReplacementPoints(string):
