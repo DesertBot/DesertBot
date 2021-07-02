@@ -113,7 +113,9 @@ class Tell(BotCommand):
 
     def _processTells(self, message: IRCMessage):
         chanTells = []
+        chanFollows = []
         pmTells = []
+        pmFollows = []
         for tell in [i for i in self.storage["tells"]]: # Iterate over a copy so we don'rlt modify the list we're iterating over
             if not any(fnmatch(message.user.nick.lower(), r) for r in tell["to"].split("/")):
                 continue
@@ -121,9 +123,15 @@ class Tell(BotCommand):
                 continue
             if tell["source"][0] in self.bot.supportHelper.chanTypes and len(chanTells) < 3:
                 if tell["source"] == message.replyTo:
+                    follows = self._tryFollowURLinTell(message, tell)
+                    if follows:
+                        chanFollows.append(follows)
                     chanTells.append(tell)
                     self.storage["tells"].remove(tell)
             elif tell["source"][0] not in self.bot.supportHelper.chanTypes:
+                follows = self._tryFollowURLinTell(message, tell)
+                if follows:
+                    pmFollows.append(follows)
                 pmTells.append(tell)
                 self.storage["tells"].remove(tell)
 
@@ -132,7 +140,22 @@ class Tell(BotCommand):
             responses.append(IRCResponse(_parseTell(message.user.nick, tell), message.replyTo))
         for tell in pmTells:
             responses.append(IRCResponse(_parseTell(message.user.nick, tell), message.user.nick))
+        for follow in chanFollows:
+            text, url = follow
+            responses.append(IRCResponse(text, message.replyTo, metadata={'var': {'urlfollowURL': url}}))
+        for follow in pmFollows:
+            text, url = follow
+            responses.append(IRCResponse(text, message.user.nick, metadata={'var': {'urlfollowURL': url}}))
+
+        # TODO: what happens if responses contains more than 3 whose target is message.replyTo? flood protection trip??
         return responses
+
+    def _tryFollowURLinTell(self, message: IRCMessage, tell):
+        tellURL = _getURL(tell["body"])
+        if tellURL:
+            follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', message, tellURL)
+            if follows:
+                return follows
 
 
 def _parseTell(nick, tell):
@@ -147,6 +170,13 @@ def _parseSentTell(tell):
                                                                        strftimeWithTimezone(tell["date"]),
                                                                        strftimeWithTimezone(tell["datetoreceive"]),
                                                                        tell["source"])
+
+
+def _getURL(tellBody):
+    tellStr = b64ToStr(tellBody)
+    match = re2.search(r'(?P<url>(https?://|www\.)[^\s]+)', tellStr, re2.IGNORECASE)
+    if match:
+        return match.group('url')
 
 
 tellCommand = Tell()
