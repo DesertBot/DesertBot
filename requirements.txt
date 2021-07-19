@@ -1,7 +1,7 @@
 beautifulsoup4==4.9.3
 bcrypt==3.2.0
 croniter==1.0.15
-Cython==0.29.23
+Cython==0.29.24
 feedparser==6.0.8
 furl==2.1.2
 google-api-python-client==2.12.0
