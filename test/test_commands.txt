@@ -21,9 +21,13 @@
 :server PRIVMSG #dev :!pronouns
 
 :server PRIVMSG #dev :!addloc new york
-:server PRIVMSG #dev :!weather
-:server PRIVMSG #dev :!forecast
-:server PRIVMSG #dev :!weather antarctica
+:server PRIVMSG #dev :!openweathermap weather
+:server PRIVMSG #dev :!openweathermap forecast
+:server PRIVMSG #dev :!openweathermap weather antarctica
+:server PRIVMSG #dev :!weatherbit weather
+:server PRIVMSG #dev :!weatherbit forecast
+:server PRIVMSG #dev :!weatherbit weather antarctica
+
 :server PRIVMSG #dev :!time antarctica
 
 :server PRIVMSG #dev :!wolframalpha 20 euros in dollars
