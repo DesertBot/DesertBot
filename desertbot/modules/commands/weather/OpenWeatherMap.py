@@ -24,9 +24,13 @@ class OpenWeatherMap(BaseWeatherCommand):
         return ["openweathermap"]
 
     def getWeather(self, location) -> str:
+        """weather (<latlon/user/place>) - Requests weather data from the API for a given set of coordinates, username
+        or place. Requests the users own weather when no parameters are given."""
         return self._handleCommand("weather", location)
 
     def getForecast(self, location) -> str:
+        """forecast (<latlon/user/place>) - Requests forecast data from the API for a given set of coordinates, username
+        or place. Requests the users own forecast when no parameters are given."""
         return self._handleCommand("forecast", location)
 
     def _handleCommand(self, subCommand, location) -> str:
