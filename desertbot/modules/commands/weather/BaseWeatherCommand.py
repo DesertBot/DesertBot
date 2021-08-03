@@ -114,7 +114,7 @@ class BaseWeatherCommand(BotCommand):
 def getFormattedWeatherData(weatherData: Dict):
     icon = _getWeatherIcon(weatherData["weatherCode"])
     description = weatherData["description"].title()
-    humidity = round(weatherData["humidity"], 0)
+    humidity = int(weatherData["humidity"])
     tempC = round(weatherData["tempC"], 1)
     tempF = round(_celsiusToFahrenheit(weatherData["tempC"]), 1)
     windSpeedMs = round(weatherData["windSpeedMs"], 1)
