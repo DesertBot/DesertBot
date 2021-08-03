@@ -150,7 +150,7 @@ def getFormattedForecastData(forecastData: List):
     formattedDays = []
     for day in forecastData:
         icon = _getWeatherIcon(day["weatherCode"])
-        description = day["description"]
+        description = day["description"].title()
         minC = round(day["minC"], 1)
         minF = round(_celsiusToFahrenheit(day["minC"]), 1)
         maxC = round(day["maxC"], 1)
