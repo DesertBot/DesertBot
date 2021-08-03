@@ -136,9 +136,14 @@ def getFormattedWeatherData(weatherData: Dict):
     else:
         dataAgeStr = "{} minute{} ago".format(dataAge, "s" if dataAge > 1 else "")
 
+    if "stationID" in weatherData:
+        stationIDStr = f"Station ID: {weatherData['stationID']} | "
+    else:
+        stationIDStr = ""
+
     return f"Temp: {tempC}°C / {tempF}°F | Weather: {icon}{description} | Humidity: {humidity}% | " \
            f"Wind Speed: {windSpeedMs} m/s / {windSpeedMph} mph / {windSpeedBft} BFT | {gustStr}Wind " \
-           f"Direction: {windDirStr} | Latest Update: {dataAgeStr}."
+           f"Direction: {windDirStr} | {stationIDStr}Latest Update: {dataAgeStr}."
 
 
 def getFormattedForecastData(forecastData: List):

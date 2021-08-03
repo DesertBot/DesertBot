@@ -66,7 +66,8 @@ def _parseWeather(json):
         "humidity": data["rh"],
         "windSpeedMs": data["wind_spd"],
         "timestamp": data["ts"],
-        "windDir": data["wind_dir"]
+        "windDir": data["wind_dir"],
+        "stationID": data["station"]
     }
 
     return getFormattedWeatherData(weatherData)
