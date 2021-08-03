@@ -26,43 +26,34 @@ class Weatherbit(BaseWeatherCommand):
     def getWeather(self, location) -> str:
         """weather (<latlon/user/place>) - Requests weather data from the API for a given set of coordinates, username
         or place. Requests the users own weather when no parameters are given."""
-        return self._handleCommand("weather", location)
+        return self._handleCommand("current", self._getApiParams(location), _parseWeather)
 
     def getForecast(self, location) -> str:
         """forecast (<latlon/user/place>) - Requests forecast data from the API for a given set of coordinates, username
         or place. Requests the users own forecast when no parameters are given."""
-        return self._handleCommand("forecast", location)
-
-    def _handleCommand(self, subCommand, location) -> str:
-        request = subCommand
-        params = {
+        params = self._getApiParams(location)
+        params["days"] = 4
+        return self._handleCommand("forecast/daily", params, _parseForecast)
+    
+    def _getApiParams(self, location):
+        return {
             "lat": location["latitude"],
             "lon": location["longitude"],
             "units": "M",
             "key": self.apiKey
         }
 
-        if subCommand == "weather":
-            request = "current"
-        if subCommand == "forecast":
-            request = "forecast/daily"
-            params["days"] = 4
-
-        url = "{}/{}".format(self.weatherBaseURL, request)
+    def _handleCommand(self, endpoint, params, parserFunc) -> str:
+        url = f"{self.weatherBaseURL}/{endpoint}"
         result = self.bot.moduleHandler.runActionUntilValue("fetch-url", url, params)
-        output = None
         if not result:
-            output = "No weather for this location could be found at this moment. Try again later."
+            return "No weather for this location could be found at this moment. Try again later."
         else:
             j = result.json()
             if "data" not in j or "count" in j and j["count"] == 0:
-                output = "The Weatherbit API returned an unknown reply."
-            else:
-                if subCommand == "weather":
-                    output = _parseWeather(j)
-                elif subCommand == "forecast":
-                    output = _parseForecast(j)
-        return output
+                return "The Weatherbit API returned an unknown reply."
+            
+            return parserFunc(j)
 
 
 def _parseWeather(json):
