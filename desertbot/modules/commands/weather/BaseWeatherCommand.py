@@ -119,7 +119,7 @@ def getFormattedWeatherData(weatherData: Dict):
     tempF = round(_celsiusToFahrenheit(weatherData["tempC"]), 1)
     windSpeedMs = round(weatherData["windSpeedMs"], 1)
     windSpeedMph = round(_msToMph(weatherData["windSpeedMs"]), 1)
-    windSpeedBft = round(_msToBft(weatherData["windSpeedMs"]), 1)
+    windSpeedBft = _msToBft(weatherData["windSpeedMs"])
     windDirStr = _getWindDirection(weatherData["windDir"]) if "windDir" in weatherData else "Unknown"
 
     if "gustSpeedMs" in weatherData:
