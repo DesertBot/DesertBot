@@ -52,7 +52,7 @@ class Weatherbit(BaseWeatherCommand):
             j = result.json()
             if "data" not in j or "count" in j and j["count"] == 0:
                 return "The Weatherbit API returned an unknown reply."
-            
+            self.logger.info(j) 
             return parserFunc(j)
 
 
@@ -76,9 +76,10 @@ def _parseWeather(json):
 def _parseForecast(json):
     daysList = json["data"]
     forecastData = []
+    dayOffset = 0
     for day in daysList:
         forecastData.append({
-            "date": datetime.fromutctimestamp(day['ts']).strftime("%A"),
+            "date": datetime.strptime(day["datetime"], "%Y-%m-%d").strftime("%A"),
             "minC": day["low_temp"],
             "maxC": day["max_temp"],
             "weatherCode": day["weather"]["code"],
