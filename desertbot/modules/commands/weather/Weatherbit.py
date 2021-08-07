@@ -78,7 +78,7 @@ def _parseForecast(json):
     forecastData = []
     for day in daysList:
         forecastData.append({
-            "date": datetime.fromtimestamp(day['ts']).strftime("%A"),
+            "date": datetime.fromutctimestamp(day['ts']).strftime("%A"),
             "minC": day["low_temp"],
             "maxC": day["max_temp"],
             "weatherCode": day["weather"]["code"],
