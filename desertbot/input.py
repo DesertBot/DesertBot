@@ -1,6 +1,6 @@
 from base64 import b64encode
 from datetime import datetime
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 from desertbot.channel import IRCChannel
 from desertbot.ircbase import ModeType
@@ -15,7 +15,7 @@ class InputHandler(object):
     def __init__(self, bot: 'DesertBot'):
         self.bot = bot
 
-    def handleCommand(self, command: str, prefix: str, params: List[str]) -> None:
+    def handleCommand(self, command: str, prefix: str, params: List[str], tags: Dict[str, Optional[str]]) -> None:
         parsedPrefix = parseUserPrefix(prefix)
         nick = parsedPrefix[0]
         ident = parsedPrefix[1]
@@ -23,14 +23,14 @@ class InputHandler(object):
 
         method = getattr(self, f'_handle{command}', None)
         if method:
-            method(nick, ident, host, params)
+            method(nick, ident, host, params, tags)
 
-    def handleNumeric(self, numeric: str, prefix: str, params: List[str]) -> None:
+    def handleNumeric(self, numeric: str, prefix: str, params: List[str], tags: Dict[str, Optional[str]]) -> None:
         method = getattr(self, f'_handleNumeric{numeric}', None)
         if method:
-            method(prefix, params)
+            method(prefix, params, tags)
 
-    def _handleACCOUNT(self, nick, ident, host, params):
+    def _handleACCOUNT(self, nick, ident, host, params, tags):
         if 'account-notify' not in self.bot.capabilities['finished']:
             return
 
@@ -44,14 +44,14 @@ class InputHandler(object):
         else:
             user.account = params[0]
 
-    def _handleAUTHENTICATE(self, nick, ident, host, params):
+    def _handleAUTHENTICATE(self, nick, ident, host, params, tags):
         if params[0] == '+':
             username = self.bot.config.getWithDefault('sasl_username', '')
             password = self.bot.config.getWithDefault('sasl_password', '')
             payload = b64encode((username + '\u0000' + username + '\u0000' + password).encode('ascii'))
             self.bot.output.cmdAUTHENTICATE(payload.decode('utf-8'))
 
-    def _handleAWAY(self, nick, ident, host, params):
+    def _handleAWAY(self, nick, ident, host, params, tags):
         if 'away-notify' not in self.bot.capabilities['finished']:
             return
 
@@ -67,7 +67,7 @@ class InputHandler(object):
             user.isAway = False
             user.awayMessage = None
 
-    def _handleCAP(self, nick, ident, host, params):
+    def _handleCAP(self, nick, ident, host, params, tags):
         subCommand = params[1]
         if subCommand == 'LS':
             self.bot.logger.info(f'Received CAP LS reply, supported caps: {params[2]}')
@@ -97,7 +97,7 @@ class InputHandler(object):
                 self.bot.logger.info(f'Rejected capability changes: {params[2]}.')
             self.checkCAPNegotiationFinished()
 
-    def _handleCHGHOST(self, nick, ident, host, params):
+    def _handleCHGHOST(self, nick, ident, host, params, tags):
         if 'chghost' not in self.bot.capabilities['finished']:
             return
 
@@ -109,10 +109,10 @@ class InputHandler(object):
         user.ident = params[0]
         user.host = params[1]
 
-    def _handleERROR(self, nick, ident, host, params):
+    def _handleERROR(self, nick, ident, host, params, tags):
         self.bot.logger.info(f'Connection terminated ({params[0]})')
 
-    def _handleINVITE(self, nick, ident, host, params):
+    def _handleINVITE(self, nick, ident, host, params, tags):
         if nick in self.bot.users:
             inviter = self.bot.users[nick]
         else:
@@ -134,10 +134,10 @@ class InputHandler(object):
             channel = self.bot.channels[chanName]
         if not invitee or invitee.nick == self.bot.nick:
             self.bot.output.cmdJOIN(chanName)
-        message = IRCMessage('INVITE', inviter, channel, '', self.bot, {'invitee': invitee})
+        message = IRCMessage('INVITE', inviter, channel, '', self.bot, {'invitee': invitee}, tags)
         self.handleMessage(message)
 
-    def _handleJOIN(self, nick, ident, host, params):
+    def _handleJOIN(self, nick, ident, host, params, tags):
         if nick not in self.bot.users:
             user = IRCUser(nick, ident, host)
             if 'extended-join' in self.bot.capabilities['finished'] and len(params) > 1:
@@ -159,10 +159,10 @@ class InputHandler(object):
             channel = self.bot.channels[params[0]]
         channel.users[nick] = user
         channel.ranks[nick] = ''
-        message = IRCMessage('JOIN', user, channel, '', self.bot)
+        message = IRCMessage('JOIN', user, channel, '', self.bot, {}, tags)
         self.handleMessage(message)
 
-    def _handleKICK(self, nick, ident, host, params):
+    def _handleKICK(self, nick, ident, host, params, tags):
         if params[0] not in self.bot.channels:
             self.bot.logger.warning(f'Received KICK message for unknown channel {params[0]}.')
             return
@@ -180,7 +180,7 @@ class InputHandler(object):
         if len(params) > 2:
             reason = params[2]
 
-        message = IRCMessage('KICK', kicker, channel, reason, self.bot, {'kicked': kicked})
+        message = IRCMessage('KICK', kicker, channel, reason, self.bot, {'kicked': kicked}, tags)
         self.handleMessage(message)
 
         # We need to run the action before we actually get rid of the user
@@ -190,7 +190,7 @@ class InputHandler(object):
             del channel.users[kicked.nick]
             del channel.ranks[kicked.nick]
 
-    def _handleMODE(self, nick, ident, host, params):
+    def _handleMODE(self, nick, ident, host, params, tags):
         message = None
         if nick in self.bot.users:
             user = self.bot.users[nick]
@@ -209,17 +209,17 @@ class InputHandler(object):
             if not modes:
                 return
             if len(modes['added']) > 0 or len(modes['removed']) > 0:
-                message = IRCMessage('MODE', user, channel, '', self.bot, modes)
+                message = IRCMessage('MODE', user, channel, '', self.bot, modes, tags)
         elif params[0] == self.bot.nick:
             modes = self.bot.setUserModes(params[1])
             if not modes:
                 return
             if len(modes['added']) > 0 or len(modes['removed']) > 0:
-                message = IRCMessage('MODE', user, None, '', self.bot, modes)
+                message = IRCMessage('MODE', user, None, '', self.bot, modes, tags)
         if message:
             self.handleMessage(message)
 
-    def _handleNICK(self, nick, ident, host, params):
+    def _handleNICK(self, nick, ident, host, params, tags):
         if nick not in self.bot.users:
             self.bot.logger.warning(f'Received NICK message for unknown user {nick}.')
             return
@@ -236,10 +236,10 @@ class InputHandler(object):
                 del channel.ranks[nick]
         if nick == self.bot.nick:
             self.bot.nick = newNick
-        message = IRCMessage('NICK', user, None, newNick, self.bot, {'oldnick': nick})
+        message = IRCMessage('NICK', user, None, newNick, self.bot, {'oldnick': nick}, tags)
         self.handleMessage(message)
 
-    def _handleNOTICE(self, nick, ident, host, params):
+    def _handleNOTICE(self, nick, ident, host, params, tags):
         user = None
         if params[0][0] in self.bot.supportHelper.chanTypes:
             if params[0] in self.bot.channels:
@@ -257,12 +257,12 @@ class InputHandler(object):
             # We got a notice from an unknown user. Create a temporary IRCUser object for them.
             source = IRCUser(nick, ident, host)
         if isinstance(source, IRCChannel):
-            message = IRCMessage('NOTICE', user, source, params[1], self.bot)
+            message = IRCMessage('NOTICE', user, source, params[1], self.bot, {}, tags)
         else:
-            message = IRCMessage('NOTICE', source, None, params[1], self.bot)
+            message = IRCMessage('NOTICE', source, None, params[1], self.bot, {}, tags)
         self.handleMessage(message)
 
-    def _handlePART(self, nick, ident, host, params):
+    def _handlePART(self, nick, ident, host, params, tags):
         if params[0] not in self.bot.channels:
             self.bot.logger.warning(f'Received PART message for unknown channel {params[0]}.')
             return
@@ -275,7 +275,7 @@ class InputHandler(object):
             reason = params[1]
         user = self.bot.users[nick]
         # We need to run the action before we actually get rid of the user
-        message = IRCMessage('PART', user, channel, reason, self.bot)
+        message = IRCMessage('PART', user, channel, reason, self.bot, {}, tags)
         self.handleMessage(message)
         if nick == self.bot.nick:
             del self.bot.channels[params[0]]
@@ -283,11 +283,11 @@ class InputHandler(object):
             del channel.users[nick]
             del channel.ranks[nick]
 
-    def _handlePING(self, nick, ident, host, params):
+    def _handlePING(self, nick, ident, host, params, tags):
         self.bot.moduleHandler.handlePing()
         self.bot.output.cmdPONG(' '.join(params))
 
-    def _handlePRIVMSG(self, nick, ident, host, params):
+    def _handlePRIVMSG(self, nick, ident, host, params, tags):
         user = None
         if params[0][0] in self.bot.supportHelper.chanTypes:
             if params[0] in self.bot.channels:
@@ -315,16 +315,16 @@ class InputHandler(object):
                 msgType = 'ACTION'
                 msgStr = msgStr[7:]
             if isinstance(source, IRCChannel):
-                message = IRCMessage(msgType, user, source, msgStr, self.bot)
+                message = IRCMessage(msgType, user, source, msgStr, self.bot, {}, tags)
             else:
-                message = IRCMessage(msgType, source, None, msgStr, self.bot)
+                message = IRCMessage(msgType, source, None, msgStr, self.bot, {}, tags)
         elif isinstance(source, IRCChannel):
-            message = IRCMessage('PRIVMSG', user, source, params[1], self.bot)
+            message = IRCMessage('PRIVMSG', user, source, params[1], self.bot, {}, tags)
         else:
-            message = IRCMessage('PRIVMSG', source, None, params[1], self.bot)
+            message = IRCMessage('PRIVMSG', source, None, params[1], self.bot, {}, tags)
         self.handleMessage(message)
 
-    def _handleQUIT(self, nick, ident, host, params):
+    def _handleQUIT(self, nick, ident, host, params, tags):
         if nick not in self.bot.users:
             self.bot.logger.warning(f'Received a QUIT message for unknown user {nick}.')
             return
@@ -333,14 +333,14 @@ class InputHandler(object):
             reason = params[0]
         user = self.bot.users[nick]
         quitChannels = [chan for _, chan in self.bot.channels.items() if nick in chan.users]
-        message = IRCMessage('QUIT', user, None, reason, self.bot, {'quitChannels': quitChannels})
+        message = IRCMessage('QUIT', user, None, reason, self.bot, {'quitChannels': quitChannels}, tags)
         self.handleMessage(message)
         for channel in self.bot.channels.values():
             if nick in channel.users:
                 del channel.users[nick]
                 del channel.ranks[nick]
 
-    def _handleTOPIC(self, nick, ident, host, params):
+    def _handleTOPIC(self, nick, ident, host, params, tags):
         if params[0] not in self.bot.channels:
             self.bot.logger.warning(f'Received TOPIC message for unknown channel {params[0]}.')
             return
@@ -354,20 +354,20 @@ class InputHandler(object):
         channel.topic = params[1]
         channel.topicSetter = user.fullUserPrefix()
         channel.topicTimestamp = timestamp(now())
-        message = IRCMessage('TOPIC', user, channel, params[1], self.bot, {'oldtopic': oldTopic})
+        message = IRCMessage('TOPIC', user, channel, params[1], self.bot, {'oldtopic': oldTopic}, tags)
         self.handleMessage(message)
 
-    def _handleNumeric001(self, prefix, params):
+    def _handleNumeric001(self, prefix, params, tags):
         # 001: RPL_WELCOME
         self.bot.loggedIn = True
         self.bot.factory.connectionAttempts = 0
-        message = IRCMessage('001', IRCUser(prefix), None, '', self.bot)
+        message = IRCMessage('001', IRCUser(prefix), None, '', self.bot, {}, tags)
         self.handleMessage(message)
         channels = self.bot.config.getWithDefault('channels', {})
         for channel, key in channels.items():
             self.bot.output.cmdJOIN(channel, key if key else '')
 
-    def _handleNumeric004(self, prefix, params):
+    def _handleNumeric004(self, prefix, params, tags):
         # 004: RPL_MYINFO
         if len(params) < 4:
             self.bot.logger.warning('Received malformed MY_INFO reply, params: {}'.format(' '.join(params)))
@@ -377,7 +377,7 @@ class InputHandler(object):
         self.bot.supportHelper.serverVersion = params[2]
         self.bot.supportHelper.userModes = params[3]
 
-    def _handleNumeric005(self, prefix, params):
+    def _handleNumeric005(self, prefix, params, tags):
         # 005: RPL_ISUPPORT
         tokens = {}
         # The first param is our prefix and the last one is ':are supported by this server'
@@ -413,32 +413,32 @@ class InputHandler(object):
                 self.bot.supportHelper.statusSymbols[symbols[i]] = modes[i]
         self.bot.supportHelper.rawTokens.update(tokens)
 
-    def _handleNumeric324(self, prefix, params):
+    def _handleNumeric324(self, prefix, params, tags):
         # 324: RPL_CHANNELMODEIS
         channel = self.bot.channels[params[1]]
         modeParams = params[3].split() if len(params) > 3 else []
         modes = channel.setModes(params[2], modeParams)
         if modes:
-            message = IRCMessage('324', IRCUser(prefix), None, '', self.bot, modes)
+            message = IRCMessage('324', IRCUser(prefix), None, '', self.bot, modes, tags)
             self.handleMessage(message)
 
-    def _handleNumeric329(self, prefix, params):
+    def _handleNumeric329(self, prefix, params, tags):
         # 329: RPL_CREATIONTIME
         channel = self.bot.channels[params[1]]
         channel.creationTime = int(params[2])
 
-    def _handleNumeric332(self, prefix, params):
+    def _handleNumeric332(self, prefix, params, tags):
         # 332: RPL_TOPIC
         channel = self.bot.channels[params[1]]
         channel.topic = params[2]
 
-    def _handleNumeric333(self, prefix, params):
+    def _handleNumeric333(self, prefix, params, tags):
         # 333: RPL_TOPICWHOTIME
         channel = self.bot.channels[params[1]]
         channel.topicSetter = params[2]
         channel.topicTimestamp = int(params[3])
 
-    def _handleNumeric352(self, prefix, params):
+    def _handleNumeric352(self, prefix, params, tags):
         # 352: RPL_WHOREPLY
         if params[5] not in self.bot.users:
             self.bot.logger.warning(f'Received WHO reply for unknown user {params[5]}.')
@@ -465,7 +465,7 @@ class InputHandler(object):
         else:
             user.gecos = 'No info'
 
-    def _handleNumeric353(self, prefix, params):
+    def _handleNumeric353(self, prefix, params, tags):
         # 353: RPL_NAMREPLY
         channel = self.bot.channels[params[2]]
         if channel.userlistComplete:
@@ -489,40 +489,40 @@ class InputHandler(object):
             channel.users[nick] = user
             channel.ranks[nick] = ranks
 
-    def _handleNumeric366(self, prefix, params):
+    def _handleNumeric366(self, prefix, params, tags):
         # 366: RPL_ENDOFNAMES
         channel = self.bot.channels[params[1]]
         channel.userlistComplete = True
 
-    def _handleNumeric401(self, prefix, params):
+    def _handleNumeric401(self, prefix, params, tags):
         # This is assuming the numeric is even sent to begin with, which some unsupported IRCds don't even seem to do.
         if params[0] == 'CAP':
             self.bot.logger.info('Server does not support capability negotiation.')
             self.bot.capabilities['init'] = False
 
-    def _handleNumeric433(self, prefix, params):
+    def _handleNumeric433(self, prefix, params, tags):
         # 433: ERR_NICKNAMEINUSE
         newNick = '{self.bot.nick}_'
         self.bot.logger.info('Nickname {self.bot.nick} is in use, retrying with {newNick} ...')
         self.bot.nick = newNick
         self.bot.output.cmdNICK(self.bot.nick)
 
-    def _handleNumeric900(self, prefix, params):
+    def _handleNumeric900(self, prefix, params, tags):
         self._handleAuthSuccessful()
 
-    def _handleNumeric902(self, prefix, params):
+    def _handleNumeric902(self, prefix, params, tags):
         self._handleAuthFailed()
 
-    def _handleNumeric903(self, prefix, params):
+    def _handleNumeric903(self, prefix, params, tags):
         self._handleAuthSuccessful()
 
-    def _handleNumeric904(self, prefix, params):
+    def _handleNumeric904(self, prefix, params, tags):
         self._handleAuthFailed()
 
-    def _handleNumeric905(self, prefix, params):
+    def _handleNumeric905(self, prefix, params, tags):
         self._handleAuthFailed()
 
-    def _handleNumeric907(self, prefix, params):
+    def _handleNumeric907(self, prefix, params, tags):
         self._handleAuthFailed()
 
     def handleMessage(self, message: IRCMessage):

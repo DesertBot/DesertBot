@@ -116,9 +116,9 @@ class DesertBot(IRCBase, object):
                       prefix: str, tags: Dict[str, Optional[str]]) -> None:
         self.logger.debug('IN: {} {} {} {}'.format(tags, prefix, command, ' '.join(params)))
         if isNumber(command):
-            self.input.handleNumeric(command, prefix, params)
+            self.input.handleNumeric(command, prefix, params, tags)
         else:
-            self.input.handleCommand(command, prefix, params)
+            self.input.handleCommand(command, prefix, params, tags)
 
     def sendMessage(self, command, *parameter_list, **prefix):
         self.logger.debug('OUT: {} {}'.format(command, ' '.join(parameter_list)))

@@ -15,10 +15,14 @@ class TargetTypes(Enum):
             
 
 class IRCMessage(object):
-    def __init__(self, msgType: str, user: IRCUser, channel: Optional[IRCChannel], message: str, bot: 'DesertBot', metadata: Dict=None):
+    def __init__(self, msgType: str, user: IRCUser, channel: Optional[IRCChannel], message: str, bot: 'DesertBot',
+                 metadata: Dict=None, tags: Dict=None):
         if metadata is None:
             metadata = {}
         self.metadata = metadata
+        if tags is None:
+            tags = {}
+        self.tags = tags
 
         if isinstance(message, bytes):
             unicodeMessage = message.decode('utf-8', 'ignore')
