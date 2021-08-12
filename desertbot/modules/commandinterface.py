@@ -55,15 +55,22 @@ class BotCommand(BotModule):
 
     def checkPermissions(self, message: IRCMessage) -> bool:
         for owner in self.bot.config.getWithDefault('owners', []):
-            if owner.startswith('R:') and message.user.account == owner[2:]:
-                return True
-            if fnmatch(message.user.fullUserPrefix(), owner):
+            if self._checkUserPermission(message, owner):
                 return True
         for admin in self.bot.config.getWithDefault('admins', []):
-            if admin.startswith('R:') and message.user.account == admin[2:]:
+            if self._checkUserPermission(message, admin):
                 return True
-            if fnmatch(message.user.fullUserPrefix(), admin):
-                return True
+        return False
+
+    def _checkUserPermission(self, message, hostmask):
+        if hostmask.startswith('R:'):
+            accountName = hostmask[2:]
+            if 'account' in message.tags:
+                return message.tags['account'] == accountName
+            else:
+                return message.user.account == accountName
+        if fnmatch(message.user.fullUserPrefix(), hostmask):
+            return True
         return False
 
     def handleCommand(self, message: IRCMessage) -> Optional[IRCResponse]:
