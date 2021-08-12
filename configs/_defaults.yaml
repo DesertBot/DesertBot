@@ -17,8 +17,10 @@ owners:
 - "*!SG@45.55.60.209"
 - "*!SG@starlitghost.xyz"
 - "*!Heufy@netadmin.dbcommunity.org"
-- "*!hubbe@hubbe.club"
 - "*!heufy@heufneutje.net"
+- "R:StarlitGhost"
+- "R:Heufneutje"
+- "R:HubbeKing"
 
 # shelve storage settings
 storage_save_interval: 60
