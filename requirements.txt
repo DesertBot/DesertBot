@@ -14,7 +14,7 @@ parsedatetime==2.6
 psutil==5.8.0
 pyhedrals==0.2.0
 pymediawiki==0.7.0
-pyre2==0.3.3
+pyre2==0.3.6
 python-dateutil==2.8.2
 pytimeparse==1.1.8
 pyxDamerauLevenshtein==1.7.0
