@@ -9,7 +9,7 @@ isodate==0.6.0
 jq==1.2.1
 jsonpath-ng==1.5.3
 lxml==4.6.3
-Pillow==8.3.2
+Pillow==8.4.0
 parsedatetime==2.6
 psutil==5.8.0
 pyhedrals==0.2.0
