@@ -88,5 +88,8 @@ class StringUtils(BotCommand):
             doc = re.sub(r"\s+", " ", self.commands[command].__doc__)
             return f"{self.bot.commandChar}{command} {doc}"
 
+    def onLoad(self):
+        self.messages = {}
+
 
 stringUtils = StringUtils()
