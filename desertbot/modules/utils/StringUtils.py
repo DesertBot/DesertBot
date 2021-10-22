@@ -16,10 +16,14 @@ from desertbot.response import IRCResponse
 @implementer(IPlugin, IModule)
 class StringUtils(BotCommand):
     def triggers(self):
-        return ["tojson", "fromjson"]
+        return ["tojson", "fromjson", "prevmsg", "prev_or_args"]
 
     def actions(self):
-        return super(StringUtils, self).actions() + [('closest-matches', 1, self.closestMatches)]
+        return super(StringUtils, self).actions() + [('closest-matches', 1, self.closestMatches),
+                                                     ('message-channel', 1, self._storeMessage),
+                                                     ('message-user', 1, self._storeMessage),
+                                                     ('action-channel', 1, self._storeMessage),
+                                                     ('action-user', 1, self._storeMessage)]
 
     def closestMatches(self, search: str, wordList: List[str],
                        numMatches: int, threshold: float) -> List[str]:
@@ -36,9 +40,39 @@ class StringUtils(BotCommand):
         """un-escapes json strings"""
         return IRCResponse(str(json.loads(message.parameters)), message.replyTo)
 
+    def _storeMessage(self, message: IRCMessage):
+        """stores the current message for _prevmsg to return later"""
+        if message.command and message.command.lower() in self.bot.moduleHandler.mappedTriggers:
+            # ignore bot commands
+            return
+
+        if 'tracking' in message.metadata:
+            # ignore internal messages from alias processing
+            if any(m in message.metadata['tracking'] for m in ['Sub', 'Chain', 'Alias']):
+                return
+
+        self.messages[message.replyTo] = message
+
+    def _prevmsg(self, message: IRCMessage):
+        """returns the previous message from the current channel"""
+        if message.replyTo not in self.messages:
+            return IRCResponse("No previous message stored for this channel yet", message.replyTo)
+        msg = self.messages[message.replyTo]
+        return IRCResponse(msg.messageString, message.replyTo)
+
+    def _prev_or_args(self, message: IRCMessage):
+        """returns the previous message from the current channel,
+        or the command arguments if given"""
+        if message.parameters:
+            return IRCResponse(message.parameters, message.replyTo)
+        else:
+            return self._prevmsg(message)
+
     commands = OrderedDict([
         ('tojson', _tojson),
         ('fromjson', _fromjson),
+        ('prevmsg', _prevmsg),
+        ('prev_or_args', _prev_or_args),
     ])
 
     def execute(self, message: IRCMessage):
