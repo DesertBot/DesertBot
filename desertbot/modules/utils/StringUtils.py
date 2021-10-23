@@ -83,10 +83,10 @@ class StringUtils(BotCommand):
             return IRCResponse(f'"{message.command}" is not a recognized StringUtils command', message.replyTo)
 
     def help(self, query):
-        command = query.lower()
+        command = query[0].lower()
         if command in self.commands:
             doc = re.sub(r"\s+", " ", self.commands[command].__doc__)
-            return f"{self.bot.commandChar}{command} {doc}"
+            return f"{self.bot.commandChar}{command} - {doc}"
 
     def onLoad(self):
         self.messages = {}
