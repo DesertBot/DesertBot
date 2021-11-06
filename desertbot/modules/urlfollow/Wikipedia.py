@@ -2,6 +2,7 @@
 @date: 2021-02-06
 @author: HelleDaryd
 """
+import urllib.parse
 
 from twisted.plugin import IPlugin
 from zope.interface import implementer
@@ -25,8 +26,8 @@ class Wikipedia(BotCommand):
         if not match:
             return
 
-        title = match.group('title')
-        section = match.group('section')
+        title = urllib.parse.unquote(match.group('title'))
+        section = urllib.parse.unquote(match.group('section') or "")
 
         response = self.bot.moduleHandler.runActionUntilValue("wikipedia", title, section)
         if response:
