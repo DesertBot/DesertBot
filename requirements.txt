@@ -4,7 +4,7 @@ croniter==1.0.15
 Cython==0.29.24
 feedparser==6.0.8
 furl==2.1.3
-google-api-python-client==2.30.0
+google-api-python-client==2.31.0
 isodate==0.6.0
 jq==1.2.1
 jsonpath-ng==1.5.3
