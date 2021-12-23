@@ -216,7 +216,7 @@ class FFXIV(BotCommand):
         15: "CUL", 16: "MIN", 17: "BTN", 18: "FSH", 19: "PLD", 20: "MNK", 21: "WAR",
         22: "DRG", 23: "BRD", 24: "WHM", 25: "BLM", 26: "ACN", 27: "SMN", 28: "SCH",
         29: "ROG", 30: "NIN", 31: "MCH", 32: "DRK", 33: "AST", 34: "SAM", 35: "RDM",
-        36: "BLU", 37: "GNB", 38: "DNC",
+        36: "BLU", 37: "GNB", 38: "DNC", 39: "RPR", 40: "SGE"
     }
 
     def _mapJobAbrvs(self, character):
@@ -228,17 +228,17 @@ class FFXIV(BotCommand):
 
     jobGroups = {
         "DoW": ["GLA", "PLD", "PGL", "MNK", "MRD", "WAR", "LNC", "DRG", "ARC", "BRD",
-                "ROG", "NIN", "MCH", "DRK", "SAM", "GNB", "DNC"],
-        "DoM": ["CNJ", "WHM", "THM", "BLM", "ACN", "SMN", "SCH", "AST", "RDM", "BLU"],
+                "ROG", "NIN", "MCH", "DRK", "SAM", "GNB", "DNC", "RPR"],
+        "DoM": ["CNJ", "WHM", "THM", "BLM", "ACN", "SMN", "SCH", "AST", "RDM", "BLU", "SGE"],
         "DoH": ["CRP", "BSM", "ARM", "GSM", "LTW", "WVR", "ALC", "CUL"],
         "DoL": ["MIN", "BTN", "FSH"],
         "DPS": ["PGL", "MNK", "LNC", "DRG", "ARC", "BRD", "ROG", "NIN", "MCH", "SAM", "DNC",
-                "THM", "BLM", "ACN", "SMN", "RDM", "BLU"],
-        "mDPS": ["PGL", "MNK", "LNC", "DRG", "ROG", "NIN", "SAM"],
+                "THM", "BLM", "ACN", "SMN", "RDM", "BLU", "RPR"],
+        "mDPS": ["PGL", "MNK", "LNC", "DRG", "ROG", "NIN", "SAM", "RPR"],
         "rpDPS": ["ARC", "BRD", "MCH", "DNC"],
         "rmDPS": ["THM", "BLM", "ACN", "SMN", "BLU", "RDM"],
         "Tank": ["GLA", "PLD", "MRD", "WAR", "DRK", "GNB"],
-        "Healer": ["CNJ", "WHM", "SCH", "AST"],
+        "Healer": ["CNJ", "WHM", "SCH", "AST", "SGE"],
     }
 
     def _getJobGroups(self, jobAbrv):
