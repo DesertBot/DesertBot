@@ -20,5 +20,5 @@ pytimeparse==1.1.8
 pyxDamerauLevenshtein==1.7.0
 regex==2021.11.10
 requests==2.26.0
-ruamel.yaml==0.17.17
+ruamel.yaml==0.17.19
 Twisted[tls]==21.7.0
