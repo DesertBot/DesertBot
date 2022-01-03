@@ -24,11 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Set up python 3.6 for linting and comics test script
-      - name: Set up python3.6
+      # Set up python 3.7 for linting and comics test script
+      - name: Set up python3.7
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: 3.7
 
       # Install pyflakes linter, pillow dependency for comics test script, and build image for IRCd used in tests
       - name: Install testing dependencies
