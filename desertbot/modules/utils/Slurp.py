@@ -45,23 +45,24 @@ class Slurp(BotCommand):
                 return IRCResponse("Problem fetching {}".format(url), message.replyTo)
             soup = BeautifulSoup(response.content, 'lxml')
 
-        tag = soup.select_one(selector)
+        if prop.endswith("list"):
+            tags = soup.select(selector)
+            prop = prop[:-4]
+        else:
+            tags = [soup.select_one(selector)]
 
-        if tag is None:
+        if not tags:
             return IRCResponse("'{}' does not select a tag at {}".format(selector, url), message.replyTo)
 
-        specials = {
-            'tagname': tag.name,
-            'text': tag.text
-        }
-
-        if prop in specials:
-            value = specials[prop]
-        elif prop in tag.attrs:
-            value = tag[prop]
+        if prop == 'tagname':
+            value = ", ".join(tag.name for tag in tags)
+        elif prop == 'text':
+            value = ", ".join(tag.text for tag in tags)
+        elif prop in tags[0].attrs:
+            value = tags[0][prop]
         else:
             attrMissing = ("The tag selected by '{}' ({}) does not have attribute '{}'"
-                           .format(selector, tag.name, prop))
+                           .format(selector, tags[0].name, prop))
             return IRCResponse(attrMissing, message.replyTo)
 
         if not isinstance(value, str):

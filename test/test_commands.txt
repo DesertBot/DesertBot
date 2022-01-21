@@ -57,6 +57,9 @@
 :server PRIVMSG #dev :!outofcontext search boop
 :server PRIVMSG #dev :!outofcontext remove Imma boop you
 
+:server PRIVMSG #dev :!slurp text https://en.wikipedia.org/wiki/Google .thumbcaption
+:server PRIVMSG #dev :!slurp textlist https://en.wikipedia.org/wiki/Google .thumbcaption
+
 :server PRIVMSG #dev :https://twitch.tv/bobross
 :server PRIVMSG #dev :https://twitch.tv/loadingreadyrun
 
