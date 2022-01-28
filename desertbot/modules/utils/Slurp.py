@@ -24,7 +24,8 @@ class Slurp(BotCommand):
     def help(self, query):
         return ("slurp <attribute> <url> <css selector>"
                 " - scrapes the given attribute from the tag selected "
-                "at the given url")
+                "at the given url. if you append 'list' to the attribute, "
+                "it will return a comma-seperated list of all matching tags")
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) < 3:
