@@ -3,6 +3,7 @@ Created on Jan 26, 2014
 
 @author: StarlitGhost
 """
+import html
 import re
 
 from twisted.plugin import IPlugin
@@ -145,6 +146,7 @@ class Steam(BotCommand):
         if 'short_description' in appData and appData['short_description'] is not None:
             limit = 100
             description = appData['short_description']
+            description = html.unescape(description)
             if len(description) > limit:
                 description = '{} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
