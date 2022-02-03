@@ -68,6 +68,9 @@ class Tell(BotCommand):
                     return IRCResponse("The given duration is invalid.", message.replyTo)
             else:
                 date = now()
+            url = self.mhRunActionUntilValue("urlfollow", message)
+            if url:
+                responses.append(IRCResponse(url, message.replyTo))
             for recep in params[0].split("&"):
                 if recep.lower() == self.bot.nick.lower():
                     responses.append(
