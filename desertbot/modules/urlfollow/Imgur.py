@@ -76,6 +76,8 @@ class Imgur(BotCommand):
                 #  but they may add new ones so we're leaving this here just in case.
                 titleUrl = 'https://imgur.com/{}'.format(origImgurID)
                 response = mh.runActionUntilValue('fetch-url', titleUrl)
+                if not response:
+                    return
                 title = mh.runActionUntilValue('get-html-title', response.content)
                 imageData['title'] = title.replace(' - Imgur', '')
                 if imageData['title'] in ['imgur: the simple image sharer',
