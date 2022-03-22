@@ -25,16 +25,17 @@ class Epic(BotCommand):
     url = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US"
     query = jq.compile("""
         def e(f): if f == "[]" then null else f end;
-        [ .data.Catalog.searchStore.elements[] |
+        [ .data.Catalog.searchStore.elements[] | . as $item |
             ({
                 id: .id,
                 title: .title,
+                seller: .seller.name,
                 url: (if e(.productSlug) then ("https://www.epicgames.com/store/en-US/product/" + .productSlug) else null end),
             }) +
             (.customAttributes | from_entries |
             {
-                publisher: e(.publisherName // .developerName),
-                developer: e(.developerName // .publisherName)
+                publisher: (e(.publisherName // .developerName) // $item.seller.name),
+                developer: (e(.developerName // .publisherName) // $item.seller.name)
             }) +
             try (.promotions |
             # Decorate future items (spammy)
