@@ -126,15 +126,17 @@ class Epic(BotCommand):
         return [IRCResponse(self._format(g, True), message.replyTo) for g in fresh]
 
     def tell_games(self, message: IRCMessage, active=True):
-        return [IRCResponse(self._format(g), message.replyTo) for g in self.storage.values() if self._active(g) == active]
+        return [IRCResponse(self._format(g), message.replyTo) for g in self.storage.values() if self._active(g, active=active)]
 
 
     @staticmethod
-    def _active(game):
+    def _active(game, active=True):
         now = datetime.now(tz=timezone.utc)
-        if dparser.isoparse(game["startDate"]) <= now <= dparser.isoparse(game["endDate"]):
-            return True
-        return False
+        if now > dparser.isoparse(game["endDate"]):
+            return False
+        if dparser.isoparse(game["startDate"]) <= now:
+            return active
+        return not active
 
     @staticmethod
     def _format(game, fresh=False):
