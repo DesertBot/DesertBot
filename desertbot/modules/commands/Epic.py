@@ -138,10 +138,10 @@ class Epic(BotCommand):
             return active
         return not active
 
-    @staticmethod
-    def _format(game, fresh=False):
+    @classmethod
+    def _format(cls, game, fresh=False):
         now = datetime.now(tz=timezone.utc)
-        active = Epic._active(game)
+        active = cls._active(game)
         future = timeDeltaString(dparser.isoparse(game["startDate"]), now)
         left = timeDeltaString(dparser.isoparse(game["endDate"]), now)
 
