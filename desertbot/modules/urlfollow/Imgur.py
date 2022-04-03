@@ -70,19 +70,6 @@ class Imgur(BotCommand):
                     return
                 j = response.json()
                 imageData = j['data']
-            else:
-                # fallback to the html page title if no other title was found.
-                #  this should always result in <No Title> now as all the endpoints are covered,
-                #  but they may add new ones so we're leaving this here just in case.
-                titleUrl = 'https://imgur.com/{}'.format(origImgurID)
-                response = mh.runActionUntilValue('fetch-url', titleUrl)
-                if not response:
-                    return
-                title = mh.runActionUntilValue('get-html-title', response.content)
-                imageData['title'] = title.replace(' - Imgur', '')
-                if imageData['title'] in ['imgur: the simple image sharer',
-                                          'Imgur: The magic of the Internet']:
-                    imageData['title'] = None
 
         data = []
         if imageData['title']:
@@ -99,6 +86,8 @@ class Imgur(BotCommand):
             else:
                 if imageData['animated']:
                     data.append('\x032\x02Animated!\x0F')
+                if imageData['has_sound']:
+                    data.append('\x032\x02Sound!\x0F')
                 data.append('{:,d}x{:,d}'.format(imageData['width'], imageData['height']))
                 data.append('Size: {:,d}kb'.format(int(imageData['size']/1024)))
         data.append('Views: {:,d}'.format(imageData['views']))
