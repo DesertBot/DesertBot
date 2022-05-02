@@ -32,6 +32,9 @@
 
 :server PRIVMSG #dev :!wolframalpha 20 euros in dollars
 
+:server PRIVMSG #dev :!define butt
+:server PRIVMSG #dev :!define buttt
+
 :server PRIVMSG #dev :HONK
 :server PRIVMSG #dev :nyaa~
 :server PRIVMSG #dev :Everything is fine.
