@@ -27,7 +27,7 @@ Installation Instructions
 * Install Python 3+
 * Clone the repo with `git clone https://github.com/DesertBot/DesertBot.git`
 * Create a virtualenv to run the bot in, and activate it
-* Run `pip install -r requirements.txt` to install all the requirements
+* Run `pip install -r requirements/requirements.txt` to install all the requirements
 * Edit [_defaults.yaml](configs/_defaults.yaml) to set the bot owner and other details
 * Copy [server.yaml.example](configs/server.yaml.example) and create a server config (you'll want one of these per IRC network)
 

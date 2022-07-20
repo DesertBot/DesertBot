@@ -8,7 +8,7 @@ RUN apt-get update && \
     libre2-dev \
 	cargo \
 	rustc
-COPY requirements.txt /
+COPY requirements/requirements.txt /
 RUN pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r /requirements.txt
 WORKDIR /app
