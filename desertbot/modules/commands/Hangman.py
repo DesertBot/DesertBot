@@ -168,7 +168,7 @@ class GameState(object):
 
 class PhraseList(object):
     def __init__(self):
-        self.dataPath = 'data/hangman.txt'
+        self.dataPath = 'data/hangman.lst'
         self.phraseList = self._loadPhrases()
         random.shuffle(self.phraseList)
         self.phraseGenerator = (p for p in self.phraseList)
