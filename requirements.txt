@@ -18,7 +18,7 @@ pyre2==0.3.6
 python-dateutil==2.8.2
 pytimeparse==1.1.8
 pyxDamerauLevenshtein==1.7.1
-regex==2022.8.17
+regex==2022.9.11
 requests==2.28.1
 ruamel.yaml==0.17.21
 Twisted[tls]==22.4.0
