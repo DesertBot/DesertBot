@@ -9,6 +9,14 @@ services:
     container_name: weercd
     volumes:
       - ./test_commands.txt:/test_commands.txt
+  comics:
+    build:
+      context: .
+      dockerfile: comics.Dockerfile
+    command: ["python", "/app/comics.py"]
+    container_name: comics
+    volumes:
+      - ./comics.py:/app/comics.py
   desertbot:
     image: starlitghost/desertbot:latest
     build:

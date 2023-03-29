@@ -1,18 +1,29 @@
-FROM python:3.7-slim AS base
+FROM python:3.10-slim AS base
 
 FROM base AS build
+
 RUN apt-get update && \
     apt-get install -y \
     build-essential \
+	cargo \
+    cmake \
+    cython3 \
     git \
     libre2-dev \
-	cargo \
+    ninja-build \
+    pybind11-dev \
+    python3-dev \
 	rustc
+
 COPY requirements.txt /
+
 RUN pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r /requirements.txt
+
 WORKDIR /app
+
 COPY . /app
+
 RUN git remote set-url origin git@github.com:DesertBot/DesertBot.git
 
 # Comment out these 6 lines if you want !update to work with requirements.txt updates
