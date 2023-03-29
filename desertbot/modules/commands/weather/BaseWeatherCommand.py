@@ -145,7 +145,7 @@ def getFormattedWeatherData(weatherData: Dict):
 
     if "timezone" in weatherData:
         zone = pytz.timezone(weatherData["timezone"])
-        localTime = datetime.fromtimestamp(weatherData["timestamp"], tz=zone)
+        localTime = datetime.datetime.fromtimestamp(weatherData["timestamp"], tz=zone)
         localTimeStr = localTime.strftime(" @ %H:%M (%Z)")
     else:
         localTimeStr = ""
