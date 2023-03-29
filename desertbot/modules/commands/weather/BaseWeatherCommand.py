@@ -1,3 +1,5 @@
+import datetime
+import pytz
 import time
 from typing import List, Union, Dict
 
@@ -132,18 +134,25 @@ def getFormattedWeatherData(weatherData: Dict):
 
     dataAge = int(round((time.time() - weatherData["timestamp"]) / 60))
     if dataAge <= 0:
-        dataAgeStr = "just now"
+        dataAgeStr = "now"
     else:
-        dataAgeStr = "{} minute{} ago".format(dataAge, "s" if dataAge > 1 else "")
+        dataAgeStr = f"{dataAge} min ago"
 
     if "stationID" in weatherData:
         stationIDStr = f"Station ID: {weatherData['stationID']} | "
     else:
         stationIDStr = ""
 
+    if "timezone" in weatherData:
+        zone = pytz.timezone(weatherData["timezone"])
+        localTime = datetime.fromtimestamp(weatherData["timestamp"], tz=zone)
+        localTimeStr = localTime.strftime(" @ %H:%M (%Z)")
+    else:
+        localTimeStr = ""
+
     return f"Temp: {tempC}°C / {tempF}°F | Weather: {icon}{description} | Humidity: {humidity}% | " \
            f"Wind Speed: {windSpeedMs} m/s / {windSpeedMph} mph / {windSpeedBft} BFT | {gustStr}Wind " \
-           f"Direction: {windDirStr} | {stationIDStr}Latest Update: {dataAgeStr}."
+           f"Direction: {windDirStr} | {stationIDStr}Latest Update: {dataAgeStr}{localTimeStr}"
 
 
 def getFormattedForecastData(forecastData: List):
