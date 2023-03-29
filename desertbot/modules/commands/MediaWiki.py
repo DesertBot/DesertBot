@@ -8,7 +8,6 @@ from zope.interface import implementer
 
 from bs4 import BeautifulSoup
 from furl import furl
-import regex
 
 import mediawiki as mw
 from mediawiki.exceptions import MediaWikiAPIURLError, MediaWikiBaseException
@@ -19,14 +18,19 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 
+try:
+    import re2
+except ImportError:
+    import re as re2
+
 USER_AGENT = 'DesertBot'
 SEARCH_RETURNED_RESULTS = 12
 SUMMARY_LENGTH = 350
 
-STRIP_PARENTHESIS = regex.compile(r"(\((?:[^()]++|(?1))*\))")
-STRIP_NON_ALNUM = regex.compile(r'\W+', regex.UNICODE)
-WIKIMARKUP_IRC_HEADERS = regex.compile(r'(=+)\s*(?<string>[^=]+?)\s*\1')
-WIKIMARKUP_IRC_BOLDITALICS = regex.compile(r"(''+)\s*(?<string>[^']+?)\s*\1")
+STRIP_PARENTHESIS = re2.compile(r"(\((?:[^()]++|(?1))*\))")
+STRIP_NON_ALNUM = re2.compile(r'\W+', re2.UNICODE)
+WIKIMARKUP_IRC_HEADERS = re2.compile(r'(=+)\s*(?<string>[^=]+?)\s*\1')
+WIKIMARKUP_IRC_BOLDITALICS = re2.compile(r"(''+)\s*(?<string>[^']+?)\s*\1")
 
 def _strip_parenthesis(string):
     return STRIP_PARENTHESIS.sub("", string)
@@ -262,7 +266,7 @@ class MediaWiki(BotCommand):
         if not summary:
             try:
                 soup = BeautifulSoup(page.html, 'lxml')
-                for tag in soup.find_all(class_=["toc", "infobox", regex.compile("^mw-(?!parser-output)")]):
+                for tag in soup.find_all(class_=["toc", "infobox", re2.compile("^mw-(?!parser-output)")]):
                     tag.clear()
                 summary = soup.get_text()
             except Exception:
@@ -276,7 +280,7 @@ class MediaWiki(BotCommand):
         summary = _strip_parenthesis(summary)
         summary = _wikimarkup_irc(summary)
         summary = summary.replace("\n", " ")
-        summary = regex.sub("\s+", " ", summary)
+        summary = re2.sub("\s+", " ", summary)
         summary = summary.replace(" ,", ",")
         summary = summary[0:SUMMARY_LENGTH].rstrip(" ,")
         summary = summary.strip()
@@ -290,7 +294,7 @@ class MediaWiki(BotCommand):
             response += colour(A.normal[A.bold[f"{title}/{section}"], f": {summary}"])
         else:
             # Have to use a regex to get case independent replacement
-            title_highlight = regex.compile(rf"(?i)({regex.escape(title)})")
+            title_highlight = re2.compile(rf"(?i)({re2.escape(title)})")
             if title_highlight.search(summary):
                 response += title_highlight.sub(colour(A.normal[A.bold[r"\1"], ""]), summary, count=1)
             else:
