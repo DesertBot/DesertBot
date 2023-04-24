@@ -71,7 +71,7 @@ jobs:
       # Login to docker hub if this is a push to master
       - name: Docker login
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2.1.0
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
