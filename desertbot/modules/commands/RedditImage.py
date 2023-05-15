@@ -33,7 +33,7 @@ class RedditImage(BotCommand):
 
     def onLoad(self):
         self.imgurClientID = self.bot.moduleHandler.runActionUntilValue('get-api-key', 'imgur Client ID')
-        self.headers = [('Authorization', 'Client-ID {}'.format(self.imgurClientID))]
+        self.headers = {'Authorization': 'Client-ID {}'.format(self.imgurClientID)}
 
     def execute(self, message: IRCMessage):
         if len(message.parameterList) == 0 or len(message.parameterList) > 2:
