@@ -8,7 +8,7 @@ google-api-python-client==2.92.0
 isodate==0.6.1
 jq==1.4.1
 jsonpath-ng==1.5.3
-lxml==4.9.2
+lxml==4.9.3
 Pillow==9.5.0
 parsedatetime==2.6
 psutil==5.9.5
