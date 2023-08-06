@@ -43,8 +43,9 @@ class GeoLocation(BotCommand):
         return self._sendLocationRequest(url, params)
 
     def geolocationForPlace(self, place):
-        url = "https://nominatim.openstreetmap.org/search/{}".format(place.replace(" ", "%20"))
+        url = "https://nominatim.openstreetmap.org/search"
         params = {
+            "q": place.replace(" ", "%20"),
             "format": "json",
             "addressdetails": 1,
             "limit": 1
