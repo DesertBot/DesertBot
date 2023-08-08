@@ -1,3 +1,7 @@
+######################
+# MAIN CONFIGURATION #
+######################
+
 # import default config values
 import: [_defaults]
 
@@ -30,3 +34,11 @@ logurl: 'http://irc.example.com'
 # whether or not to save configs to file on shutdown
 # this should generally be true, but it can be useful to set to false in testing and/or CI
 save_on_exit: true
+
+########################
+# MODULE CONFIGURATION #
+########################
+
+# URLFollow
+# whether automatic URL following should be enabled by default
+auto_urlfollow: true

@@ -32,7 +32,7 @@ class URLFollow(BotCommand):
                 'and grabs information about the resultant webpage')
 
     def onLoad(self):
-        self.autoFollow = True
+        self.autoFollow = self.bot.config.getWithDefault('auto_urlfollow', True)
 
     def execute(self, message: IRCMessage):
         if message.parameterList[0].lower() == 'on':
