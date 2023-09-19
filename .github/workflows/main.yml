@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       COMPOSE_FILE: ./test/docker-compose.yml
 
@@ -24,11 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Set up python 3.7 for linting and comics test script
-      - name: Set up python3.7
+      # Set up python 3.8 for linting and comics test script
+      - name: Set up python3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       # Install pyflakes linter, pillow dependency for comics test script, and build image for IRCd used in tests
       - name: Install testing dependencies
