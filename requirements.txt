@@ -21,5 +21,5 @@ pytz==2023.3.post1
 pyxDamerauLevenshtein==1.7.1
 regex==2023.3.23
 requests==2.31.0
-ruamel.yaml==0.17.32
+ruamel.yaml==0.17.33
 Twisted[tls]==23.8.0
