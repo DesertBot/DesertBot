@@ -45,4 +45,4 @@ This could be streamlined a bit more, but for now:
 * Edit [_defaults.yaml](configs/_defaults.yaml) to set the bot owner and other details
 * Copy [server.yaml.example](configs/server.yaml.example) and create a server config (you'll want one of these per IRC network)
 * Copy [docker-compose-example.yml](docker-compose-example.yml) to docker-compose.yml and edit in the config file you created above
-* `docker-compose up -d desertbot-server`
+* `docker-compose up -d desertbot-server` 
