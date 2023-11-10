@@ -348,8 +348,8 @@ class Comic(BotCommand):
 
             # How big is this line?
             left, top, right, bottom = draw.multiline_textbbox((0,0), " ".join(messageWords[:numWords]),
-                                                            font=font,
-                                                            spacing=-2)
+                                                               font=font,
+                                                               spacing=-2)
             lineWidth = right - left
             lineHeight = bottom - top
 
