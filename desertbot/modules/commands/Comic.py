@@ -334,7 +334,8 @@ class Comic(BotCommand):
             numWords = 1
             while numWords < len(messageWords):
                 # Try fitting the next numWords words on the line
-                width, _ = draw.textsize(" ".join(messageWords[:numWords]), font=font)
+                left, _, right, _ = draw.textbbox((0, 0), " ".join(messageWords[:numWords]), font=font)
+                width = right - left
                 if width > maxWidth:
                     numWords -= 1
                     break
@@ -346,9 +347,11 @@ class Comic(BotCommand):
                 numWords = 1
 
             # How big is this line?
-            lineWidth, lineHeight = draw.multiline_textsize(" ".join(messageWords[:numWords]),
+            left, top, right, bottom = draw.multiline_textbbox((0,0), " ".join(messageWords[:numWords]),
                                                             font=font,
                                                             spacing=-2)
+            lineWidth = right - left
+            lineHeight = bottom - top
 
             wrappedWidth = max(wrappedWidth, lineWidth)  # wrappedWidth should be the length of the longest line
             wrappedHeight += lineHeight
