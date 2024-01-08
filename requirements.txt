@@ -13,7 +13,7 @@ Pillow==10.1.0
 parsedatetime==2.6
 psutil==5.9.7
 pyhedrals==0.2.0
-pymediawiki==0.7.3
+pymediawiki==0.7.4
 pyre2==0.3.6
 python-dateutil==2.8.2
 pytimeparse==1.1.8
