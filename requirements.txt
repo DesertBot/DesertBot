@@ -1,4 +1,4 @@
-beautifulsoup4==4.12.2
+beautifulsoup4==4.12.3
 bcrypt==4.1.2
 croniter==2.0.1
 Cython==3.0.8
