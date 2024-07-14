@@ -42,3 +42,7 @@ save_on_exit: true
 # URLFollow
 # whether automatic URL following should be enabled by default
 auto_urlfollow: true
+
+# WebUtils
+# the user agent string to be used for web requests
+user_agent: 'DesertBot/1.0.0'
