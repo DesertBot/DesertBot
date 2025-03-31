@@ -4,7 +4,7 @@ croniter==6.0.0
 Cython==3.0.12
 feedparser==6.0.11
 furl==2.1.4
-google-api-python-client==2.165.0
+google-api-python-client==2.166.0
 isodate==0.7.2
 jq==1.8.0
 jsonpath-ng==1.7.0
@@ -17,7 +17,7 @@ pymediawiki==0.7.5
 pyre2==0.3.6
 python-dateutil==2.9.0.post0
 pytimeparse==1.1.8
-pytz==2025.1
+pytz==2025.2
 pyxDamerauLevenshtein==1.8.0
 regex==2023.3.23
 requests==2.32.3
