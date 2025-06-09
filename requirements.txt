@@ -1,10 +1,10 @@
 beautifulsoup4==4.13.4
 bcrypt==4.3.0
 croniter==6.0.0
-Cython==3.0.12
+Cython==3.1.2
 feedparser==6.0.11
 furl==2.1.4
-google-api-python-client==2.169.0
+google-api-python-client==2.171.0
 isodate==0.7.2
 jq==1.8.0
 jsonpath-ng==1.7.0
@@ -20,6 +20,6 @@ pytimeparse==1.1.8
 pytz==2025.2
 pyxDamerauLevenshtein==1.8.0
 regex==2023.3.23
-requests==2.32.3
-ruamel.yaml==0.18.10
+requests==2.32.4
+ruamel.yaml==0.18.14
 Twisted[tls]==24.11.0
