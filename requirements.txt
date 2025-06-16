@@ -4,9 +4,9 @@ croniter==6.0.0
 Cython==3.1.2
 feedparser==6.0.11
 furl==2.1.4
-google-api-python-client==2.171.0
+google-api-python-client==2.172.0
 isodate==0.7.2
-jq==1.8.0
+jq==1.9.1
 jsonpath-ng==1.7.0
 lxml==5.4.0
 Pillow==11.2.1
@@ -22,4 +22,4 @@ pyxDamerauLevenshtein==1.8.0
 regex==2023.3.23
 requests==2.32.4
 ruamel.yaml==0.18.14
-Twisted[tls]==24.11.0
+Twisted[tls]==25.5.0
