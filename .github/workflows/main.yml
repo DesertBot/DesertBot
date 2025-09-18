@@ -33,7 +33,6 @@ jobs:
       # Install pyflakes linter, pillow dependency for comics test script, and build image for IRCd used in tests
       - name: Install testing dependencies
         run: |
-          export CXXFLAGS="-std=c++14"
           pip install pyflakes
           pip install pillow
           docker compose build weercd

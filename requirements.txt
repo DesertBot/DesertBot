@@ -5,7 +5,6 @@ Cython==3.1.2
 feedparser==6.0.11
 furl==2.1.4
 google-api-python-client==2.178.0
-google-re2==1.1.20250805
 isodate==0.7.2
 jq==1.10.0
 jsonpath-ng==1.7.0
@@ -15,6 +14,7 @@ parsedatetime==2.6
 psutil==7.0.0
 pyhedrals==0.2.0
 pymediawiki==0.7.5
+pyre2==0.3.6
 python-dateutil==2.9.0.post0
 pytimeparse==1.1.8
 pytz==2025.2

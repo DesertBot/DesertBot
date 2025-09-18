@@ -15,8 +15,6 @@ RUN apt-get update && \
     python3-dev \
 	rustc
 
-ENV CXXFLAGS="-std=c++14"
-
 COPY requirements.txt /
 
 RUN pip install --no-cache-dir Cython && \
