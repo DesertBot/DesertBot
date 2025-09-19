@@ -12,11 +12,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 from desertbot.utils import string
-
-try:
-    import re2
-except ImportError:
-    import re as re2
+from desertbot.utils.regex import re
 
 
 @implementer(IPlugin, IModule)
@@ -137,11 +133,11 @@ class LogSearch(BotCommand):
                             getAll=True)
 
     def _search(self, searchTerms, logPath, files, searchForNick, includeToday, reverse, getAll: bool = False):
-        candidatePattern = re2.compile(searchTerms, re2.IGNORECASE)
+        candidatePattern = re.compile(searchTerms, re.IGNORECASE)
         if searchForNick:
-            fullPattern = re2.compile(fr"^\[[^]]+\]\s+<(.?{searchTerms})>\s+.*", re2.IGNORECASE)
+            fullPattern = re.compile(fr"^\[[^]]+\]\s+<(.?{searchTerms})>\s+.*", re.IGNORECASE)
         else:
-            fullPattern = re2.compile(fr'.*<.*> .*({searchTerms}).*', re2.IGNORECASE)
+            fullPattern = re.compile(fr'.*<.*> .*({searchTerms}).*', re.IGNORECASE)
         if not getAll:
             found = None
         else:

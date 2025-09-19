@@ -14,9 +14,9 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.utils.string import deltaTimeToString
+from desertbot.utils.regex import re
 
 import jq
-import re2 as re
 
 TWITCH_GQL = "https://gql.twitch.tv/gql#origin=twilight"
 TWITCH_URL_RE = re.compile(r'twitch\.tv/(?P<twitchChannel>[^/]+)/?(\s|$)')

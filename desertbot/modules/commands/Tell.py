@@ -10,13 +10,9 @@ from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse, ResponseType
+from desertbot.utils.regex import re
 from desertbot.utils.string import b64ToStr, strftimeWithTimezone, strToB64, timeDeltaString
 from desertbot.utils.timeutils import now
-
-try:
-    import re2
-except ImportError:
-    import re as re2
 
 
 @implementer(IPlugin, IModule)
@@ -102,7 +98,7 @@ class Tell(BotCommand):
                 return IRCResponse("Remove what?", message.replyTo)
             tells = [x for x in self.storage["tells"] if x["from"].lower() == message.user.nick.lower()]
             for tell in tells:
-                if re2.search(" ".join(params), b64ToStr(tell["body"]), re2.IGNORECASE):
+                if re.search(" ".join(params), b64ToStr(tell["body"]), re.IGNORECASE):
                     self.storage["tells"].remove(tell)
                     m = "Message {!r} was removed from the message database.".format(_parseSentTell(tell))
                     return IRCResponse(m, message.user.nick, ResponseType.Notice)

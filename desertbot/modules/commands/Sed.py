@@ -10,12 +10,8 @@ from zope.interface import implementer
 
 from desertbot.moduleinterface import IModule, ignore
 from desertbot.modules.commandinterface import BotCommand
+from desertbot.utils.regex import re
 
-try:
-    import re2
-except ImportError:
-    import re as re2
-import re
 import sre_constants
 
 from desertbot.message import IRCMessage
@@ -132,7 +128,7 @@ class Sed(BotCommand):
             newMessage = copy.copy(inputMessage)
 
             try:
-                searchC = re2.compile(search, subFlags)
+                searchC = re.compile(search, subFlags)
                 new = searchC.sub(replace, text, count)
             except sre_constants.error as e:
                 newMessage.messageString = "[Regex Error in Sed pattern: {}]".format(e.message)
@@ -149,7 +145,7 @@ class Sed(BotCommand):
 
         for message in reversed(messages):
             try:
-                searchC = re2.compile(search, subFlags)
+                searchC = re.compile(search, subFlags)
                 new = searchC.sub(replace, message.messageString, count)
             except sre_constants.error as e:
                 newMessage = copy.copy(inputMessage)

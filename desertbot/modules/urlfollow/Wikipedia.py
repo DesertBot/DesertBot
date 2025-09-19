@@ -10,7 +10,7 @@ from zope.interface import implementer
 from desertbot.message import IRCMessage
 from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
-import re2 as re
+from desertbot.utils.regex import re
 
 WIKIPEDIA_URL_RE = re.compile(r"(?i)en\.(?:m.)?wikipedia\.org/wiki/(?P<title>[^#\s]+)(?:#(?P<section>\S+))?")
 @implementer(IPlugin, IModule)

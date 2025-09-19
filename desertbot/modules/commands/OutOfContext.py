@@ -12,11 +12,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 from desertbot.utils import string
-
-try:
-    import re2
-except ImportError:
-    import re as re2
+from desertbot.utils.regex import re
 
 
 @implementer(IPlugin, IModule)
@@ -37,7 +33,7 @@ class OutOfContext(BotCommand):
         if message.targetType == TargetTypes.USER:
             return IRCResponse("You can only add messages from channels.", message.replyTo)
 
-        regex = re2.compile(re2.escape(" ".join(message.parameterList[1:])), re2.IGNORECASE)
+        regex = re.compile(re.escape(" ".join(message.parameterList[1:])), re.IGNORECASE)
         if len(self.messageStore) == 0 or message.channel not in self.messageStore:
             return IRCResponse("Sorry, there are no messages in my buffer.", message.replyTo)
 
@@ -63,7 +59,7 @@ class OutOfContext(BotCommand):
             return IRCResponse("Remove what?", message.replyTo)
         if len(self.storage) == 0 or message.replyTo not in self.storage:
             return IRCResponse("There are no quotes in the log.", message.replyTo)
-        regex = re2.compile(" ".join(message.parameterList[1:]), re2.IGNORECASE)
+        regex = re.compile(" ".join(message.parameterList[1:]), re.IGNORECASE)
         matches = list(filter(regex.search, self.storage[message.replyTo]))
         if len(matches) == 0:
             return IRCResponse("That message is not in the log.", message.replyTo)
@@ -132,19 +128,19 @@ class OutOfContext(BotCommand):
     def _postList(self, source, searchString, searchNickname):
         if len(self.storage) == 0 or source not in self.storage:
             return IRCResponse("There are no quotes in the log.", source)
-        regex = re2.compile(searchString, re2.IGNORECASE)
+        regex = re.compile(searchString, re.IGNORECASE)
         matches = []
         if searchNickname:
             for x in self.storage[source]:
                 if x[21] == "*":
-                    match = re2.search(regex, x[:x.find(" ", 23)])
+                    match = re.search(regex, x[:x.find(" ", 23)])
                 else:
-                    match = re2.search(regex, x[x.find("<") + 1:x.find(">")])
+                    match = re.search(regex, x[x.find("<") + 1:x.find(">")])
                 if match:
                     matches.append(x)
         else:
             for x in self.storage[source]:
-                if re2.search(regex, x[x.find(">") + 1:]):
+                if re.search(regex, x[x.find(">") + 1:]):
                     matches.append(x)
         if len(matches) == 0:
             return IRCResponse(f"No matches for '{searchString}' found.", source)
@@ -158,19 +154,19 @@ class OutOfContext(BotCommand):
     def _getQuote(self, source, searchString, searchNickname, index):
         if len(self.storage) == 0 or source not in self.storage:
             return IRCResponse("There are no quotes in the log.", source)
-        regex = re2.compile(searchString, re2.IGNORECASE)
+        regex = re.compile(searchString, re.IGNORECASE)
         matches = []
         if searchNickname:
             for x in self.storage[source]:
                 if x[21] == "*":
-                    match = re2.search(regex, x[:x.find(" ", 23)])
+                    match = re.search(regex, x[:x.find(" ", 23)])
                 else:
-                    match = re2.search(regex, x[x.find("<") + 1:x.find(">")])
+                    match = re.search(regex, x[x.find("<") + 1:x.find(">")])
                 if match:
                     matches.append(x)
         else:
             for x in self.storage[source]:
-                if re2.search(regex, x[x.find(">") + 1:]):
+                if re.search(regex, x[x.find(">") + 1:]):
                     matches.append(x)
         if len(matches) == 0:
             return IRCResponse(f"No matches for '{searchString}' found.", source)
@@ -192,7 +188,7 @@ class OutOfContext(BotCommand):
         if len(query) > 1:
             subCommand = query[1].lower()
             if subCommand in self.subCommands:
-                return ('{1}outofcontext {0}' .format(re2.sub(r"\s+", " ", self.subCommands[subCommand].__doc__),
+                return ('{1}outofcontext {0}' .format(re.sub(r"\s+", " ", self.subCommands[subCommand].__doc__),
                         self.bot.commandChar))
             else:
                 return self._unrecognizedSubcommand(subCommand)
