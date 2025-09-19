@@ -14,7 +14,7 @@ parsedatetime==2.6
 psutil==7.0.0
 pyhedrals==0.2.0
 pymediawiki==0.7.5
-pyre2==0.3.6
+pyre2-updated==0.3.9.post1
 python-dateutil==2.9.0.post0
 pytimeparse==1.1.8
 pytz==2025.2

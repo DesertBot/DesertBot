@@ -6,11 +6,7 @@ from typing import List, Union, Dict
 from desertbot.message import IRCMessage
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
-
-try:
-    import re2
-except ImportError:
-    import re as re2
+from desertbot.utils.regex import re
 
 
 class BaseWeatherCommand(BotCommand):
@@ -23,7 +19,7 @@ class BaseWeatherCommand(BotCommand):
         if query and len(query) > 1:
             subCommand = query[1].lower()
             if subCommand in self.subCommands:
-                doc = re2.sub(r"\s+", " ", self.subCommands[subCommand].__doc__)
+                doc = re.sub(r"\s+", " ", self.subCommands[subCommand].__doc__)
                 return f"{self.bot.commandChar}{self.triggers()[0]} {doc}"
             else:
                 return self._unrecognizedSubcommand(subCommand)

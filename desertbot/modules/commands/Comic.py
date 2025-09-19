@@ -19,11 +19,7 @@ from desertbot.moduleinterface import IModule
 from desertbot.modules.commandinterface import BotCommand
 from desertbot.response import IRCResponse
 from desertbot.utils import string
-
-try:
-    import re2
-except ImportError:
-    import re as re2
+from desertbot.utils.regex import re
 
 
 CHARS_PATH = 'data/comics/chars'
@@ -85,7 +81,7 @@ class Comic(BotCommand):
 
         messages = self.getMessages(message.replyTo)
         if len(params) > 0:
-            regex = re2.compile(" ".join(params), re2.IGNORECASE)
+            regex = re.compile(" ".join(params), re.IGNORECASE)
             matches = list(filter(regex.search, [msg[1] for msg in messages]))
             if len(matches) == 0:
                 return IRCResponse("Sorry, that didn't match anything in my message buffer.", message.replyTo)
@@ -171,7 +167,7 @@ class Comic(BotCommand):
         lastChar = None
         for message in messages:
             msgTxt = message[1]
-            regex = re2.compile(r"(https?://|www\.)[^\s]+", re2.IGNORECASE)
+            regex = re.compile(r"(https?://|www\.)[^\s]+", re.IGNORECASE)
             for url in filter(regex.match, msgTxt.split(" ")):
                 shortenedUrl = self.bot.moduleHandler.runActionUntilValue("shorten-url", url)
                 if shortenedUrl:
