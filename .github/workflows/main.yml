@@ -24,11 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Set up python 3.10 for linting and comics test script
-      - name: Set up python3.10
+      # Set up python 3.11 for linting and comics test script
+      - name: Set up python3.11
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       # Install pyflakes linter, pillow dependency for comics test script, and build image for IRCd used in tests
       - name: Install testing dependencies
