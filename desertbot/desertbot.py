@@ -60,7 +60,8 @@ class DesertBot(IRCBase, object):
             self.capabilities['available'].append('sasl')
 
         self.rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-        self.dataPath = os.path.join(self.rootDir, 'data', self.server)
+        dataDir = os.path.splitext(os.path.basename(self.config.configFile))[0]
+        self.dataPath = os.path.join(self.rootDir, 'data', 'servers', dataDir)
         if not os.path.exists(self.dataPath):
             os.makedirs(self.dataPath)
 

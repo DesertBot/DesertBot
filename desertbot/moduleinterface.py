@@ -132,7 +132,7 @@ class BotModule(object):
         self.bot = bot
 
     def loadDataStore(self):
-        dataRootPath = os.path.join(self.bot.rootDir, 'data', 'servers', self.bot.server)
+        dataRootPath = self.bot.dataPath
         defaultRootPath = os.path.join(self.bot.rootDir, 'data', 'defaults')
 
         self.storage = DataStore(storagePath=os.path.join(dataRootPath, f'{self.__class__.__name__}.json'),
