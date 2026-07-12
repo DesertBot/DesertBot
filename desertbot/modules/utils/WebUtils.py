@@ -145,7 +145,7 @@ class WebUtils(BotModule):
         return
 
     def shortenURL(self, url: str) -> str:
-        apiURL = 'https://dbco.link/u'
+        apiURL = 'https://paste.heufneutje.net/u'
         post = {'content': url}
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json'}
@@ -194,7 +194,7 @@ class WebUtils(BotModule):
                         .format(jsonResult["errorcode"], jsonResult["error"]))
 
     def pasteDBCO(self, data: str, expire: int=0, vanity: str=None) -> str:
-        apiURL = 'https://dbco.link/'
+        apiURL = 'https://paste.heufneutje.net/'
         post = {"content": data,
                 "sunset": expire}
         headers = {'Content-Type': 'application/json',

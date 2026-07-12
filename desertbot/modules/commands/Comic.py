@@ -136,7 +136,7 @@ class Comic(BotCommand):
         self.messageStore[message.replyTo] = messages
 
     def postComic(self, comicObject):
-        apiUrl = 'https://dbco.link/'
+        apiUrl = 'https://paste.heufneutje.net/'
         postData = {'c': ('comic.png', comicObject, 'application/octet-stream')}
         headers = {'Accept': 'application/json'}
 
