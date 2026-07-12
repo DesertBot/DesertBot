@@ -70,11 +70,6 @@
 :server PRIVMSG #dev :!epic
 :server PRIVMSG #dev :!epic next
 
-:server PRIVMSG #dev :!wiki randomness
-:server PRIVMSG #dev :!wiki Appel
-:server PRIVMSG #dev :!wiki search Banana
-:server PRIVMSG #dev :!wiki random
-
 :server PRIVMSG #dev :you've gotta have a longer message, like this one
 :server PRIVMSG #dev :**ones
 
